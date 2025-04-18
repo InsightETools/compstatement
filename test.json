@@ -1,149 +1,149 @@
 {
-  "company_name": "",
-  "logo_url": "",
-  "company_address1": "",
-  "company_address2": "",
-  "company_city": "",
-  "company_state": "",
-  "company_zip": "",
-  "company_phone": "",
-  "company_email": "",
-  "companyRep": "",
-  "companyRepTitle": "",
-  "signature_url": "",
-  "employee_name": "Corbin Harder",
-  "employee_firstname": "",
-  "employee_position": "",
-  "employee_status": "",
-  "wage": "",
-  "employee_address1": "",
-  "employee_address2": "",
-  "employee_city": "",
-  "employee_state": "",
-  "employee_zip": "",
-  "primary_color": "",
-  "secondary_color": "",
-  "statement_year": "",
-  "effective_date": "",
-  "statement_start": "",
-  "statement_end": "",
-  "statement_subheader": "",
+  "company_name": "Brightwave Solutions",
+  "logo_url": "https://example.com/assets/logo.png",
+  "company_address1": "123 Innovation Way",
+  "company_address2": "Suite 500",
+  "company_city": "San Francisco",
+  "company_state": "CA",
+  "company_zip": "94107",
+  "company_phone": "(415) 555-1234",
+  "company_email": "hr@brightwavesolutions.com",
+  "companyRep": "Samantha Lee",
+  "companyRepTitle": "Director of Human Resources",
+  "signature_url": "https://example.com/assets/signature.png",
+  "employee_name": "Jordan Smith",
+  "employee_firstname": "Jordan",
+  "employee_position": "Product Manager",
+  "employee_status": "Full-Time",
+  "wage": "$105,000",
+  "employee_address1": "456 Elm Street",
+  "employee_address2": "Apt 12B",
+  "employee_city": "Oakland",
+  "employee_state": "CA",
+  "employee_zip": "94607",
+  "primary_color": "#0057B8",
+  "secondary_color": "#FDB813",
+  "statement_year": "2024",
+  "effective_date": "2024-12-31",
+  "statement_start": "2024-01-01",
+  "statement_end": "2024-12-31",
+  "statement_subheader": "Your 2024 Total Compensation Summary",
   "modules": [
     {
       "compa-ratio": {
-        "label": "",
+        "label": "Compa-Ratio",
         "tiers": [
           {
-            "value": 0,
-            "color": ""
+            "value": 1,
+            "color": "#4CAF50"
           }
         ],
-        "ratio_values": [0],
-        "compa_ratio": 0,
-        "position": 0,
-        "icon_url": ""
+        "ratio_values": [0.95],
+        "compa_ratio": 0.95,
+        "position": 1,
+        "icon_url": "https://example.com/icons/compa-ratio.png"
       },
       "current_pay": {
-        "label": "0",
-        "pay_value": 0,
-        "pay_range": [0]
+        "label": "Annual Base Pay",
+        "pay_value": 105000,
+        "pay_range": [90000, 120000]
       },
       "pay_grade": {
-        "label": "",
-        "grade_index": 0
+        "label": "Grade 8",
+        "grade_index": 3
       }
     }
   ],
   "contributors": [
     {
-      "name": "",
-      "color": "",
-      "total": 0
+      "name": "Brightwave Solutions",
+      "color": "#0057B8",
+      "total": 15200
     }
   ],
   "compensation_table": [
     {
-      "name": "",
+      "name": "Annual Compensation",
       "columns": {
         "enrolled": null,
         "employee": null,
         "company": null,
-        "components": ["ORIC Paid", "Employee", "Total"],
+        "components": ["Company Paid", "Employee", "Total"],
         "categories": [
           {
             "Label": "Cash Compensation",
-            "Color": "",
+            "Color": "#4CAF50",
             "chart": null,
             "items": [
               {
-                "id": "",
+                "id": "ot",
                 "label": "Overtime",
-                "description": "",
+                "description": "Extra hours worked beyond 40 hrs/week",
                 "link": null,
-                "enrolled": null,
-                "contributions": ["0", "0", "0"]
+                "enrolled": true,
+                "contributions": ["$0", "$3,000", "$3,000"]
               }
             ],
-            "grouptotal": ["", "$12,858", ""]
+            "grouptotal": ["", "$108,000", "$108,000"]
           }
         ]
       },
       "table_total": {
-        "label": "",
-        "summarytabletotals": ["", "$12,858", ""]
+        "label": "Total Compensation",
+        "summarytabletotals": ["", "$108,000", "$108,000"]
       }
     }
   ],
   "timeoff_table": [
     {
-      "name": "",
-      "columns": [""],
+      "name": "Time Off Benefits",
+      "columns": ["Available"],
       "categories": [
         {
-          "Label": "",
-          "short_label": "",
-          "Color": "",
+          "Label": "Paid Time Off",
+          "short_label": "PTO",
+          "Color": "#2196F3",
           "chart": null,
           "items": [
             {
-              "id": "",
-              "label": "",
-              "description": "",
-              "contributions": [0],
-              "total": 0,
+              "id": "pto",
+              "label": "Paid Time Off",
+              "description": "Vacation and sick time",
+              "contributions": [120],
+              "total": 120,
               "chart": null
             }
           ]
         }
       ],
       "table_total": {
-        "label": "",
-        "totals": [0]
+        "label": "Total PTO Hours",
+        "totals": [120]
       }
     }
   ],
   "chartcomponents": [
     {
       "componenttag": "totalcomp",
-      "total": "$5,000",
+      "total": "$108,000",
       "categories": [
         {
           "name": "Cash",
-          "percent": 15.2,
-          "amount": "$48,757",
-          "color": "1,7,8"
+          "percent": 100,
+          "amount": "$108,000",
+          "color": "0,123,255"
         }
       ]
     },
     {
       "componenttag": "benefitcomparison",
-      "total": "$3,000",
+      "total": "$18,500",
       "categories": [
         {
-          "name": "Employee",
-          "percent": 42.8,
-          "amount": "$48,757",
-          "color": "1,7,8"
+          "name": "Employer Contribution",
+          "percent": 100,
+          "amount": "$18,500",
+          "color": "255,193,7"
         }
       ]
     }
@@ -154,21 +154,21 @@
       "name": "2024 Additional Benefits & Perks",
       "list": [
         {
-          "text": "$75 Communication reimburemnetlkjaslkdfj",
+          "text": "$75 Communication reimbursement",
           "url": null
         },
         {
           "text": "2 Free Erasers a month!",
-          "url": "https://kawaiipenshop.com/collections/erasers-correction-tapes-and-sharpeners?srsltid=AfmBOoo2LRUvtJWpt1qO658g1kG82ObcEOC4negkojqMUhJ6oiNqphCY"
+          "url": "https://kawaiipenshop.com/collections/erasers-correction-tapes-and-sharpeners"
         }
       ]
     },
     {
       "listtag": "list2",
-      "name": "2024 Special STfuf",
+      "name": "2024 Special Stuff",
       "list": [
         {
-          "text": "$75 Communication reimburemnetlkjaslkdfj",
+          "text": "$500 Wellness Reimbursement",
           "url": null
         }
       ]
