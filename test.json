@@ -68,7 +68,6 @@
         "enrolled": null,
         "employee": null,
         "company": null,
-        "components": ["ORIC Paid", "Employee", "Total"],
         "categories": [
           {
             "Label": "Cash Compensation",
