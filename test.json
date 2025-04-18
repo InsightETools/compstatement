@@ -30,7 +30,7 @@
   "statement_subheader": "Your 2024 Total Compensation Summary",
   "modules": [
     {
-      "compa-ratio": {
+      "compa_ratio": {
         "label": "Compa-Ratio",
         "tiers": [
           {
