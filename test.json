@@ -1,11 +1,11 @@
 {
   "employee_name": "Dana Test",
   "employee_address": "123 some place",
-  "employee_address_two": null,
+  "employee_address_two": "",
   "employee_city": "Kennewick",
   "employee_state": "WA",
   "emplyee_zip": "60515",
-  "employee_pay": "77,112.36",
+  "employee_pay": "77112.36",
   "employee_position": "Special Events Manager",
   "pay_grade": "17",
   "compa_ratio": "0.93",
