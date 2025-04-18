@@ -1,177 +1,94 @@
 {
-  "company_name": "Brightwave Solutions",
-  "logo_url": "https://example.com/assets/logo.png",
-  "company_address1": "123 Innovation Way",
-  "company_address2": "Suite 500",
-  "company_city": "San Francisco",
-  "company_state": "CA",
-  "company_zip": "94107",
-  "company_phone": "(415) 555-1234",
-  "company_email": "hr@brightwavesolutions.com",
-  "companyRep": "Samantha Lee",
-  "companyRepTitle": "Director of Human Resources",
-  "signature_url": "https://example.com/assets/signature.png",
-  "employee_name": "Jordan Smith",
-  "employee_firstname": "Jordan",
-  "employee_position": "Product Manager",
-  "employee_status": "Full-Time",
-  "wage": "$105,000",
-  "employee_address1": "456 Elm Street",
-  "employee_address2": "Apt 12B",
-  "employee_city": "Oakland",
-  "employee_state": "CA",
-  "employee_zip": "94607",
-  "primary_color": "#0057B8",
-  "secondary_color": "#FDB813",
-  "statement_year": "2024",
-  "effective_date": "2024-12-31",
-  "statement_start": "2024-01-01",
-  "statement_end": "2024-12-31",
-  "statement_subheader": "Your 2024 Total Compensation Summary",
-  "modules": [
-    {
-      "compa_ratio": {
-        "label": "Compa-Ratio",
-        "tiers": [
-          {
-            "value": 1,
-            "color": "#4CAF50"
-          }
-        ],
-        "ratio_values": [0.95],
-        "compa_ratio": 0.95,
-        "position": 1,
-        "icon_url": "https://example.com/icons/compa-ratio.png"
-      },
-      "current_pay": {
-        "label": "Annual Base Pay",
-        "pay_value": 105000,
-        "pay_range": [90000, 120000]
-      },
-      "pay_grade": {
-        "label": "Grade 8",
-        "grade_index": 3
-      }
-    }
-  ],
-  "contributors": [
-    {
-      "name": "Brightwave Solutions",
-      "color": "#0057B8",
-      "total": 15200
-    }
-  ],
-  "compensation_table": [
-    {
-      "name": "Annual Compensation",
-      "columns": {
-        "enrolled": null,
-        "employee": null,
-        "company": null,
-        "components": ["Company Paid", "Employee", "Total"],
-        "categories": [
-          {
-            "Label": "Cash Compensation",
-            "Color": "#4CAF50",
-            "chart": null,
-            "items": [
-              {
-                "id": "ot",
-                "label": "Overtime",
-                "description": "Extra hours worked beyond 40 hrs/week",
-                "link": null,
-                "enrolled": true,
-                "contributions": ["$0", "$3,000", "$3,000"]
-              }
-            ],
-            "grouptotal": ["", "$108,000", "$108,000"]
-          }
-        ]
-      },
-      "table_total": {
-        "label": "Total Compensation",
-        "summarytabletotals": ["", "$108,000", "$108,000"]
-      }
-    }
-  ],
-  "timeoff_table": [
-    {
-      "name": "Time Off Benefits",
-      "columns": ["Available"],
-      "categories": [
-        {
-          "Label": "Paid Time Off",
-          "short_label": "PTO",
-          "Color": "#2196F3",
-          "chart": null,
-          "items": [
-            {
-              "id": "pto",
-              "label": "Paid Time Off",
-              "description": "Vacation and sick time",
-              "contributions": [120],
-              "total": 120,
-              "chart": null
-            }
-          ]
-        }
-      ],
-      "table_total": {
-        "label": "Total PTO Hours",
-        "totals": [120]
-      }
-    }
-  ],
-  "chartcomponents": [
-    {
-      "componenttag": "totalcomp",
-      "total": "$108,000",
-      "categories": [
-        {
-          "name": "Cash",
-          "percent": 100,
-          "amount": "$108,000",
-          "color": "0,123,255"
-        }
-      ]
-    },
-    {
-      "componenttag": "benefitcomparison",
-      "total": "$18,500",
-      "categories": [
-        {
-          "name": "Employer Contribution",
-          "percent": 100,
-          "amount": "$18,500",
-          "color": "255,193,7"
-        }
-      ]
-    }
-  ],
-  "lists": [
-    {
-      "listtag": "list1",
-      "name": "2024 Additional Benefits & Perks",
-      "list": [
-        {
-          "text": "$75 Communication reimbursement",
-          "url": null
-        },
-        {
-          "text": "2 Free Erasers a month!",
-          "url": "https://kawaiipenshop.com/collections/erasers-correction-tapes-and-sharpeners"
-        }
-      ]
-    },
-    {
-      "listtag": "list2",
-      "name": "2024 Special Stuff",
-      "list": [
-        {
-          "text": "$500 Wellness Reimbursement",
-          "url": null
-        }
-      ]
-    }
-  ]
+  "employee_name": "Dana Test",
+  "employee_address": "123 some place",
+  "employee_address_two": "",
+  "employee_city": "Kennewick",
+  "employee_state": "WA",
+  "emplyee_zip": "60515",
+  "employee_pay": "77,112.36",
+  "employee_position": "Special Events Manager",
+  "pay_grade": "17",
+  "compa_ratio": "0.93",
+  "compa_ratio_minvalue": "64319",
+  "compa_ratio_midvalue": "82783",
+  "compa_ratio_maxvalue": "101349",
+  "compa_ratio_onepoint": "0.78",
+  "compa_ratio_twopoint": "0.93",
+  "compa_ratio_threepoint": "1.08",
+  "compa_ratio_fourpoint": "1.22",
+  "total_comp_value": "123456",
+  "total_comp_cash": "80",
+  "total_comp_benefits": "10",
+  "total_comp_mandatory": "8",
+  "total_comp_timeoff": "3",
+  "annualized_company": "80000",
+  "cash_subtotal_company": "80000",
+  "401k_enrolled": "Yes",
+  "401k_employee": "5397.87",
+  "401k_company": "4626.74",
+  "medical_enrolled": "Yes",
+  "medical_employee": "1894.44",
+  "medical": "5683.20",
+  "dental_enrolled": "Yes",
+  "dental_employee": "144.96",
+  "dental_company": "435.00",
+  "hsa_enrolled": "Yes",
+  "hsa_employee": "500.00",
+  "hsa_company": "1000.00",
+  "fsa_enrolled": "no",
+  "fsa_employee": "0",
+  "fsa_company": "0",
+  "arboretum_add_enrolled": "Yes",
+  "arboretum_add_employee": "301.32",
+  "arboretum_add_company": "0",
+  "disability_enrolled": "Yes",
+  "disability_employee": "171.48",
+  "disability_company": "91.00",
+  "wellness_enrolled": "Yes",
+  "wellness_employee": "0.00",
+  "wellness_company": "4780.97",
+  "benefits_subtotal_employee": "12345.22",
+  "benefits_subtotal_company": "12344.44",
+  "social_security_employee": "4780.97",
+  "social_security_company": "4780.97",
+  "workers_comp_employee": "0.00",
+  "workers_comp_company": "1118.13",
+  "mandatory_subtotal_employee": "8000",
+  "mandatory_subtotal_company": "8000",
+  "529_enrolled": "Yes",
+  "529_employee": "294.53",
+  "accident_enrolled": "Yes",
+  "accident_employee": "150.00",
+  "critical_enrolled": "Yes",
+  "critical_employee": "0.00",
+  "family_legal_enrolled": "no",
+  "family_legal_employee": "0.00",
+  "id_protection_enrolled": "no",
+  "id_protection_employee": "0.00",
+  "voluntary_add_enrolled": "no",
+  "voluntary_add_employee": "0.00",
+  "pet_insurance_enrolled": "no",
+  "pet_insurance_employee": "0.00",
+  "transit_enrolled": "no",
+  "transit_employee": "0.00",
+  "vision_enrolled": "no",
+  "vision__employee": "0.00",
+  "voluntary_subtotal_employee": "no",
+  "holidays_hours": "82.5",
+  "holidays_days": "11",
+  "holidays_value": "3262.45",
+  "sick_day_hours": "75",
+  "sick_day_days": "10",
+  "sick_day_value": "2965.86",
+  "vacation_hours": "112.5",
+  "vacation_days": "15.0",
+  "vacation_value": "4448.79",
+  "personal_hours": "8",
+  "personal_days": "1",
+  "personal_value": "35",
+  "timeoff_subtotal_hours": "42",
+  "timeoff_subtotal_days": "3",
+  "timeoff_subtotal_value": "500",
+  "ext_leave_hours": "7",
+  "ext_leave_days": "8"
 }
