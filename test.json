@@ -29,31 +29,31 @@
   "statement_end": "",
   "statement_subheader": "",
   "modules": [
-{
-    "compa-ratio": {
-      "label": "",
-      "tiers": [
-        {
-          "value": 0,
-          "color": ""
-        }
-      ],
-      "ratio_values": [0],
-      "compa_ratio": 0,
-      "position": 0,
-      "icon_url": ""
-    },
-    "current_pay": {
-      "label": "0",
-      "pay_value": 0,
-      "pay_range": [0]
-    },
-    "pay_grade": {
-      "label": "",
-      "grade_index": 0
+    {
+      "compa-ratio": {
+        "label": "",
+        "tiers": [
+          {
+            "value": 0,
+            "color": ""
+          }
+        ],
+        "ratio_values": [0],
+        "compa_ratio": 0,
+        "position": 0,
+        "icon_url": ""
+      },
+      "current_pay": {
+        "label": "0",
+        "pay_value": 0,
+        "pay_range": [0]
+      },
+      "pay_grade": {
+        "label": "",
+        "grade_index": 0
+      }
     }
-  }
-],
+  ],
   "contributors": [
     {
       "name": "",
@@ -67,29 +67,30 @@
       "columns": {
         "enrolled": null,
         "employee": null,
-        "company": null
-	"components": ["ORIC Paid","Employee","Total"],
-	"categories": [
-        {
-          "Label": "Cash Compensation",
-          "Color": "",
-          "chart": null,
-          "items": [
-            {
-              "id": "",
-              "label": "Overtime",
-              "description": "",
-		"link": null,
-              "enrolled": null,
-              "contributions": ["0","0","0"],
-            }
-          ],
-	"grouptotal" : ["","$12,858",""],
-        }
-      ],
+        "company": null,
+        "components": ["ORIC Paid", "Employee", "Total"],
+        "categories": [
+          {
+            "Label": "Cash Compensation",
+            "Color": "",
+            "chart": null,
+            "items": [
+              {
+                "id": "",
+                "label": "Overtime",
+                "description": "",
+                "link": null,
+                "enrolled": null,
+                "contributions": ["0", "0", "0"]
+              }
+            ],
+            "grouptotal": ["", "$12,858", ""]
+          }
+        ]
+      },
       "table_total": {
         "label": "",
-        "summarytabletotals": ["","$12,858",""]
+        "summarytabletotals": ["", "$12,858", ""]
       }
     }
   ],
@@ -121,56 +122,56 @@
       }
     }
   ],
-"chartcomponents": [
-	{
-		"componenttag":"totalcomp",
-		"total": "$5,000"
-		"categories":[
-			{
-				"name":"Cash"
-				"percent": 15.2,
-				"amount": "$48,757",
-				"color": "1,7,8"
-			}
-		]
-	},
-	{
-		"componenttag":"benefitcomparison",
-		"total": "$3,000"
-		"categories":[
-			{
-				"name":"Employee"
-				"percent": 42.8,
-				"amount": "$48,757",
-				"color": "1,7,8"
-			}
-		]
-	}
-],
+  "chartcomponents": [
+    {
+      "componenttag": "totalcomp",
+      "total": "$5,000",
+      "categories": [
+        {
+          "name": "Cash",
+          "percent": 15.2,
+          "amount": "$48,757",
+          "color": "1,7,8"
+        }
+      ]
+    },
+    {
+      "componenttag": "benefitcomparison",
+      "total": "$3,000",
+      "categories": [
+        {
+          "name": "Employee",
+          "percent": 42.8,
+          "amount": "$48,757",
+          "color": "1,7,8"
+        }
+      ]
+    }
+  ],
   "lists": [
     {
-	"listtag": "list1"
+      "listtag": "list1",
       "name": "2024 Additional Benefits & Perks",
       "list": [
-		{
-		"text":"$75 Communication reimburemnetlkjaslkdfj"
-		"url" : null
-		},
-		{
-		"text":"2 Free Erasers a month!"
-		"url" : "https://kawaiipenshop.com/collections/erasers-correction-tapes-and-sharpeners?srsltid=AfmBOoo2LRUvtJWpt1qO658g1kG82ObcEOC4negkojqMUhJ6oiNqphCY"
-		}
-	]
+        {
+          "text": "$75 Communication reimburemnetlkjaslkdfj",
+          "url": null
+        },
+        {
+          "text": "2 Free Erasers a month!",
+          "url": "https://kawaiipenshop.com/collections/erasers-correction-tapes-and-sharpeners?srsltid=AfmBOoo2LRUvtJWpt1qO658g1kG82ObcEOC4negkojqMUhJ6oiNqphCY"
+        }
+      ]
     },
-{
-	"listtag": "list2"
+    {
+      "listtag": "list2",
       "name": "2024 Special STfuf",
       "list": [
-		{
-		"text":"$75 Communication reimburemnetlkjaslkdfj"
-		"url" : null
-		}
-	]
+        {
+          "text": "$75 Communication reimburemnetlkjaslkdfj",
+          "url": null
+        }
+      ]
     }
   ]
 }
