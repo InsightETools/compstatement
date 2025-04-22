@@ -22,8 +22,8 @@
   "state_tax_employee": "E_TX",
   "comp_total_company": "C_CT",
   "comp_total_employee": "E_CT",
-  "comp_total_ratio": "R_CT",
-  "comp_cost_ratio": "R_CC",
+  "comp_total_ratio": 16.666,
+  "comp_cost_ratio": 16.666,
 
   "fica_company": "C_FI",
   "fica_employee": "E_FI",
@@ -37,8 +37,8 @@
   "state_unemployment_employee": "E_SU",
   "tax_total_company": "C_TT",
   "tax_total_employee": "E_TT",
-  "tax_total_ratio": "R_TTR",
-  "tax_cost_ratio": "R_TCR",
+  "tax_total_ratio": 16.666,
+  "tax_cost_ratio": 16.666,
 
   "medical_company": "C_ME",
   "medical_employee": "E_ME",
@@ -56,8 +56,8 @@
   "malpractice_employee": "E_MA",
   "insurance_total_company": "C_IN",
   "insurance_total_employee": "E_IN",
-  "insurance_total_ratio": "R_ITR",
-  "insurance_cost_ratio": "R_ICR",
+  "insurance_total_ratio": 16.666,
+  "insurance_cost_ratio": 16.666,
 
   "profit_share_company": "C_PS",
   "profit_share_employee": "E_PS",
@@ -65,8 +65,8 @@
   "cash_employee": "E_CA",  
   "retirement_total_company": "C_RT",
   "retirement_total_employee": "E_RT",
-  "retirement_total_ratio": "R_RTR",
-  "retirement_cost_ratio": "R_RCR",
+  "retirement_total_ratio": 16.666,
+  "retirement_cost_ratio": 16.666,
 
   "group_long_disability_company": "C_GL",
   "group_long_disability_employee": "E_GL",
@@ -74,8 +74,8 @@
   "life_add_employee": "E_LA",
   "income_protection_total_company": "C_IP",
   "income_protection_total_employee": "E_IP",
-  "income_protection_total_ratio": "R_IPR",
-  "income_protection_cost_ratio": "R_IPC",
+  "income_protection_total_ratio": 16.666,
+  "income_protection_cost_ratio": 16.666,
 
   "dues_fees_company": "C_DU",
   "dues_fees_employee": "E_DU",
@@ -87,8 +87,8 @@
   "additional_overhead_employee": "E_AO",
   "misc_total_company": "C_MS",
   "misc_total_employee": "E_MS",
-  "misc_total_ratio": "R_MSR",
-  "misc_cost_ratio": "R_MCR",
+  "misc_total_ratio": 16.666,
+  "misc_cost_ratio": 16.666,
 
   "total_comp_benefits_total": "R_TCB"
 }
