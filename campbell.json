@@ -69,7 +69,7 @@
   "group_long_disability_company": "C_GL",
   "group_long_disability_employee": "E_GL",
   "life_add_company": "C_LA",
-  "life_add_company": "E_LA",
+  "life_add_employee": "E_LA",
   "income_protection_total_company": "C_IP",
   "income_protection_total_employee": "E_IP",
   "income_protection_total_ratio": "R_IPR",
