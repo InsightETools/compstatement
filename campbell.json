@@ -58,7 +58,9 @@
   "insurance_cost_ratio": "R_ICR",
 
   "profit_share_company": "C_PS",
+  "profit_share_employee": "C_PS",
   "cash_company": "C_CA",
+  "cash_employee": "C_CA",  
   "retirement_total_company": "C_RT",
   "retirement_total_employee": "E_RT",
   "retirement_total_ratio": "R_RTR",
