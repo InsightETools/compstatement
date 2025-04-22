@@ -16,7 +16,6 @@
   "hsa_employee": "E_HS",
   "long_disability_company": "C_LD",
   "long_disability_employee": "E_LD",
-
   "ltd_company": "C_LT",
   "ltd_employee": "E_LT",
   "state_tax_company": "C_TX",
@@ -51,8 +50,8 @@
   "id_theft_employee": "E_ID",
   "umbrella_company": "C_UM",
   "umbrella_employee": "E_UM",
-  "malpractive_company": "C_MA",
-  "malpractive_employee": "E_MA",
+  "malpractice_company": "C_MA",
+  "malpractice_employee": "E_MA",
   "insurance_total_company": "C_IN",
   "insurance_total_employee": "E_IN",
   "insurance_total_ratio": "R_ITR",
