@@ -1,5 +1,5 @@
 {
-  "employee_name": "John Doe",
+  "employee_name": "John Do",
   "date_range": "January 2024 - December 2024",
   
   "total_comp": 198000,
@@ -47,7 +47,6 @@
       "company_subtotal": 2,
       "ratio": 2,
       "cost" : 2
-    },
+    }
   ]
 }
-
