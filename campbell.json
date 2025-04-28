@@ -31,7 +31,7 @@
     },{
       "label": "Category 2",
       "color": "#fa0000",
-      "e_contribute": false,
+      "e_contribute": true,
       "items": [
         {
           "label": "Line 1",
