@@ -10,7 +10,7 @@
   "employee_pay": "89340.000",
   "_coverage": "89340.000",
   "_enrolled": "true",
-  "_employee": "",
-  "_company": "",
-  "_total": "",
+  "_employee": "*",
+  "_company": "*",
+  "_total": "*",
 }
