@@ -1,6 +1,6 @@
 {
   "employee_name": "Jamal Reyes",
-  "employee_firstname": "NEW DATA",
+  "employee_firstname": "Jamal",
   "status": "full",
   "employee_address": "742 Redwood Trail",
   "employee_address_two": "Suite 10",
@@ -10,7 +10,7 @@
   "employee_pay": "89340.000",
   "_coverage": "89340.000",
   "_enrolled": true,
-  "_employee": "*",
-  "_company": "*",
-  "_total": "*",
+  "_employee": "",
+  "_company": "",
+  "_total": ""
 }
