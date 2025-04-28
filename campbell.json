@@ -1,5 +1,5 @@
 {
-  "employee_name": "John Do",
+  "employee_name": "John Doe",
   "date_range": "January 2024 - December 2024",
   
   "total_comp": 198000,
@@ -8,7 +8,7 @@
   "categories": [
     {
       "label": "Category 1",
-      "color": "#ffffff",
+      "color": "#35b1ea",
       "e_contribute": false,
       "items": [
         {
