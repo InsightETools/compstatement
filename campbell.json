@@ -1,18 +1,26 @@
 {
   "employee_name": "John Doe",
   "date_range": "January 2024 - December 2024",
+  
+  "total_comp": 198000,
+  "total_cost": 83000,
 
-  "total_comp_total": 198000,
-  "total_benefits_total": 83000,
-
-  "categories": {
-    "label": "Compensation",
-    "items": {
-      "label": "Annual Pay",
-      "color": "#ffffff",
-      "employee": "0",
-      "company": "80000.00",
-      "percent": "20",
+  "categories": [
+    {
+      "label": "Compensation",
+      "items": [
+        {
+          "label": "Annual Pay",
+          "employee": "0",
+          "company": "80000.00",
+          "percent": "20"
+        }
+      ],
+      "employee_subtotal": 0,
+      "company_subtotal": 80000,
+      "ratio": 80,
+      "cost" : 76
     }
-  },
+  ]
 }
+
