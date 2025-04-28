@@ -28,6 +28,28 @@
       "company_subtotal": 1,
       "ratio": 1,
       "cost" : 1
+    },{
+      "label": "Category 2",
+      "color": "#fa0000",
+      "e_contribute": false,
+      "items": [
+        {
+          "label": "Line 1",
+          "employee": "1",
+          "company": "1",
+          "percent": "1"
+        },
+        {
+          "label": "Line 2",
+          "employee": "2",
+          "company": "2",
+          "percent": "2"
+        }
+      ],
+      "employee_subtotal": 1,
+      "company_subtotal": 1,
+      "ratio": 1,
+      "cost" : 1
     }
   ]
 }
