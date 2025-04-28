@@ -7,20 +7,47 @@
 
   "categories": [
     {
-      "label": "Compensation",
+      "label": "Category 1",
       "items": [
         {
-          "label": "Annual Pay",
-          "employee": "0",
-          "company": "80000.00",
-          "percent": "20"
+          "label": "Line 1",
+          "employee": "1",
+          "company": "1",
+          "percent": "1"
+        },
+        {
+          "label": "Line 2",
+          "employee": "2",
+          "company": "2",
+          "percent": "2"
         }
       ],
-      "employee_subtotal": 0,
-      "company_subtotal": 80000,
-      "ratio": 80,
-      "cost" : 76
-    }
+      "employee_subtotal": 1,
+      "company_subtotal": 1,
+      "ratio": 1,
+      "cost" : 1
+    },
+    {
+      "label": "Category 2",
+      "items": [
+        {
+          "label": "Line 1",
+          "employee": "1",
+          "company": "1",
+          "percent": "1"
+        },
+        {
+          "label": "Line 2",
+          "employee": "2",
+          "company": "2",
+          "percent": "2"
+        }
+      ],
+      "employee_subtotal": 2,
+      "company_subtotal": 2,
+      "ratio": 2,
+      "cost" : 2
+    },
   ]
 }
 
