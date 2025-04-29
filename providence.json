@@ -1,16 +1,3 @@
 {
-  "employee_name": "Jamal Reyes",
-  "employee_firstname": "Jamal",
-  "status": "full",
-  "employee_address": "742 Redwood Trail",
-  "employee_address_two": "Suite 10",
-  "employee_city": "Spokane",
-  "employee_state": "WA",
-  "employee_zip": "99201",
-  "employee_pay": "89340.000",
-  "_coverage": "89340.000",
-  "_enrolled": true,
-  "_employee": "",
-  "_company": "",
-  "_total": ""
+
 }
