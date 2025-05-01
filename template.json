@@ -1,3 +1,4 @@
+
 {
   "statementYear": "2024",
   "statemenntRange": "January 1, 2024 - December 31, 2024",
@@ -5,7 +6,6 @@
   "primaryColor": "#004aad",
   "secondaryColor": "#f1f5f9",
   "tertiaryColor": "#1e293b",
-
   "companyName": "Northwest Tech Solutions",
   "logoURL": "https://example.com/logo.png",
   "companyStreet": "123 Innovation Way",
@@ -15,7 +15,6 @@
   "companyZip": "98101",
   "companyRep": "Jordan Matthews",
   "signatureURL": "https://example.com/signature.png",
-
   "employeeFirstName": "Emily",
   "employeeLastName": "Rogers",
   "employeeStreet": "456 Evergreen Ln",
@@ -23,12 +22,10 @@
   "employeeCity": "Tacoma",
   "employeeState": "WA",
   "employeeZip": "98402",
-
   "employeeSalary": "$75,000",
   "employeeWage": "$36.06/hr",
   "employeeComp": "$85,000",
   "employeeStatus": "Full-time",
-
   "listings": [
     {
       "listing": "Health & Benefits",
