@@ -1,1 +1,63 @@
+{
+"statementYear": "", [item=statementYear]
+"statemenntRange": "", [item=statmentRange]
+"statementEffective": "", [item=statementEffective]
+"primaryColor": "", [color=primary],
+"secondaryColor": "", [color=secondary],
+"tertiaryColor": "", [color=tertiary]
 
+"companyName": "", [item=companyName]
+"logoURL": "", [link=logoURL]
+"companyStreet": "", [item=companyStreet]
+"companyUnit": "", [item=companyUnit]
+"companyCity": "", [item=companyCity]
+"companyState": "", [item=companyState]
+"companyZip": "", [item=companyZip]
+"companyRep": "", [item=companyRep]
+"signatureURL": "", [link=signature]
+
+"employeeFirstName": "", [item=employeeFirstName
+"employeeLastName": "", [item=employeeLastName]
+"employeeStreet": "", [item=employeeStreet]
+"employeeUnit": "", [item=employeeUnit]
+"employeeCity": "", [item=employeeCity]
+"employeeState": "", [item=employeeState]
+"employeeZip": "", [item=employeeZip]
+
+"employeeSalary": "", [item=employeeSalary]
+"employeeWage": "", [item=employeeWage]
+"employeeComp": "", [item=employeeComp]
+"employeeStatus": "", [item=employeeStatus]
+
+"listings": [ [item=listings]
+  {
+    "listing": "", [item=listing]
+    "headerColor": "", [header=color]
+    "listingName": "", [header=label]
+    "listingDetails": true, [header=details]
+    "listingEnrolled": true, [header=enrolled]
+    "listingEmployee": true, [header=employee]
+    "listingEmployer": true, [header=employer]
+    "listingTotal": true, [header=total]
+    "categories": [
+      {
+        "category": "", [category=label]
+        "iconColor": "", [cateogry=icon]
+        "listings": [ [item=line]
+          {
+            "listing": "", [line=label]
+            "detail": "", [line=detail]
+            "enrolled": true, [line=enrolled]
+            "employee": "", [line=employee]
+            "company": "", [line=employer]
+            "total": "" [line=total]
+          },
+        ],
+        "employeeSubtotal": "", [subtotal=employee]
+        "employerSubtotal": "", [subtotal=employer]
+        "totalSubtotal": "" [subtotal=total]
+      },
+    ],
+  },
+],
+}
