@@ -80,60 +80,6 @@
           "totalSubtotal": "$600"
         }
       ]
-    },
-    {
-      "listing": "Test",
-      "headerColor": "#0ea5e9",
-      "listingName": "Test",
-      "listingDetails": true,
-      "listingEnrolled": true,
-      "listingEmployee": true,
-      "listingEmployer": true,
-      "listingTotal": true,
-      "categories": [
-        {
-          "category": "asdf",
-          "iconColor": "#3b82f6",
-          "listings": [
-            {
-              "listing": "Medical PPO Plan",
-              "detail": "Blue Cross Blue Shield PPO",
-              "enrolled": true,
-              "employee": "$2,400",
-              "company": "$6,000",
-              "total": "$8,400"
-            },
-            {
-              "listing": "Prescription Coverage",
-              "detail": "Included with medical plan",
-              "enrolled": true,
-              "employee": "$200",
-              "company": "$600",
-              "total": "$800"
-            }
-          ],
-          "employeeSubtotal": "$2,600",
-          "employerSubtotal": "$6,600",
-          "totalSubtotal": "$9,200"
-        },
-        {
-          "category": "Dental",
-          "iconColor": "#f59e0b",
-          "listings": [
-            {
-              "listing": "Dental Plan",
-              "detail": "Delta Dental Basic",
-              "enrolled": true,
-              "employee": "$150",
-              "company": "$450",
-              "total": "$600"
-            }
-          ],
-          "employeeSubtotal": "$150",
-          "employerSubtotal": "$450",
-          "totalSubtotal": "$600"
-        }
-      ]
     }
   ]
 }
