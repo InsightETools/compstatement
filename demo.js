@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (test) {
     fetchUrl = 
-    "https://enchanting-otter-cfb0ff.netlify.app/demo.json";
+    "https://https://compstatementdemo.netlify.app/demo.json";
   } else {
     fetchUrl = `${baseUrl}?${queryParams}`;
   }
