@@ -17,23 +17,23 @@
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "John Smith",
-  "employeeFirstName": "John",
-  "employeeTitle": "Software Engineer",
-  "employeeSalary": "95000",
-  "employeeWage": "45",
-  "employeeAddress": "1225 Innovation Blvd",
-  "employeeUnit": "Floor 3",
-  "employeeCity": "Pasco",
+  "employeeName": "Sally Smith",
+  "employeeFirstName": "Sally",
+  "employeeTitle": "Marketing Specialist",
+  "employeeSalary": "75000",
+  "employeeWage": "35",
+  "employeeAddress": "1110 N Center Parkway",
+  "employeeUnit": "Suite B",
+  "employeeCity": "Kennewick",
   "employeeState": "WA",
-  "employeeZip": "99301",
+  "employeeZip": "99336",
   "statementTitle": "Total Compensation & Benefits Statement",
   "statementRange": "January 2024 - December 2024",
   "statementYear": "2025",
   "lookbackYear": "2024",
   "lookbackMessage": "",
   "lookaheadYear": "2025",
-  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off\u2014offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
+  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off—offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
   "statementEffectiveDate": "January 2025",
   "statementDisclaimer": "IMPORTANT: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details. Policy forms for your reference will be made available upon request. In the case of any discrepancy between this statement of benefits and the paper enrollment form completed by the employee, the paper enrollment form will prevail.",
   "primaryColor": "#f5c527",
@@ -49,31 +49,31 @@
       "label": "Total Compensation",
       "description": "Employer contributions to your total compensation package, including benefits and cash",
       "disclaimer": "",
-      "totalValue": 100,
+      "totalValue": 65000,
       "groups": [
         {
           "relatedGroupId": 0,
           "label": "Cash",
           "color": "#b89237",
-          "value": 50
+          "value": 20
         },
         {
           "relatedGroupId": 1,
           "label": "Health",
           "color": "#063d69",
-          "value": 20
+          "value": 30
         },
         {
           "relatedGroupId": 2,
           "label": "Protection",
           "color": "#466c8a",
-          "value": 15
+          "value": 50
         },
         {
           "relatedGroupId": 2,
           "label": "Retirement",
           "color": "#5ee1ff",
-          "value": 15
+          "value": 50
         }
       ]
     },
@@ -85,19 +85,19 @@
       "label": "Total Benefits Costs",
       "description": "",
       "disclaimer": "Disclaimer goes here",
-      "totalValue": 100,
+      "totalValue": 15000,
       "groups": [
         {
           "relatedGroupId": 0,
           "label": "Employer",
           "color": "#b89237",
-          "value": 55
+          "value": 12
         },
         {
           "relatedGroupId": 1,
           "label": "Employee",
           "color": "#063d69",
-          "value": 45
+          "value": 88
         }
       ]
     }
@@ -114,7 +114,7 @@
         {
           "label": "Annual Salary",
           "type": "currency",
-          "value": "95000",
+          "value": "50000",
           "description": "Description goes here"
         }
       ]
@@ -130,19 +130,19 @@
         {
           "label": "",
           "type": "currency",
-          "value": "4000",
+          "value": "50000",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "6000",
+          "value": "",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "8000",
+          "value": "",
           "description": "Description goes here"
         }
       ]
@@ -158,19 +158,19 @@
         {
           "label": "Paid Time Off",
           "type": "currency",
-          "value": "12000",
+          "value": "50000",
           "description": ""
         },
         {
           "label": "Paid Holidays",
           "type": "currency",
-          "value": "3000",
+          "value": "15000",
           "description": ""
         },
         {
           "label": "Sick Days",
           "type": "currency",
-          "value": "2000",
+          "value": "10000",
           "description": ""
         }
       ]
@@ -186,7 +186,7 @@
         {
           "label": "Annual Salary",
           "type": "currency",
-          "value": "97000",
+          "value": "65000",
           "description": ""
         }
       ]
@@ -202,7 +202,7 @@
         {
           "label": "Total Compensation",
           "type": "currency",
-          "value": "108000",
+          "value": "75000",
           "description": ""
         }
       ]
@@ -218,20 +218,20 @@
         {
           "label": "Paid Time Off",
           "type": "currency",
-          "value": "8500",
+          "value": "50000",
           "description": "25 hours at your daily rate"
         },
         {
           "label": "",
           "type": "currency",
           "value": "",
-          "description": "11 paid & 2 floating"
+          "description": "12 paid & 1 floating"
         },
         {
           "label": "",
           "type": "currency",
           "value": "",
-          "description": "18 hours at your daily rate"
+          "description": "20 hours at your daily rate"
         }
       ]
     }
@@ -246,7 +246,7 @@
       "column3Name": "Employer",
       "column1Total": 0,
       "column2Total": 0,
-      "column3Total": 10000,
+      "column3Total": 56000,
       "totalLineName": "Total",
       "categories": [
         {
@@ -257,18 +257,18 @@
             {
               "label": "Salary",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Overtime",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 2000,
+          "col2_subtotal": 0,
           "col3_subtotal": null
         },
         {
@@ -279,30 +279,30 @@
             {
               "label": "Medical",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Life and AD&D",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Long Term Disability",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Employee Assistance Program",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 4000,
+          "col2_subtotal": 0,
           "col3_subtotal": null
         },
         {
@@ -313,12 +313,12 @@
             {
               "label": "401(k) Match",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 1000,
+          "col2_subtotal": 0,
           "col3_subtotal": null
         },
         {
@@ -329,24 +329,24 @@
             {
               "label": "Holiday Bonus",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Education & Other Cash Rewards",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             },
             {
               "label": "Retirement Plan Deposit (Deferred)",
               "col1_value": null,
-              "col2_value": 1000,
+              "col2_value": 0,
               "col3_value": null
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 3000,
+          "col2_subtotal": 0,
           "col3_subtotal": null
         }
       ]
@@ -362,43 +362,43 @@
       "column1Name": "Employee Contributions",
       "column2Name": "Employer Contributions",
       "column3Name": "Total Contributions",
-      "column1Total": 1000,
-      "column2Total": 1400,
-      "column3Total": 2400,
+      "column1Total": 100,
+      "column2Total": 200,
+      "column3Total": 300,
       "totalLineName": "Total",
       "categories": [
         {
           "label": "Medical",
           "shortLabel": "Medical",
           "colBool_value": true,
-          "col0_value": "Family Medical PPO",
-          "col1_value": 250,
-          "col2_value": 350,
-          "col3_value": 600
+          "col0_value": "Test Coverage",
+          "col1_value": 100,
+          "col2_value": 200,
+          "col3_value": 300
         },
         {
           "label": "Dental",
           "shortLabel": "Dental",
           "colBool_value": true,
-          "col0_value": "Delta Dental Premier",
-          "col1_value": 250,
-          "col2_value": 350,
-          "col3_value": 600
+          "col0_value": "Test Coverage",
+          "col1_value": 100,
+          "col2_value": 200,
+          "col3_value": 300
         },
         {
           "label": "Long Term Disablity",
           "shortLabel": "Disability",
           "colBool_value": true,
-          "col0_value": "LTD Core Plan",
-          "col1_value": 250,
-          "col2_value": 350,
-          "col3_value": 600
+          "col0_value": "Test Coverage",
+          "col1_value": 100,
+          "col2_value": 200,
+          "col3_value": 300
         },
         {
           "label": "Life Insurance",
           "shortLabel": "Life Insurance",
           "colBool_value": false,
-          "col0_value": "3x Base Salary",
+          "col0_value": "Test Coverage",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -407,16 +407,16 @@
           "label": "Accidental Death & Dismemberment",
           "shortLabel": "AD&D",
           "colBool_value": true,
-          "col0_value": "6x Base Salary",
-          "col1_value": 250,
-          "col2_value": 350,
-          "col3_value": 600
+          "col0_value": "Test Coverage",
+          "col1_value": 100,
+          "col2_value": 200,
+          "col3_value": 300
         },
         {
           "label": "Employee Assistance Program",
           "shortLabel": "EAP",
           "colBool_value": false,
-          "col0_value": "SupportLinc EAP",
+          "col0_value": "Test Coverage",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -432,34 +432,34 @@
       "column1Name": "Employee Contributions",
       "column2Name": "Employer Contributions",
       "column3Name": "Total Contributions",
-      "column1Total": 1400,
-      "column2Total": 1800,
-      "column3Total": 3200,
+      "column1Total": 400,
+      "column2Total": 500,
+      "column3Total": 600,
       "totalLineName": "",
       "categories": [
         {
           "label": "Vision",
           "shortLabel": "Vision",
           "colBool_value": true,
-          "col0_value": "Vision Pro Plus",
-          "col1_value": 700,
-          "col2_value": 900,
-          "col3_value": 1600
+          "col0_value": "Test Coverage",
+          "col1_value": 400,
+          "col2_value": 500,
+          "col3_value": 600
         },
         {
           "label": "Flexible Spending Accounts",
           "shortLabel": "FSA",
           "colBool_value": true,
-          "col0_value": "Healthcare & Dependent Care",
-          "col1_value": 700,
-          "col2_value": 900,
-          "col3_value": 1600
+          "col0_value": "Test Coverage",
+          "col1_value": 400,
+          "col2_value": 500,
+          "col3_value": 600
         },
         {
           "label": "401(k)",
           "shortLabel": "401(k)",
           "colBool_value": false,
-          "col0_value": "Pre-tax Contribution Plan",
+          "col0_value": "Test Coverage",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -477,53 +477,53 @@
       "column3Name": "Employer Contributions",
       "column1Total": null,
       "column2Total": null,
-      "column3Total": 15000,
+      "column3Total": 700,
       "totalLineName": "Total",
       "categories": [
         {
           "label": "Holiday Bonus",
           "shortLabel": "Holiday",
           "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 3000
+          "col0_value": "",
+          "col1_value": null,
+          "col2_value": null,
+          "col3_value": 700
         },
         {
           "label": "Profit Sharing",
           "shortLabel": "Profit Sharing",
           "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 3000
+          "col0_value": "",
+          "col1_value": null,
+          "col2_value": null,
+          "col3_value": 700
         },
         {
           "label": "Incentive Award",
           "shortLabel": "Incentive",
           "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 3000
+          "col0_value": "",
+          "col1_value": null,
+          "col2_value": null,
+          "col3_value": 700
         },
         {
           "label": "Discretionary Retirement Award",
           "shortLabel": "Retirement Award",
           "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 3000
+          "col0_value": "",
+          "col1_value": null,
+          "col2_value": null,
+          "col3_value": 700
         },
         {
           "label": "Tuition Reimbursement",
           "shortLabel": "Tuition",
           "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 3000
+          "col0_value": "",
+          "col1_value": null,
+          "col2_value": null,
+          "col3_value": 700
         }
       ]
     }
@@ -547,7 +547,7 @@
     },
     {
       "name": "Discretionary Retirement Award",
-      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee\u2019s salary into a defined contribution plan. This contribution is considered annually."
+      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee’s salary into a defined contribution plan. This contribution is considered annually."
     },
     {
       "name": "Employee Assistance Program",
@@ -555,7 +555,7 @@
     },
     {
       "name": "Flexible Spending Accounts",
-      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. \u2022 You are not currently enrolled in the medical flexible spending account. \u2022 You are not currently enrolled in the dependent care flexible spending account."
+      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. • You are not currently enrolled in the medical flexible spending account. • You are not currently enrolled in the dependent care flexible spending account."
     },
     {
       "name": "Holiday Bonus",
