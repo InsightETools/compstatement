@@ -1,6 +1,7 @@
 //Load Status Initiated
 let isLoaded = false;
 console.log(isLoaded);
+//Test Here
 
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
