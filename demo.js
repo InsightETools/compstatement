@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (test) {
     fetchUrl = 
-    "https://gist.githubusercontent.com/InsightETools/f3c13974a9926d97576b461b474e8c40/raw/e4f211d180eba048a41dc9290fd06ec895810f0a/templateDraft.json";
+    "https://enchanting-otter-cfb0ff.netlify.app/demo.json";
   } else {
     fetchUrl = `${baseUrl}?${queryParams}`;
   }
