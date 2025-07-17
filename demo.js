@@ -188,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ek,
   }).toString();
 
-  if (test) {
+  if (!key) {
   fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
 } else {
   fetchUrl = `${baseUrl}?${queryParams}`;
