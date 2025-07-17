@@ -1,44 +1,44 @@
 {
-  "companyName": "Demo Company",
+  "companyName": "Summit Solutions",
   "coverSheet": true,
-  "companyLogoCover": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
+  "companyLogoCover": "https://example.com/logos/summit_logo_cover.png",
   "companyLogoCoverHeight": 50,
-  "companyLogo": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
+  "companyLogo": "https://example.com/logos/summit_logo.png",
   "companyLogoHeight": 55,
-  "companyWelcome": "Hi",
-  "companyMessage": "Demo Company is committed to offering a highly competitive compensation and benefits package that allows our company to recruit and retain the best employees. Your total compensation and benefit package helps to protect you and your family today and to support your long-term financial goals.<br><br>To help each of our employees gain a thorough understanding of the total value of their compensation and benefits, Demo Company has prepared this personalized Compensation Statement specifically for you. The information contained in this statement is designed to show you the combined value of your annual pay and the employee benefits you elected.<br><br>Please take the time to carefully review each benefit to ensure that all your personal information is accurate. If you find anything that does not correctly describe the coverage you have elected, or if you have any questions, please contact Human Resources.<br><br>Sincerely,",
-  "companyRepName": "Stuart Little",
-  "companyRepTitle": "Chief Comp Officer",
-  "companySignature": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792cff6b7dfcbdb518c6b5_DemoSignature.png",
+  "companyWelcome": "Welcome to Your 2024 Compensation Statement",
+  "companyMessage": "Summit Solutions is proud to offer a robust compensation and benefits package to support our employees. This personalized statement outlines the full value of your rewards for the year.",
+  "companyRepName": "Dana Fields",
+  "companyRepTitle": "Director of People Operations",
+  "companySignature": "https://example.com/signatures/dana_fields.png",
   "companySignatureText": "",
-  "companyAttn": "",
-  "companyAddress": "723 The Parkway",
-  "companyUnit": "",
-  "companyCity": "Richland",
+  "companyAttn": "Attention: Alex Ramirez",
+  "companyAddress": "456 Innovation Way",
+  "companyUnit": "Suite 300",
+  "companyCity": "Seattle",
   "companyState": "WA",
-  "companyZip": "99352",
-  "employeeName": "Carlos Bennett",
-  "employeeFirstName": "Carlos",
-  "employeeTitle": "Operations Manager",
-  "employeeSalary": "88000",
-  "employeeWage": "42.31",
-  "employeeAddress": "1900 Pioneer Way",
-  "employeeUnit": "",
-  "employeeCity": "Richland",
+  "companyZip": "98101",
+  "employeeName": "Alex Ramirez",
+  "employeeFirstName": "Alex",
+  "employeeTitle": "Data Analyst",
+  "employeeSalary": "95000",
+  "employeeWage": "45.67",
+  "employeeAddress": "789 Maple Lane",
+  "employeeUnit": "Apt 12B",
+  "employeeCity": "Tacoma",
   "employeeState": "WA",
-  "employeeZip": "99352",
+  "employeeZip": "98402",
   "statementTitle": "Total Compensation & Benefits Statement",
   "statementRange": "January 2024 - December 2024",
   "statementYear": "2025",
   "lookbackYear": "2024",
   "lookbackMessage": "",
   "lookaheadYear": "2025",
-  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off\u2014offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
+  "lookaheadMessage": "Your projected 2025 compensation includes salary, bonuses, and benefits. This helps illustrate Summit Solutions' ongoing investment in your success.",
   "statementEffectiveDate": "January 2025",
-  "statementDisclaimer": "IMPORTANT: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details. Policy forms for your reference will be made available upon request. In the case of any discrepancy between this statement of benefits and the paper enrollment form completed by the employee, the paper enrollment form will prevail.",
-  "primaryColor": "#f5c527",
-  "secondaryColor": "#00406c",
-  "tableColor": "#00406c",
+  "statementDisclaimer": "This statement is a summary and does not replace official plan documents or legal agreements.",
+  "primaryColor": "#2a9d8f",
+  "secondaryColor": "#264653",
+  "tableColor": "#264653",
   "chartSize": "small",
   "charts": [
     {
@@ -47,33 +47,33 @@
       "type": "donut",
       "isDecimal": false,
       "label": "Total Compensation",
-      "description": "Employer contributions to your total compensation package, including benefits and cash",
+      "description": "Employer contributions including benefits and cash",
       "disclaimer": "",
-      "totalValue": 100,
+      "totalValue": 97000,
       "groups": [
         {
           "relatedGroupId": 0,
           "label": "Cash",
           "color": "#b89237",
-          "value": 48
+          "value": 45000
         },
         {
           "relatedGroupId": 1,
           "label": "Health",
           "color": "#063d69",
-          "value": 22
+          "value": 25000
         },
         {
           "relatedGroupId": 2,
           "label": "Protection",
           "color": "#466c8a",
-          "value": 15
+          "value": 15000
         },
         {
-          "relatedGroupId": 2,
+          "relatedGroupId": 3,
           "label": "Retirement",
           "color": "#5ee1ff",
-          "value": 15
+          "value": 12000
         }
       ]
     },
@@ -84,20 +84,20 @@
       "isDecimal": false,
       "label": "Total Benefits Costs",
       "description": "",
-      "disclaimer": "Disclaimer goes here",
-      "totalValue": 100,
+      "disclaimer": "Employer and employee contribution breakdown",
+      "totalValue": 30000,
       "groups": [
         {
           "relatedGroupId": 0,
           "label": "Employer",
           "color": "#b89237",
-          "value": 50
+          "value": 18000
         },
         {
           "relatedGroupId": 1,
           "label": "Employee",
           "color": "#063d69",
-          "value": 50
+          "value": 12000
         }
       ]
     }
@@ -105,45 +105,17 @@
   "modules": [
     {
       "id": "module10",
-      "year": "",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Annual Salary",
-          "type": "currency",
-          "value": "88000",
-          "description": "Description goes here"
-        }
-      ]
-    },
-    {
-      "id": "module11",
       "year": "2024",
-      "label": "Time Off Snapshot",
+      "label": "Annual Salary",
       "description": "",
       "isDecimal": false,
       "disclaimer": "",
       "components": [
         {
-          "label": "",
+          "label": "Base Salary",
           "type": "currency",
-          "value": "3500",
-          "description": "Description goes here"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "6000",
-          "description": "Description goes here"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "8500",
-          "description": "Description goes here"
+          "value": "90000",
+          "description": ""
         }
       ]
     },
@@ -158,80 +130,20 @@
         {
           "label": "Paid Time Off",
           "type": "currency",
-          "value": "11000",
+          "value": "4500",
           "description": ""
         },
         {
           "label": "Paid Holidays",
           "type": "currency",
-          "value": "3200",
+          "value": "3000",
           "description": ""
         },
         {
           "label": "Sick Days",
           "type": "currency",
-          "value": "1500",
+          "value": "2500",
           "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module14",
-      "year": "2025",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Annual Salary",
-          "type": "currency",
-          "value": "91000",
-          "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module15",
-      "year": "2025",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Total Compensation",
-          "type": "currency",
-          "value": "101000",
-          "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module16",
-      "year": "2025",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Paid Time Off",
-          "type": "currency",
-          "value": "7900",
-          "description": "25 hours at your daily rate"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "",
-          "description": "12 paid & 1 floating"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "",
-          "description": "22 hours at your daily rate"
         }
       ]
     }
@@ -246,7 +158,7 @@
       "column3Name": "Employer",
       "column1Total": 0,
       "column2Total": 0,
-      "column3Total": 10000,
+      "column3Total": 47000,
       "totalLineName": "Total",
       "categories": [
         {
@@ -257,19 +169,19 @@
             {
               "label": "Salary",
               "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
+              "col2_value": 0,
+              "col3_value": 30000
             },
             {
               "label": "Overtime",
               "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
+              "col2_value": 0,
+              "col3_value": 2000
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 2000,
-          "col3_subtotal": null
+          "col2_subtotal": 0,
+          "col3_subtotal": 32000
         },
         {
           "label": "Core Benefits",
@@ -279,75 +191,35 @@
             {
               "label": "Medical",
               "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
+              "col2_value": 0,
+              "col3_value": 8000
             },
             {
               "label": "Life and AD&D",
               "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
-            },
-            {
-              "label": "Long Term Disability",
-              "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
-            },
-            {
-              "label": "Employee Assistance Program",
-              "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
+              "col2_value": 0,
+              "col3_value": 3000
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 4000,
-          "col3_subtotal": null
+          "col2_subtotal": 0,
+          "col3_subtotal": 11000
         },
         {
-          "label": "Elective Benefits",
-          "shortLabel": "Elective",
+          "label": "Retirement",
+          "shortLabel": "401k",
           "color": "#b89237",
           "items": [
             {
               "label": "401(k) Match",
               "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
+              "col2_value": 0,
+              "col3_value": 4000
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 1000,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Additional Benefits",
-          "shortLabel": "Additional",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Holiday Bonus",
-              "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
-            },
-            {
-              "label": "Education & Other Cash Rewards",
-              "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
-            },
-            {
-              "label": "Retirement Plan Deposit (Deferred)",
-              "col1_value": null,
-              "col2_value": 1000,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 3000,
-          "col3_subtotal": null
+          "col2_subtotal": 0,
+          "col3_subtotal": 4000
         }
       ]
     }
@@ -362,9 +234,9 @@
       "column1Name": "Employee Contributions",
       "column2Name": "Employer Contributions",
       "column3Name": "Total Contributions",
-      "column1Total": 1200,
-      "column2Total": 1600,
-      "column3Total": 2800,
+      "column1Total": 12000,
+      "column2Total": 18000,
+      "column3Total": 30000,
       "totalLineName": "Total",
       "categories": [
         {
@@ -372,158 +244,27 @@
           "shortLabel": "Medical",
           "colBool_value": true,
           "col0_value": "Family Medical PPO",
-          "col1_value": 300,
-          "col2_value": 400,
-          "col3_value": 700
+          "col1_value": 5000,
+          "col2_value": 8000,
+          "col3_value": 13000
         },
         {
           "label": "Dental",
           "shortLabel": "Dental",
           "colBool_value": true,
           "col0_value": "Delta Dental Premier",
-          "col1_value": 300,
-          "col2_value": 400,
-          "col3_value": 700
+          "col1_value": 2000,
+          "col2_value": 4000,
+          "col3_value": 6000
         },
-        {
-          "label": "Long Term Disablity",
-          "shortLabel": "Disability",
-          "colBool_value": true,
-          "col0_value": "LTD Core Plan",
-          "col1_value": 300,
-          "col2_value": 400,
-          "col3_value": 700
-        },
-        {
-          "label": "Life Insurance",
-          "shortLabel": "Life Insurance",
-          "colBool_value": false,
-          "col0_value": "3x Base Salary",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 0
-        },
-        {
-          "label": "Accidental Death & Dismemberment",
-          "shortLabel": "AD&D",
-          "colBool_value": true,
-          "col0_value": "6x Base Salary",
-          "col1_value": 300,
-          "col2_value": 400,
-          "col3_value": 700
-        },
-        {
-          "label": "Employee Assistance Program",
-          "shortLabel": "EAP",
-          "colBool_value": false,
-          "col0_value": "SupportLinc EAP",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 0
-        }
-      ]
-    },
-    {
-      "id": "booleantable2",
-      "name": "Elective Benefits",
-      "isDecimal": false,
-      "columnBoolName": "Enrolled",
-      "column0Name": "Coverage",
-      "column1Name": "Employee Contributions",
-      "column2Name": "Employer Contributions",
-      "column3Name": "Total Contributions",
-      "column1Total": 1000,
-      "column2Total": 1400,
-      "column3Total": 2400,
-      "totalLineName": "",
-      "categories": [
         {
           "label": "Vision",
           "shortLabel": "Vision",
           "colBool_value": true,
           "col0_value": "Vision Pro Plus",
-          "col1_value": 500,
-          "col2_value": 700,
-          "col3_value": 1200
-        },
-        {
-          "label": "Flexible Spending Accounts",
-          "shortLabel": "FSA",
-          "colBool_value": true,
-          "col0_value": "Healthcare & Dependent Care",
-          "col1_value": 500,
-          "col2_value": 700,
-          "col3_value": 1200
-        },
-        {
-          "label": "401(k)",
-          "shortLabel": "401(k)",
-          "colBool_value": false,
-          "col0_value": "Pre-tax Contribution Plan",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 0
-        }
-      ]
-    },
-    {
-      "id": "booleantable3",
-      "name": "Additional Benefits",
-      "isDecimal": false,
-      "columnBoolName": "",
-      "column0Name": "",
-      "column1Name": "",
-      "column2Name": "",
-      "column3Name": "Employer Contributions",
-      "column1Total": null,
-      "column2Total": null,
-      "column3Total": 13500,
-      "totalLineName": "Total",
-      "categories": [
-        {
-          "label": "Holiday Bonus",
-          "shortLabel": "Holiday",
-          "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 2700
-        },
-        {
-          "label": "Profit Sharing",
-          "shortLabel": "Profit Sharing",
-          "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 2700
-        },
-        {
-          "label": "Incentive Award",
-          "shortLabel": "Incentive",
-          "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 2700
-        },
-        {
-          "label": "Discretionary Retirement Award",
-          "shortLabel": "Retirement Award",
-          "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 2700
-        },
-        {
-          "label": "Tuition Reimbursement",
-          "shortLabel": "Tuition",
-          "colBool_value": null,
-          "col0_value": "Standard Coverage",
-          "col1_value": 0,
-          "col2_value": 0,
-          "col3_value": 2700
+          "col1_value": 1000,
+          "col2_value": 2000,
+          "col3_value": 3000
         }
       ]
     }
@@ -531,110 +272,57 @@
   "benefits": [
     {
       "name": "401(k) Match",
-      "description": "Employees elect to make pre-tax or post-tax contributions through payroll deduction equal to a percentage of their salary not to exceed the maximum dollar amount allowed by law. The company will match 30% of employee contributions up to 10% of salary."
-    },
-    {
-      "name": "Accidental Death & Dismemberment",
-      "description": "This benefit is 100% paid by Demo Company.Your Accidental Death and Dismemberment benefit is equal to six (6) times your annual salary rounded up to the next highest $1,000 up to a maximum of $1,000,000. Based on your current salary, you or your beneficiaries would receive: <span>$600,000</span>. Age reductions for AD&D coverage beings at age 65. Remember to keep your beneficiary designation up to date."
-    },
-    {
-      "name": "Anniversary Days",
-      "description": "In recognition of their commitment to the company, all full and part-time employees will receive two (2) paid personal days off during the calendar year in which their 10, 15, 20, 25, 30 & 35 year employment anniversary is reached."
-    },
-    {
-      "name": "Dental",
-      "description": "You are currently enrolled in the Demo Company dental program with Family coverage. For all those benefit details, you can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.deltadentalri.com."
-    },
-    {
-      "name": "Discretionary Retirement Award",
-      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee\u2019s salary into a defined contribution plan. This contribution is considered annually."
-    },
-    {
-      "name": "Employee Assistance Program",
-      "description": "Demo Company provides an Employee Assistance Program (EAP) through SupportLinc. Professional, confidential, short-term counseling is available for any personal or work-related issue. Services include 24-hour telephone assistance and unlimited web access for financial and legal counseling, parenting, eldercare, adoption assistance, stress management and much more. Visit their website at www.supportlinc.com [Company Code: democompany] or call 888.881.5462 for more information."
-    },
-    {
-      "name": "Flexible Spending Accounts",
-      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. \u2022 You are not currently enrolled in the medical flexible spending account. \u2022 You are not currently enrolled in the dependent care flexible spending account."
-    },
-    {
-      "name": "Holiday Bonus",
-      "description": "Historically, the Board of Directors has voted to award the company staff a holiday bonus. The bonus is pro-rated based on your length of service with the company throughout the year."
-    },
-    {
-      "name": "Life Insurance",
-      "description": "This benefit is 100% paid by Demo Company. Your Life Insurance benefit is equal to three (3) times your annual salary rounded up to the next highest $1,000 to a maximum of $500,000. The IRS considers employer paid life insurance in excess of $50,000 to be a taxable benefit, therefore you pay income tax on the amount of your life insurance above $50,000.Based on your current salary, your beneficiaries would receive: [$]. Age reductions for basic life coverage begins at age 65. Remember to keep your beneficiaries up to date."
-    },
-    {
-      "name": "Long Term Disability",
-      "description": "Demo Company provides employees with Long Term Disability (LTD)coverage and pays 100% of your LTD premium. In order for employees t  receive disability benefits tax-free, the employee must pay taxes on their premium amount. If you become disabled and are approved for LTD, you would receive 60% of basic monthly earnings up to a maximum of $15,000 per month. Based on your current salary, your monthly benefit would be: [$]"
+      "description": "Summit Solutions offers a 401(k) retirement savings plan with a company match of 50% of employee contributions up to 6% of salary. You are currently enrolled in this benefit."
     },
     {
       "name": "Medical",
-      "description": "You are currently enrolled in the company medical program with Family coverage. You may go to www.bluebenefitma.com to locate a provider."
+      "description": "Comprehensive medical coverage through Blue Horizon Health, including preventive care, specialist visits, and prescriptions. Your plan includes family coverage."
+    },
+    {
+      "name": "Dental",
+      "description": "Dental coverage through ClearSmile includes preventive services, basic procedures, and major dental work. You are enrolled with individual + spouse coverage."
+    },
+    {
+      "name": "Vision",
+      "description": "Vision benefits cover annual exams, lenses, frames, and contact lenses through SeeClearly Vision Network."
+    },
+    {
+      "name": "Life Insurance",
+      "description": "Company-paid life insurance equal to 2x your annual salary up to a maximum of $500,000. Voluntary supplemental coverage is available."
     },
     {
       "name": "Paid Time Off",
-      "description": "Paid Time Off is provided as a period of rest and relaxation for our employees as well as time to get well or deal with personal affairs. Your Paid Time Off (PTO) days are based on your length of service and position to Demo Company. PTO days are pro-rated during your first year of service."
+      "description": "You accrue 15 days of PTO annually, plus 2 personal days and 9 company holidays."
     },
     {
-      "name": "Profit Sharing & Incentive Award",
-      "description": "The company supports an employee incentive compensation plan. Incentive awards are earned annually based on the achievement of goals stated in the current year plan. This award is paid in cash."
+      "name": "Flexible Spending Account (FSA)",
+      "description": "Health and Dependent Care FSAs allow you to set aside pre-tax dollars for eligible medical and dependent care expenses."
     },
     {
-      "name": "Paid Holidays",
-      "description": "Demo Company offers employees 12 paid holidays and 1 paid floating holiday in 2024 to use at your discretion."
-    },
-    {
-      "name": "Salary Continuation Plan",
-      "description": "Demo Company provides a Salary Continuation Program to eligible full time regular employees. The intent of this plan is to provide you with full/partial compensation up to your 90th day out of work due to illness or injury. After the 90th day, Long Term Disability may apply. Salary continuation applies to either planned or sudden illness/injury. To be eligible for salary continuation, the employee must first be approved for FML leave of absence for their own serious health condition."
+      "name": "Employee Assistance Program (EAP)",
+      "description": "Confidential counseling, financial and legal guidance, and wellness support available 24/7 through HarmonyEAP."
     }
   ],
   "holidays": [
     {
       "name": "New Year's Day",
       "date": "January 1st",
-      "weekday": "WED"
-    },
-    {
-      "name": "Martin Luther King Jr. Day",
-      "date": "January 15th",
-      "weekday": "WED"
-    },
-    {
-      "name": "Memorial Day",
-      "date": "May 26th",
       "weekday": "MON"
-    },
-    {
-      "name": "Juneteenth",
-      "date": "June 19th",
-      "weekday": "THU"
     },
     {
       "name": "Independence Day",
       "date": "July 4th",
-      "weekday": "FRI"
-    },
-    {
-      "name": "Labor Day",
-      "date": "September 1",
-      "weekday": "MON"
-    },
-    {
-      "name": "Veterans' Day",
-      "date": "November 11th",
-      "weekday": "TUE"
+      "weekday": "THU"
     },
     {
       "name": "Thanksgiving",
-      "date": "November 27 - 28",
-      "weekday": "THU FRI"
+      "date": "November 28th",
+      "weekday": "THU"
     },
     {
       "name": "Christmas Day",
-      "date": "January 25st",
-      "weekday": "THU"
+      "date": "December 25th",
+      "weekday": "WED"
     }
   ],
   "companyContacts": [
@@ -657,24 +345,6 @@
       "description": "Peak Dental",
       "contact": "www.peakdentalwa.com",
       "url": "http://www.peakdentalwa.com"
-    },
-    {
-      "name": "FSA",
-      "description": "Sage Financial",
-      "contact": "www.sagefinancialwa.com",
-      "url": "http://www.sagefinancialwa.com"
-    },
-    {
-      "name": "Retirement",
-      "description": "River Financial",
-      "contact": "www.riverfinancialwa.com",
-      "url": "http://www.riverfinancialwa.com"
-    },
-    {
-      "name": "Vision",
-      "description": "Vision Pro",
-      "contact": "www.visionprowa.com",
-      "url": "http://www.visionprowa.com"
     }
   ]
 }

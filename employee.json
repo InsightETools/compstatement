@@ -132,18 +132,6 @@
           "type": "",
           "value": "",
           "description": ""
-        },
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
-        },
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
         }
       ]
     },
@@ -160,20 +148,8 @@
           "type": "",
           "value": "",
           "description": ""
-        },
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
-        },
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
         }
-      ]
+     ]
     },
     {
       "id": "",
@@ -215,18 +191,6 @@
       "isDecimal": "",
       "disclaimer": "",
       "components": [
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
-        },
-        {
-          "label": "",
-          "type": "",
-          "value": "",
-          "description": ""
-        },
         {
           "label": "",
           "type": "",
@@ -254,12 +218,6 @@
           "shortLabel": "",
           "color": "",
           "items": [
-            {
-              "label": "",
-              "col1_value": "",
-              "col2_value": "",
-              "col3_value": ""
-            },
             {
               "label": "",
               "col1_value": "",
