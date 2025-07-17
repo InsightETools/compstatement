@@ -2,22 +2,8 @@
 let isLoaded = false;
 console.log(isLoaded);
 
-
-
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
-const params = new URLSearchParams(window.location.search);
-  let ek = params.get("ek");
-
-  if (!ek || !document.getElementById(ek)) {
-    ek = "000000"; // default
-    params.set("ek", ek);
-    const newUrl = `${window.location.pathname}?${params.toString()}${
-      window.location.hash
-    }`;
-    window.location.replace(newUrl); // ⬅️ replaces URL and reloads
-  }
-
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
     const hash = window.location.hash; // preserve #…
@@ -50,7 +36,7 @@ const params = new URLSearchParams(window.location.search);
         b.classList.toggle("active", b === activeDesign)
       );
   }
-  //const ek = qs().get("ek");
+  const ek = qs().get("ek");
   if (ek) {
     const activeEmp = document.getElementById(`employee-${ek}`);
     if (activeEmp)
@@ -172,8 +158,15 @@ function applyElementColors(clone, colorMap) {
 
 //Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
-  // === Get query parameters from current URL ===
   const urlParams = new URLSearchParams(window.location.search);
+
+  if (!urlParams.has("ek")) {
+    urlParams.set("ek", "000000");
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    window.location.replace(newUrl);
+    return; 
+  }
+
   const key = urlParams.get("key");
   const cpid = urlParams.get("cpid");
   const yr = urlParams.get("yr");
@@ -1284,33 +1277,6 @@ const updateScale = () => {
     el.style.marginBottom = `${baseSpacing * scale}px`;
   });
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-  const empBtns = document.querySelectorAll('[id^="000"]');
-
-  const setActiveButton = (empId) => {
-    empBtns.forEach((btn) => {
-      btn.classList.toggle("active", btn.id === empId);
-    });
-  };
-
-  empBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const empId = btn.id;
-      const params = new URLSearchParams(window.location.search);
-      params.set("ek", empId);
-
-      const newUrl = `${window.location.pathname}?${params.toString()}${
-        window.location.hash
-      }`;
-      window.location.href = newUrl; // ⬅️ triggers full page reload
-    });
-  });
-
-  
-
-  setActiveButton(ek);
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   const pagesWrapper = document.getElementById("pagesWrapper");
