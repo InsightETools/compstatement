@@ -184,7 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (test) {
     fetchUrl = 
-    "https://https://compstatementdemo.netlify.app/demo.json";
+    "https://compstatementdemo.netlify.app/demo.json";
   } else {
     fetchUrl = `${baseUrl}?${queryParams}`;
   }
