@@ -49,7 +49,7 @@
       "label": "Total Compensation",
       "description": "Employer contributions to your total compensation package, including benefits and cash",
       "disclaimer": "",
-      "totalValue": 98000,
+      "totalValue": 100,
       "groups": [
         {
           "relatedGroupId": 0,
@@ -85,7 +85,7 @@
       "label": "Total Benefits Costs",
       "description": "",
       "disclaimer": "Disclaimer goes here",
-      "totalValue": 22000,
+      "totalValue": 100,
       "groups": [
         {
           "relatedGroupId": 0,
@@ -246,7 +246,7 @@
       "column3Name": "Employer",
       "column1Total": 0,
       "column2Total": 0,
-      "column3Total": 68000,
+      "column3Total": 10000,
       "totalLineName": "Total",
       "categories": [
         {
@@ -268,7 +268,7 @@
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 0,
+          "col2_subtotal": 2000,
           "col3_subtotal": null
         },
         {
@@ -302,7 +302,7 @@
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 0,
+          "col2_subtotal": 4000,
           "col3_subtotal": null
         },
         {
@@ -318,7 +318,7 @@
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 0,
+          "col2_subtotal": 1000,
           "col3_subtotal": null
         },
         {
@@ -346,7 +346,7 @@
             }
           ],
           "col1_subtotal": null,
-          "col2_subtotal": 0,
+          "col2_subtotal": 3000,
           "col3_subtotal": null
         }
       ]
@@ -362,16 +362,16 @@
       "column1Name": "Employee Contributions",
       "column2Name": "Employer Contributions",
       "column3Name": "Total Contributions",
-      "column1Total": 250,
-      "column2Total": 350,
-      "column3Total": 600,
+      "column1Total": 1000,
+      "column2Total": 1400,
+      "column3Total": 2400,
       "totalLineName": "Total",
       "categories": [
         {
           "label": "Medical",
           "shortLabel": "Medical",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "Family Medical PPO",
           "col1_value": 250,
           "col2_value": 350,
           "col3_value": 600
@@ -380,7 +380,7 @@
           "label": "Dental",
           "shortLabel": "Dental",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "Delta Dental Premier",
           "col1_value": 250,
           "col2_value": 350,
           "col3_value": 600
@@ -389,7 +389,7 @@
           "label": "Long Term Disablity",
           "shortLabel": "Disability",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "LTD Core Plan",
           "col1_value": 250,
           "col2_value": 350,
           "col3_value": 600
@@ -398,7 +398,7 @@
           "label": "Life Insurance",
           "shortLabel": "Life Insurance",
           "colBool_value": false,
-          "col0_value": "Test Coverage",
+          "col0_value": "3x Base Salary",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -407,7 +407,7 @@
           "label": "Accidental Death & Dismemberment",
           "shortLabel": "AD&D",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "6x Base Salary",
           "col1_value": 250,
           "col2_value": 350,
           "col3_value": 600
@@ -416,7 +416,7 @@
           "label": "Employee Assistance Program",
           "shortLabel": "EAP",
           "colBool_value": false,
-          "col0_value": "Test Coverage",
+          "col0_value": "SupportLinc EAP",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -432,16 +432,16 @@
       "column1Name": "Employee Contributions",
       "column2Name": "Employer Contributions",
       "column3Name": "Total Contributions",
-      "column1Total": 700,
-      "column2Total": 900,
-      "column3Total": 1600,
+      "column1Total": 1400,
+      "column2Total": 1800,
+      "column3Total": 3200,
       "totalLineName": "",
       "categories": [
         {
           "label": "Vision",
           "shortLabel": "Vision",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "Vision Pro Plus",
           "col1_value": 700,
           "col2_value": 900,
           "col3_value": 1600
@@ -450,7 +450,7 @@
           "label": "Flexible Spending Accounts",
           "shortLabel": "FSA",
           "colBool_value": true,
-          "col0_value": "Test Coverage",
+          "col0_value": "Healthcare & Dependent Care",
           "col1_value": 700,
           "col2_value": 900,
           "col3_value": 1600
@@ -459,7 +459,7 @@
           "label": "401(k)",
           "shortLabel": "401(k)",
           "colBool_value": false,
-          "col0_value": "Test Coverage",
+          "col0_value": "Pre-tax Contribution Plan",
           "col1_value": 0,
           "col2_value": 0,
           "col3_value": 0
@@ -477,52 +477,52 @@
       "column3Name": "Employer Contributions",
       "column1Total": null,
       "column2Total": null,
-      "column3Total": 3000,
+      "column3Total": 15000,
       "totalLineName": "Total",
       "categories": [
         {
           "label": "Holiday Bonus",
           "shortLabel": "Holiday",
           "colBool_value": null,
-          "col0_value": "",
-          "col1_value": null,
-          "col2_value": null,
+          "col0_value": "Standard Coverage",
+          "col1_value": 0,
+          "col2_value": 0,
           "col3_value": 3000
         },
         {
           "label": "Profit Sharing",
           "shortLabel": "Profit Sharing",
           "colBool_value": null,
-          "col0_value": "",
-          "col1_value": null,
-          "col2_value": null,
+          "col0_value": "Standard Coverage",
+          "col1_value": 0,
+          "col2_value": 0,
           "col3_value": 3000
         },
         {
           "label": "Incentive Award",
           "shortLabel": "Incentive",
           "colBool_value": null,
-          "col0_value": "",
-          "col1_value": null,
-          "col2_value": null,
+          "col0_value": "Standard Coverage",
+          "col1_value": 0,
+          "col2_value": 0,
           "col3_value": 3000
         },
         {
           "label": "Discretionary Retirement Award",
           "shortLabel": "Retirement Award",
           "colBool_value": null,
-          "col0_value": "",
-          "col1_value": null,
-          "col2_value": null,
+          "col0_value": "Standard Coverage",
+          "col1_value": 0,
+          "col2_value": 0,
           "col3_value": 3000
         },
         {
           "label": "Tuition Reimbursement",
           "shortLabel": "Tuition",
           "colBool_value": null,
-          "col0_value": "",
-          "col1_value": null,
-          "col2_value": null,
+          "col0_value": "Standard Coverage",
+          "col1_value": 0,
+          "col2_value": 0,
           "col3_value": 3000
         }
       ]
