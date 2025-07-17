@@ -1279,6 +1279,43 @@ const updateScale = () => {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
+  const empBtns = document.querySelectorAll('[id^="000"]');
+
+  const setActiveButton = (empId) => {
+    empBtns.forEach((btn) => {
+      btn.classList.toggle("active", btn.id === empId);
+    });
+  };
+
+  empBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const empId = btn.id;
+      const params = new URLSearchParams(window.location.search);
+      params.set("ek", empId);
+
+      const newUrl = `${window.location.pathname}?${params.toString()}${
+        window.location.hash
+      }`;
+      window.location.href = newUrl; 
+    });
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  let ek = params.get("ek");
+
+  if (!ek || !document.getElementById(ek)) {
+    ek = "000000"; // default
+    params.set("ek", ek);
+    const newUrl = `${window.location.pathname}?${params.toString()}${
+      window.location.hash
+    }`;
+    window.location.replace(newUrl); // ⬅️ replaces URL and reloads
+  }
+
+  setActiveButton(ek);
+});
+
+document.addEventListener("DOMContentLoaded", () => {
   const pagesWrapper = document.getElementById("pagesWrapper");
 
   const scrollToComponent = (buttonId, componentName) => {
