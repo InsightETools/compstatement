@@ -1,59 +1,68 @@
-//Load Status Initiated
+// Load Status
 let isLoaded = false;
-if(isLoaded == false){console.log("Initializing")}else{console.log("Initialize Failed")}
+console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-//Demo
 document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
-    const hash = window.location.hash; // preserve #…
+    const hash = window.location.hash;
     window.location.href = pathname + "?" + params.toString() + hash;
   };
 
+  const params = qs();
+
+  // Handle Design Buttons
   const designBtns = document.querySelectorAll('[id^="design-"]');
-  designBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      nav(`/design/design-${idNum}`, qs());
+  if (designBtns.length) {
+    designBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        nav(`/design/design-${idNum}`, params);
+      });
     });
-  });
 
+    const pathMatch = window.location.pathname.match(/design-(\d+)$/);
+    if (pathMatch) {
+      const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
+      if (activeDesign) {
+        designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+      }
+    }
+  }
+
+  // Handle Employee Buttons
   const empBtns = document.querySelectorAll('[id^="employee-"]');
-  empBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      const params = new URLSearchParams(window.location.search);
-      params.set("ek", idNum);
-      nav(window.location.pathname, params);
+  if (empBtns.length) {
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.set("ek", idNum);
+        nav(window.location.pathname, newParams);
+      });
     });
-  });
 
-  const pathMatch = window.location.pathname.match(/design-(\d+)$/);
-  if (pathMatch) {
-    const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
-    if (activeDesign)
-      designBtns.forEach((b) =>
-        b.classList.toggle("active", b === activeDesign)
-      );
-  }
-  const ek = qs().get("ek");
-  if (ek) {
-    const activeEmp = document.getElementById(`employee-${ek}`);
-    if (activeEmp)
-      empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+    const ek = params.get("ek");
+    if (ek) {
+      const activeEmp = document.getElementById(`employee-${ek}`);
+      if (activeEmp) {
+        empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+      }
+    }
   }
 
+  // Handle Demo Element
   const demoEl = document.getElementById("demo");
-  if (demoEl) demoEl.style.display = qs().get("demo") === "true" ? "" : "none";
+  if (demoEl) {
+    demoEl.style.display = params.get("demo") === "true" ? "" : "none";
+  }
 });
 
+// Convert HEX to RGB string
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
-    hex = hex
-      .split("")
-      .map((c) => c + c)
-      .join("");
+    hex = hex.split("").map((c) => c + c).join("");
   }
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -62,12 +71,8 @@ function hexToRgb(hex) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatCurrency(
-  value,
-  element = null,
-  decimalFlag = null,
-  isCurrency = true
-) {
+// Format numbers to currency strings
+function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
   if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
 
   const isDynamic = element?.getAttribute?.("number") === "dynamic";
@@ -84,11 +89,12 @@ function formatCurrency(
   return isCurrency ? `$${formatted}` : formatted;
 }
 
+// Render donut chart with gradient and legend
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
-  const chartContainer = document.querySelector(`#${chartId}`);
+  const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
 
-  if (!Array.isArray(categoryGroup)) return;
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
 
   legendContainer.innerHTML = "";
 
@@ -100,6 +106,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     const color = hexToRgb(category.color);
     const end = start + value;
 
+    // Create item layout
     const itemDiv = document.createElement("div");
     itemDiv.setAttribute("category", "item");
     itemDiv.classList.add("moduledonutindex");
@@ -133,25 +140,25 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     start = end;
   });
 
-  chartContainer.style.background = `conic-gradient(${gradientParts.join(
-    ", "
-  )})`;
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
 
+// Apply color values from a map to cloned element
 function applyElementColors(clone, colorMap) {
-  if (!clone) return;
+  if (!clone || !colorMap) return;
+
   clone.querySelectorAll("[element]").forEach((el) => {
-    const elementType = el.getAttribute("element");
-    const colorAttr = el.getAttribute("color");
-    const cssColor = colorMap?.[colorAttr];
+    const type = el.getAttribute("element");
+    const colorKey = el.getAttribute("color");
+    const cssColor = colorMap[colorKey];
     if (!cssColor) return;
 
-    if (elementType === "text") {
+    if (type === "text") {
       el.style.color = cssColor;
-    } else if (elementType === "block") {
+    } else if (type === "block") {
       el.style.backgroundColor = cssColor;
-    } else if (elementType === "stroke") {
-      el.style.borderColor = elementType;
+    } else if (type === "stroke") {
+      el.style.borderColor = cssColor;
     }
   });
 }
