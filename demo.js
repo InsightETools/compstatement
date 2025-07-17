@@ -183,8 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }).toString();
 
   if (test) {
-    fetchUrl = "https://ywrfgg.csb.app/test.json";
-    /*"https://gist.githubusercontent.com/InsightETools/f3c13974a9926d97576b461b474e8c40/raw/e4f211d180eba048a41dc9290fd06ec895810f0a/templateDraft.json";*/
+    fetchUrl = 
+    "https://gist.githubusercontent.com/InsightETools/f3c13974a9926d97576b461b474e8c40/raw/e4f211d180eba048a41dc9290fd06ec895810f0a/templateDraft.json";
   } else {
     fetchUrl = `${baseUrl}?${queryParams}`;
   }
