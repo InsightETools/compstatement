@@ -1,0 +1,14 @@
+name: Purge jsDelivr Cache
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Purge jsDelivr cache
+        run: |
+          curl -X POST "https://purge.jsdelivr.net/gh/InsightETools/compstatement@latest/demo.js"
