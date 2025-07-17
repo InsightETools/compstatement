@@ -1364,6 +1364,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!hasKey) {
     const preparedFor = document.getElementById("preparedFor");
     preparedFor?.classList.add("hidden");
+    console.log(designParam);
     document.title = `Design #${designParam} Preview`;
   }
 });
