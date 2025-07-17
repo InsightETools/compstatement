@@ -1,10 +1,23 @@
 //Load Status Initiated
 let isLoaded = false;
 console.log(isLoaded);
-//Test Later
+
+
 
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
+const params = new URLSearchParams(window.location.search);
+  let ek = params.get("ek");
+
+  if (!ek || !document.getElementById(ek)) {
+    ek = "000000"; // default
+    params.set("ek", ek);
+    const newUrl = `${window.location.pathname}?${params.toString()}${
+      window.location.hash
+    }`;
+    window.location.replace(newUrl); // ⬅️ replaces URL and reloads
+  }
+
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
     const hash = window.location.hash; // preserve #…
@@ -1294,17 +1307,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  const params = new URLSearchParams(window.location.search);
-  let ek = params.get("ek");
-
-  if (!ek || !document.getElementById(ek)) {
-    ek = "000000"; // default
-    params.set("ek", ek);
-    const newUrl = `${window.location.pathname}?${params.toString()}${
-      window.location.hash
-    }`;
-    window.location.replace(newUrl); // ⬅️ replaces URL and reloads
-  }
+  
 
   setActiveButton(ek);
 });
