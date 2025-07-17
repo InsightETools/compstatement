@@ -1,6 +1,6 @@
 //Load Status Initiated
 let isLoaded = false;
-console.log(isLoaded);
+if(isLoaded == false){console.log("Initializing")}else{console.log("Initialize Failed")}
 
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
@@ -1089,7 +1089,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       //Load Status Finished
       isLoaded = true;
-      console.log(isLoaded);
+      if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
     })
     .catch((error) => {
       const errorCheck = error.message.includes("Unexpected token");
