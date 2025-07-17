@@ -50,7 +50,7 @@ const params = new URLSearchParams(window.location.search);
         b.classList.toggle("active", b === activeDesign)
       );
   }
-  const ek = qs().get("ek");
+  //const ek = qs().get("ek");
   if (ek) {
     const activeEmp = document.getElementById(`employee-${ek}`);
     if (activeEmp)
