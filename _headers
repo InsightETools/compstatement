@@ -1,0 +1,5 @@
+/demo.json
+  Access-Control-Allow-Origin: *
+
+/demo.js
+  Access-Control-Allow-Origin: *
