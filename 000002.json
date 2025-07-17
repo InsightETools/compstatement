@@ -256,19 +256,19 @@
           "items": [
             {
               "label": "Salary",
-              "col1_value": null,
-              "col2_value": 82000,
+              "col1_value": 82000,
+              "col2_value": null,
               "col3_value": null
             },
             {
               "label": "Overtime",
-              "col1_value": null,
-              "col2_value": 8250,
+              "col1_value": 8250,
+              "col2_value": null,
               "col3_value": null
             }
           ],
-          "col1_subtotal": null,
-          "col2_subtotal": 92500,
+          "col1_subtotal": 92500,
+          "col2_subtotal": null,
           "col3_subtotal": null
         },
         {
@@ -278,31 +278,31 @@
           "items": [
             {
               "label": "Medical",
-              "col1_value": null,
-              "col2_value": 1250,
+              "col1_value": 1250,
+              "col2_value": null,
               "col3_value": null
             },
             {
               "label": "Life and AD&D",
-              "col1_value": null,
-              "col2_value": 10300,
+              "col1_value": 10300,
+              "col2_value": null,
               "col3_value": null
             },
             {
               "label": "Long Term Disability",
-              "col1_value": null,
-              "col2_value": 2000,
+              "col1_value": 2000,
+              "col2_value": null,
               "col3_value": null
             },
             {
               "label": "Employee Assistance Program",
-              "col1_value": null,
-              "col2_value": 8650,
+              "col1_value": 8650,
+              "col2_value": null,
               "col3_value": null
             }
           ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
+          "col1_subtotal": 22650,
+          "col2_subtotal": null,
           "col3_subtotal": null
         },
         {
