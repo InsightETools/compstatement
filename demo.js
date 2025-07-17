@@ -183,11 +183,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }).toString();
 
   if (test) {
-    fetchUrl = 
-    "https://compstatementdemo.netlify.app/demo.json";
-  } else {
-    fetchUrl = `${baseUrl}?${queryParams}`;
-  }
+  fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
+} else {
+  fetchUrl = `${baseUrl}?${queryParams}`;
+}
 
   fetch(fetchUrl)
     .then((response) => response.json())
