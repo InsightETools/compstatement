@@ -3,6 +3,8 @@ let isLoaded = false;
 console.log(isLoaded);
 //Test Now
 
+alert("Dev");
+
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
