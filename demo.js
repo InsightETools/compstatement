@@ -1,62 +1,68 @@
-//Load Status Initiated
+// Load Status
 let isLoaded = false;
-console.log(isLoaded);
-//Test Now
+console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-alert("Viewing the Development Branch");
-
-//Demo
 document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
-    const hash = window.location.hash; // preserve #…
+    const hash = window.location.hash;
     window.location.href = pathname + "?" + params.toString() + hash;
   };
 
+  const params = qs();
+
+  // Handle Design Buttons
   const designBtns = document.querySelectorAll('[id^="design-"]');
-  designBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      nav(`/design/design-${idNum}`, qs());
+  if (designBtns.length) {
+    designBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        nav(`/design/design-${idNum}`, params);
+      });
     });
-  });
 
+    const pathMatch = window.location.pathname.match(/design-(\d+)$/);
+    if (pathMatch) {
+      const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
+      if (activeDesign) {
+        designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+      }
+    }
+  }
+
+  // Handle Employee Buttons
   const empBtns = document.querySelectorAll('[id^="employee-"]');
-  empBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      const params = new URLSearchParams(window.location.search);
-      params.set("ek", idNum);
-      nav(window.location.pathname, params);
+  if (empBtns.length) {
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.set("ek", idNum);
+        nav(window.location.pathname, newParams);
+      });
     });
-  });
 
-  const pathMatch = window.location.pathname.match(/design-(\d+)$/);
-  if (pathMatch) {
-    const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
-    if (activeDesign)
-      designBtns.forEach((b) =>
-        b.classList.toggle("active", b === activeDesign)
-      );
-  }
-  const ek = qs().get("ek");
-  if (ek) {
-    const activeEmp = document.getElementById(`employee-${ek}`);
-    if (activeEmp)
-      empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+    const ek = params.get("ek");
+    if (ek) {
+      const activeEmp = document.getElementById(`employee-${ek}`);
+      if (activeEmp) {
+        empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+      }
+    }
   }
 
+  // Handle Demo Element
   const demoEl = document.getElementById("demo");
-  if (demoEl) demoEl.style.display = qs().get("demo") === "true" ? "" : "none";
+  if (demoEl) {
+    demoEl.style.display = params.get("demo") === "true" ? "" : "none";
+  }
 });
 
+// Convert HEX to RGB string
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
-    hex = hex
-      .split("")
-      .map((c) => c + c)
-      .join("");
+    hex = hex.split("").map((c) => c + c).join("");
   }
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -65,12 +71,8 @@ function hexToRgb(hex) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatCurrency(
-  value,
-  element = null,
-  decimalFlag = null,
-  isCurrency = true
-) {
+// Format numbers to currency strings
+function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
   if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
 
   const isDynamic = element?.getAttribute?.("number") === "dynamic";
@@ -87,11 +89,12 @@ function formatCurrency(
   return isCurrency ? `$${formatted}` : formatted;
 }
 
+// Render donut chart with gradient and legend
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
-  const chartContainer = document.querySelector(`#${chartId}`);
+  const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
 
-  if (!Array.isArray(categoryGroup)) return;
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
 
   legendContainer.innerHTML = "";
 
@@ -103,6 +106,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     const color = hexToRgb(category.color);
     const end = start + value;
 
+    // Create item layout
     const itemDiv = document.createElement("div");
     itemDiv.setAttribute("category", "item");
     itemDiv.classList.add("moduledonutindex");
@@ -136,33 +140,40 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     start = end;
   });
 
-  chartContainer.style.background = `conic-gradient(${gradientParts.join(
-    ", "
-  )})`;
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
 
+// Apply color values from a map to cloned element
 function applyElementColors(clone, colorMap) {
-  if (!clone) return;
+  if (!clone || !colorMap) return;
+
   clone.querySelectorAll("[element]").forEach((el) => {
-    const elementType = el.getAttribute("element");
-    const colorAttr = el.getAttribute("color");
-    const cssColor = colorMap?.[colorAttr];
+    const type = el.getAttribute("element");
+    const colorKey = el.getAttribute("color");
+    const cssColor = colorMap[colorKey];
     if (!cssColor) return;
 
-    if (elementType === "text") {
+    if (type === "text") {
       el.style.color = cssColor;
-    } else if (elementType === "block") {
+    } else if (type === "block") {
       el.style.backgroundColor = cssColor;
-    } else if (elementType === "stroke") {
-      el.style.borderColor = elementType;
+    } else if (type === "stroke") {
+      el.style.borderColor = cssColor;
     }
   });
 }
 
 //Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
-  // === Get query parameters from current URL ===
   const urlParams = new URLSearchParams(window.location.search);
+
+  if (!urlParams.has("ek")) {
+    urlParams.set("ek", "000000");
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    window.location.replace(newUrl);
+    return; 
+  }
+
   const key = urlParams.get("key");
   const cpid = urlParams.get("cpid");
   const yr = urlParams.get("yr");
@@ -184,12 +195,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ek,
   }).toString();
 
-  if (test) {
-    fetchUrl = 
-    "https://enchanting-otter-cfb0ff.netlify.app/demo.json";
-  } else {
-    fetchUrl = `${baseUrl}?${queryParams}`;
-  }
+  if (!key) {
+  fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
+} else {
+  fetchUrl = `${baseUrl}?${queryParams}`;
+}
 
   fetch(fetchUrl)
     .then((response) => response.json())
@@ -1086,7 +1096,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       //Load Status Finished
       isLoaded = true;
-      console.log(isLoaded);
+      if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
     })
     .catch((error) => {
       const errorCheck = error.message.includes("Unexpected token");
@@ -1095,22 +1105,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 (() => {
+  // Utility functions for selecting elements
   const qs = (sel) => document.querySelector(sel);
   const qsa = (sel) => document.querySelectorAll(sel);
   const params = new URLSearchParams(window.location.search);
+  let scale = 1; // Initial zoom level
 
+  // Update the URL parameter without reloading the page
   const setParam = (key, value) => {
     params.set(key, value);
     history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
   };
 
-  const toggleActive = (id, isActive) => {
-    const el = qs("#" + id);
-    if (el) el.classList.toggle("active", isActive);
-  };
+  // Toggle "active" class for an element
+  const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
 
+  // Get currently selected design (defaults to "1")
   const getCurrentDesign = () => params.get("design") || "1";
 
+  // Toggle between design 1 and design 2, and apply visibility logic
   const applyDesignSwitch = (val) => {
     ["1", "2"].forEach((d) => {
       const show = d === val;
@@ -1122,306 +1135,204 @@ document.addEventListener("DOMContentLoaded", () => {
     toggleActive("design1", val === "1");
     toggleActive("design2", val === "2");
 
-    if (val === "2") {
-      setParam("cover", "false");
-    }
+    if (val === "2") setParam("cover", "false");
 
     setParam("design", val);
     updateExtras();
   };
 
+  // Apply toggle logic for optional elements (cover, company, benefits)
   const updateExtras = () => {
-    const currentDesign = getCurrentDesign();
-    const isDesign2 = currentDesign === "2";
+    const design = getCurrentDesign();
+    const isDesign2 = design === "2";
 
-    const coverTrueBtn = qs("#coverTrue");
-    const coverFalseBtn = qs("#coverFalse");
+    // Disable cover toggle buttons when design 2 is active
+    qs("#coverTrue")?.classList.toggle("disabled", isDesign2);
+    qs("#coverFalse")?.classList.toggle("disabled", isDesign2);
 
-    if (coverTrueBtn) {
-      coverTrueBtn.classList.toggle("disabled", isDesign2);
-    }
-    if (coverFalseBtn) {
-      coverFalseBtn.classList.toggle("disabled", isDesign2);
-    }
-
+    // Show/hide company and benefits sections
     ["benefits", "company"].forEach((key) => {
-      const isEnabled = params.get(key) === "true";
-      toggleActive(`${key}Page`, isEnabled);
+      const enabled = params.get(key) === "true";
+      toggleActive(`${key}Page`, enabled);
 
       qsa(`[design="${key}"]`).forEach((el) => {
-        const designAttr = el.getAttribute("designgroup");
-        const matchesDesign = !designAttr || designAttr === currentDesign;
-        el.style.display = isEnabled && matchesDesign ? "" : "none";
+        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        el.style.display = enabled && match ? "" : "none";
       });
     });
 
+    // Show/hide cover section based on logic
     const showCover = params.get("cover") === "true" && !isDesign2;
     toggleActive("coverTrue", showCover);
     toggleActive("coverFalse", !showCover);
 
     qsa('[component="cover"]').forEach((el) => {
-      const designAttr = el.getAttribute("designgroup");
-      const matchesDesign = !designAttr || designAttr === currentDesign;
-      el.style.display = showCover && matchesDesign ? "" : "none";
+      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      el.style.display = showCover && match ? "" : "none";
     });
   };
 
+  // Toggle specific section (company or benefits)
   const toggleExtra = (key) => {
     const current = params.get(key) === "true";
     setParam(key, (!current).toString());
     updateExtras();
   };
 
+  // Apply cover toggle based on user action (but block on design 2)
   const applyCoverToggle = (val) => {
-    const currentDesign = getCurrentDesign();
-
-    if (currentDesign === "2" && val === "true") {
-      return;
-    }
-
+    if (getCurrentDesign() === "2" && val === "true") return;
     setParam("cover", val);
     updateExtras();
   };
 
-  qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
-  qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
+  // Set up all button click listeners and initialize design view
+  const initDesignControls = () => {
+    qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
+    qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
+    qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
+    qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
+    qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
+    qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
-  qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
-  qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
-
-  qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
-  qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
-
-  const currentDesign = getCurrentDesign();
-
-  if (currentDesign === "2" && params.get("cover") !== "false") {
-    setParam("cover", "false");
-  }
-
-  applyDesignSwitch(currentDesign);
-
-  if (currentDesign === "2" && params.get("cover") !== "false") {
-    setParam("cover", "false");
-  }
-  applyDesignSwitch(currentDesign);
-})();
-
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const designParam = params.get("design");
-
-  if (designParam) {
-    const designNumberEl = document.getElementById("designNumber");
-    if (designNumberEl) {
-      designNumberEl.textContent = `Design #${designParam}`;
+    // Auto-correct cover value on design 2
+    const currentDesign = getCurrentDesign();
+    if (currentDesign === "2" && params.get("cover") !== "false") {
+      setParam("cover", "false");
     }
-  }
-});
 
-//Window Buttons
-document.addEventListener("DOMContentLoaded", () => {
-  const editorPanel = document.getElementById("editorPanel");
-  const fullScreenBtn = document.getElementById("fullScreen");
-  const zoomOutBtn = document.getElementById("zoomOut");
-  const zoomInBtn = document.getElementById("zoomIn");
-  const pagesWrapper = document.getElementById("pagesWrapper");
-  const zoomLevelEl = document.getElementById("zoomLevel");
-
-  let scale = 1; // initial zoom level
-
-  const updateScale = () => {
-    document.querySelectorAll('[item="page"]').forEach((el) => {
-      el.style.zoom = scale;
-    });
-    if (zoomLevelEl) {
-      zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
-    }
+    applyDesignSwitch(currentDesign);
   };
 
-  if (fullScreenBtn) {
-    fullScreenBtn.addEventListener("click", () => {
-      editorPanel?.classList.toggle("hidden");
-      //pagesWrapper?.classList.toggle("centered");
-    });
-  }
+  // DOM Ready
+  document.addEventListener("DOMContentLoaded", () => {
+    // Display design number
+    const designParam = params.get("design");
+    if (designParam) {
+      const label = qs("#designNumber");
+      if (label) label.textContent = `Design #${designParam}`;
+    }
 
-  if (zoomOutBtn) {
-    zoomOutBtn.addEventListener("click", () => {
+    // Zoom controls
+    const zoomLevelEl = qs("#zoomLevel");
+    const updateZoom = () => {
+      qsa('[item="page"]').forEach((el) => {
+        el.style.zoom = scale;
+      });
+      if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    qs("#fullScreen")?.addEventListener("click", () => {
+      qs("#editorPanel")?.classList.toggle("hidden");
+    });
+
+    qs("#zoomOut")?.addEventListener("click", () => {
       scale = Math.max(0.1, scale - 0.1);
-      updateScale();
+      updateZoom();
     });
-  }
 
-  if (zoomInBtn) {
-    zoomInBtn.addEventListener("click", () => {
+    qs("#zoomIn")?.addEventListener("click", () => {
       scale = Math.min(2, scale + 0.1);
-      updateScale();
+      updateZoom();
     });
-  }
 
-  // Initialize on load
-  updateScale();
-});
+    updateZoom();
 
-const pagesWrapper = document.getElementById("pagesWrapper");
+    // Employee selector buttons (ID starts with "000")
+    const empBtns = qsa('[id^="000"]');
+    const setActiveButton = (id) => {
+      empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
+    };
 
-const updateScale = () => {
-  document.querySelectorAll('[item="page"]').forEach((el) => {
-    el.style.transform = `scale(${scale})`;
-    el.style.transformOrigin = "top left";
-
-    const baseSpacing = 24;
-    el.style.marginBottom = `${baseSpacing * scale}px`;
-  });
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-  const empBtns = document.querySelectorAll('[id^="000"]');
-
-  const setActiveButton = (empId) => {
     empBtns.forEach((btn) => {
-      btn.classList.toggle("active", btn.id === empId);
-    });
-  };
-
-  empBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const empId = btn.id;
-      const params = new URLSearchParams(window.location.search);
-      params.set("ek", empId);
-
-      const newUrl = `${window.location.pathname}?${params.toString()}${
-        window.location.hash
-      }`;
-      window.location.href = newUrl; // ⬅️ triggers full page reload
-    });
-  });
-
-  const params = new URLSearchParams(window.location.search);
-  let ek = params.get("ek");
-
-  if (!ek || !document.getElementById(ek)) {
-    ek = "000000"; // default
-    params.set("ek", ek);
-    const newUrl = `${window.location.pathname}?${params.toString()}${
-      window.location.hash
-    }`;
-    window.location.replace(newUrl); // ⬅️ replaces URL and reloads
-  }
-
-  setActiveButton(ek);
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const pagesWrapper = document.getElementById("pagesWrapper");
-
-  const scrollToComponent = (buttonId, componentName) => {
-    const button = document.getElementById(buttonId);
-    if (!button || !pagesWrapper) return;
-
-    button.addEventListener("click", () => {
-      const target = document.querySelector(`[design="${componentName}"]`);
-      if (!target) {
-        console.warn(`No component found with component="${componentName}"`);
-        return;
-      }
-
-      const targetOffset = target.offsetTop - pagesWrapper.offsetTop;
-      pagesWrapper.scrollTo({
-        top: targetOffset,
-        behavior: "smooth",
+      btn.addEventListener("click", () => {
+        params.set("ek", btn.id);
+        window.location.href = `${location.pathname}?${params.toString()}${location.hash}`;
       });
     });
+
+    let ek = params.get("ek");
+    if (!ek || !document.getElementById(ek)) {
+      ek = "000000";
+      params.set("ek", ek);
+      window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
+    }
+    setActiveButton(ek);
+
+    // Scroll to component when clicking top nav buttons
+    const scrollToComponent = (btnId, key) => {
+      qs("#" + btnId)?.addEventListener("click", () => {
+        const target = qs(`[design="${key}"]`);
+        if (target) {
+          const offset = target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
+          qs("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
+        }
+      });
+    };
+
+    scrollToComponent("benefitsPage", "benefits");
+    scrollToComponent("companyPage", "company");
+
+    // Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+  });
+
+  // Generate preview URL
+  const getUrlWithPreviewParam = () => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("preview")) {
+      url.searchParams.set("preview", "true");
+    }
+    return url.toString();
   };
 
-  scrollToComponent("benefitsPage", "benefits");
-  scrollToComponent("companyPage", "company");
-});
+  // Share via email
+  qs("#shareEmail")?.addEventListener("click", () => {
+    const subject = `Design #${params.get("design")} Preview`;
+    const body = `Here is a preview of Compensation Statement Design #${params.get("design")}:\n\n${getUrlWithPreviewParam()}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
 
-document.addEventListener("DOMContentLoaded", () => {
-  const params = new URLSearchParams(window.location.search);
-  const hasKey = params.has("key");
-  const isPreview = params.has("preview");
-
-  if (hasKey || isPreview) {
-    const editorPanel = document.getElementById("editorPanel");
-    const fullScreen = document.getElementById("fullScreen");
-    const pagesWrapper = document.getElementById("pagesWrapper");
-
-    editorPanel?.classList.add("hidden");
-    fullScreen?.classList.add("hidden");
-    pagesWrapper?.classList.add("centered");
-  }
-
-  if (!hasKey && !isPreview) {
-    const editButton = document.getElementById("editButton");
-    editButton?.classList.add("hidden");
-  }
-
-  if (!hasKey) {
-    const preparedFor = document.getElementById("preparedFor");
-    preparedFor?.classList.add("hidden");
-    document.title = `Design #${designParam} Preview`;
-  }
-});
-
-function getUrlWithPreviewParam() {
-  const url = new URL(window.location.href);
-  if (!url.searchParams.has("preview")) {
-    url.searchParams.set("preview", "true");
-  }
-  return url.toString();
-}
-
-document.getElementById("shareEmail").addEventListener("click", function () {
-  const params = new URLSearchParams(window.location.search);
-  const designParam = params.get("design");
-  const subject = `Design #${designParam} Preview`;
-  const body = `Here is a preview of Compensation Statement Design #${designParam}:\n\n${getUrlWithPreviewParam()}`;
-
-  const mailtoLink = `mailto:?subject=${encodeURIComponent(
-    subject
-  )}&body=${encodeURIComponent(body)}`;
-  window.location.href = mailtoLink;
-});
-
-document.getElementById("copyButton").addEventListener("click", function () {
-  const updatedUrl = getUrlWithPreviewParam();
-
-  navigator.clipboard
-    .writeText(updatedUrl)
-    .then(() => {
-      const copyIcon = document.getElementById("copyIcon");
-      const copyAlert = document.getElementById("copyAlert");
-
-      copyIcon.style.display = "none";
-      copyAlert.style.display = "block";
-
-      // After 5 seconds, switch back
-      setTimeout(() => {
-        copyIcon.style.display = "flex";
-        copyAlert.style.display = "none";
-      }, 5000);
-    })
-    .catch((err) => {
-      console.error("Failed to copy URL: ", err);
+  // Copy preview link to clipboard
+  qs("#copyButton")?.addEventListener("click", () => {
+    const url = getUrlWithPreviewParam();
+    navigator.clipboard.writeText(url).then(() => {
+      const icon = qs("#copyIcon");
+      const alert = qs("#copyAlert");
+      if (icon && alert) {
+        icon.style.display = "none";
+        alert.style.display = "block";
+        setTimeout(() => {
+          icon.style.display = "flex";
+          alert.style.display = "none";
+        }, 5000);
+      }
     });
-});
+  });
 
-document.getElementById("editButton").addEventListener("click", function () {
-  const params = new URLSearchParams(window.location.search);
+  // "Edit" button clears preview params and redirects
+  qs("#editButton")?.addEventListener("click", () => {
+    params.delete("preview");
+    params.delete("key");
+    const newUrl = `${location.origin}${location.pathname}?${params}${location.hash}`;
+    window.location.href = newUrl;
+  });
 
-  // Remove specific parameters
-  params.delete("preview");
-  params.delete("key");
-
-  // Reconstruct the URL
-  const baseUrl = window.location.origin + window.location.pathname;
-  const hash = window.location.hash; // preserve any hash (e.g., #section1)
-  const newUrl = params.toString()
-    ? `${baseUrl}?${params.toString()}${hash}`
-    : `${baseUrl}${hash}`;
-
-  // Navigate to the new URL
-  window.location.href = newUrl;
-});
+  // Initial setup
+  initDesignControls();
+})();
