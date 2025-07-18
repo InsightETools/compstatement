@@ -3,7 +3,7 @@ let isLoaded = false;
 console.log(isLoaded);
 //Test Now
 
-alert("Dev");
+alert("Viewing the Development Branch");
 
 //Demo
 document.addEventListener("DOMContentLoaded", () => {
