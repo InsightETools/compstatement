@@ -1,6 +1,4 @@
 // Load Status
-alert("Development Demo");
-
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -1338,3 +1336,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial setup
   initDesignControls();
 })();
+
+alert("Development Demo");
