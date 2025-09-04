@@ -117,12 +117,12 @@
   "listModule": [
     {
       "id": 1,
-      "label": "Additional Benefits",
+      "label": "Additional Benies",
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "values": [
-        "50% tuition reimbursement up to <span>$5,000</span>",
+        "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
-        "Fit & Fun Dollars",
+        "Fit & Fun Dollas",
         "Service Award Program",
         "Professional development training"
       ]
