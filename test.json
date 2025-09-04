@@ -1,0 +1,216 @@
+{
+  "companyName": "Company ",
+  "coverSheet": true,
+  "autoExpandMainSheet": false,
+  "companyLogoCover": "https://etools.secure-solutions.biz/totalcompreport/logos/NCHLogoStandardLong.png",
+  "companyLogoCoverHeight": 60,
+  "companyLogo": "https://etools.secure-solutions.biz/totalcompreport/logos/NCHLogoStandardLong.png",
+  "companyLogoHeight": 45,
+  "companyWelcome": "Heyo  Bob",
+  "companyMessage": "As a valued employee, Company is pleased to present you with your personalized Total Compensation Statement for 2024.<BR><BR>While cash compensation is the largest portion of your total compensation, a significant portion is provided through indirect pay for health insurance, retirement and other benefits. We prepared this statement to help you better understand the full value of your compensation and benefits.<BR><BR>If you have questions regarding this statement or your compensation and benefits, please schedule a time to speak with a representative of the Human Resources Department.",
+  "companyRepName": "",
+  "companyRepTitle": "Human Resources Director",
+  "companySignature": "",
+  "companySignatureText": "Sincerely,<br><br>Person name",
+  "companyAttn": "ATTN: Human Resources Department",
+  "companyAddress": "456 Disco Drive",
+  "companyUnit": "",
+  "companyCity": "Newport",
+  "companyState": "VT",
+  "companyZip": "05855",
+  "employeeName": " Bob B Smith",
+  "employeeFirstName": "Bob",
+  "employeeAddress": "1234 Some Road               ",
+  "employeeUnit": "                              ",
+  "employeeCity": "Newport                       ",
+  "employeeState": "Vt",
+  "employeeZip": "012345",
+  "statementTitle": "Total Compensation Statement",
+  "statementRange": "January 2024 - December 2024",
+  "statementYear": "2024",
+  "lookbackYear": null,
+  "lookbackMessage": null,
+  "lookaheadYear": "",
+  "lookaheadMessage": "",
+  "statementEffectiveDate": "June 2025",
+  "statementDisclaimer": "This statement is based on your pay and benefits as of Dec 31, 2024. Every effort has been made to ensure the accuracy of this statement. Some benefit figures were estimated for the year such as those listed in the miscellaneous section of the statement. Nothing in this document is intended to alter the at-will nature of the employee/employer relationship.",
+  "primaryColor": "#00704a",
+  "secondaryColor": "#76b8dc",
+  "tableColor": "#0082c8",
+  "chartSize": "medium",
+  "charts": [
+    {
+      "id": "chart1",
+      "relatedGroupId": null,
+      "type": "donut",
+      "isDecimal": false,
+      "label": "Total Compensation",
+      "description": "Employer contributions to your total compensation package, including benefits and cash",
+      "disclaimer": "",
+      "totalValue": 20278.913405000003,
+      "groups": [
+        {
+          "relatedGroupId": 1,
+          "label": "Cash Comp",
+          "color": "7fffd4",
+          "value": 91.1
+        },
+        {
+          "relatedGroupId": 3,
+          "label": "Inc Prot",
+          "color": "deb887",
+          "value": 0.1
+        },
+        {
+          "relatedGroupId": 4,
+          "label": "Retirement",
+          "color": "20b2aa",
+          "value": 8.8
+        }
+      ]
+    },
+    {
+      "id": "chart2",
+      "relatedGroupId": null,
+      "type": "donut",
+      "isDecimal": false,
+      "label": "Total Benefits Costs",
+      "description": "",
+      "disclaimer": "",
+      "totalValue": 3952.6534049999996,
+      "groups": [
+        {
+          "relatedGroupId": 0,
+          "label": "Employee",
+          "color": "#0082c8",
+          "value": 54.5
+        },
+        {
+          "relatedGroupId": 0,
+          "label": "Company",
+          "color": "#00704a",
+          "value": 45.5
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "id": "",
+      "year": null,
+      "label": "",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": []
+    },
+    {
+      "id": "",
+      "year": null,
+      "label": "",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": []
+    }
+  ],
+  "standardTables": [
+    {
+      "id": "table1",
+      "name": "Pay & Benefits",
+      "isDecimal": true,
+      "column1Name": "Employee",
+      "column2Name": "Employer",
+      "column3Name": null,
+      "column1Total": 44300.0,
+      "column2Total": 172395.0,
+      "column3Total": 0.0,
+      "totalLineName": "Total",
+      "categories": [
+        {
+          "relatedGroupId": 1,
+          "isBenefitCost": false,
+          "label": "Cash Compensation",
+          "shortLabel": null,
+          "color": "#7fffd4",
+          "items": [
+            {
+              "label": "Regular Pay",
+              "col1_value": 0.0,
+              "col2_value": 17476.100000000002,
+              "col3_value": 0.0
+            },
+            {
+              "label": "Overtime",
+              "col1_value": 0.0,
+              "col2_value": 193.5,
+              "col3_value": 0.0
+            },
+            {
+              "label": "PTO",
+              "col1_value": 0.0,
+              "col2_value": 812.18000000000006,
+              "col3_value": 0.0
+            }
+          ],
+          "col1_subtotal": 0.0,
+          "col2_subtotal": 18481.780000000002,
+          "col3_subtotal": 0.0
+        },
+        {
+          "relatedGroupId": 3,
+          "isBenefitCost": true,
+          "label": "Income Protection",
+          "shortLabel": null,
+          "color": "#deb887",
+          "items": [
+            {
+              "label": "Life Insurance",
+              "col1_value": 0.0,
+              "col2_value": 11.99,
+              "col3_value": 0.0
+            }
+          ],
+          "col1_subtotal": 0.0,
+          "col2_subtotal": 11.99,
+          "col3_subtotal": 0.0
+        },
+        {
+          "relatedGroupId": 4,
+          "isBenefitCost": true,
+          "label": "Retirement Benefits",
+          "shortLabel": null,
+          "color": "#20b2aa",
+          "items": [
+            {
+              "label": "Medicare",
+              "col1_value": 268.16,
+              "col2_value": 268.159665,
+              "col3_value": 0.0
+            },
+            {
+              "label": "Social Security",
+              "col1_value": 1146.61,
+              "col2_value": 1146.61374,
+              "col3_value": 0.0
+            },
+            {
+              "label": "403(b)",
+              "col1_value": 740.75,
+              "col2_value": 370.37,
+              "col3_value": 0.0
+            }
+          ],
+          "col1_subtotal": 2155.52,
+          "col2_subtotal": 1785.1434049999998,
+          "col3_subtotal": 0.0
+        }
+      ]
+    }
+  ],
+  "booleanTables": null,
+  "benefits": null,
+  "holidays": null,
+  "companyContacts": null,
+  "benefitContacts": null
+}
