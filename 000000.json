@@ -40,6 +40,20 @@
   "secondaryColor": "#00406c",
   "tableColor": "#00406c",
   "chartSize": "small",
+  "listModule": [
+    {
+      "id": "module13",
+      "label": "Additional Benies",
+      "details": "The following perks are provided in addition to the compensation and benefits above",
+      "values": [
+        "100% tuition reimbursement up to <span>$5,000</span>",
+        "Short-term Disability coverage at no cost",
+        "Fit & Fun Dollas",
+        "Service Award Program",
+        "Professional development training"
+      ]
+    }
+  ],
   "charts": [
     {
       "id": "chart1",
