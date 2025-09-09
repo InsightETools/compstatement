@@ -166,9 +166,9 @@ function applyElementColors(clone, colorMap) {
   });
 }
 
+   /*
 //Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
- /*
   const urlParams = new URLSearchParams(window.location.search);
 
   if (!urlParams.has("ek")) {
