@@ -168,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   if (!urlParams.has("ek")) {
-    urlParams.set("ek", "000000");
+    urlParams.set("ek", "EmployeeA");
     const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
     window.location.replace(newUrl);
     return; 
@@ -1253,7 +1253,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let ek = params.get("ek");
     if (!ek || !document.getElementById(ek)) {
-      ek = "000000";
+      ek = "EmployeeA";
       params.set("ek", ek);
       window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
     }
@@ -1486,7 +1486,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let ek = params.get("ek");
     if (!ek || !document.getElementById(ek)) {
-      ek = "000000";
+      ek = "EmployeeA";
       params.set("ek", ek);
       window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
     }
