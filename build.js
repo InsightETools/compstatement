@@ -988,99 +988,106 @@ document.addEventListener("DOMContentLoaded", () => {
         container.appendChild(standDisclaimer);
       }
 
-      function listModule(data) {
-        function buildListModule({
-          label = "Additional Benefits",
-          details = "",
-          values = ["[Bullet Point]"],
-          orientation = "vertical",
-          color = elementColor.tableColor,
-        } = {}) {
-          const el = (tag, attrs = {}, children = []) => {
-            const node = document.createElement(tag);
-            Object.entries(attrs).forEach(([k, v]) => {
-              if (k === "class" || k === "className") node.className = v;
-              else node.setAttribute(k, v);
-            });
-            (Array.isArray(children) ? children : [children]).forEach((c) => {
-              if (c == null) return;
-              node.appendChild(
-                typeof c === "string" ? document.createTextNode(c) : c
-              );
-            });
-            return node;
-          };
+function listModule(data) {
+  function buildListModule({
+    label = "Additional Benefits",
+    details = "",
+    values = ["[Bullet Point]"],
+    orientation = "vertical",
+    color = elementColor.tableColor,
+    height = null, // new param
+  } = {}) {
+    const el = (tag, attrs = {}, children = []) => {
+      const node = document.createElement(tag);
+      Object.entries(attrs).forEach(([k, v]) => {
+        if (k === "class" || k === "className") node.className = v;
+        else node.setAttribute(k, v);
+      });
+      (Array.isArray(children) ? children : [children]).forEach((c) => {
+        if (c == null) return;
+        node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+      });
+      return node;
+    };
 
-          const heading = el(
-            "div",
-            { data: "label", class: "listmoduleheading" },
-            label
-          );
-          const header = el(
-            "div",
-            { module: "header", class: "listmoduleheader" },
-            heading
-          );
+    const heading = el(
+      "div",
+      { data: "label", class: "listmoduleheading" },
+      label
+    );
+    const header = el(
+      "div",
+      { module: "header", class: "listmoduleheader" },
+      heading
+    );
+    header.style.backgroundColor = color;
 
-          header.style.backgroundColor = color;
+    const detailsEl = el("div", {
+      data: "details",
+      class: "listdescription",
+    });
+    if (details) {
+      detailsEl.textContent = details;
+    } else {
+      detailsEl.style.display = "none";
+    }
 
-          const detailsEl = el("div", {
-            data: "details",
-            class: "listdescription",
-          });
-          if (details) {
-            detailsEl.textContent = details;
-          } else {
-            detailsEl.style.display = "none";
-          }
+    const ul = el("ul", {
+      data: "values",
+      role: "list",
+      class: "listitemline",
+    });
+    values.forEach((val) => {
+      const li = el("li", { data: "value", class: "listitemtext" });
+      li.innerHTML = val;
+      ul.appendChild(li);
+    });
 
-          const ul = el("ul", {
-            data: "values",
-            role: "list",
-            class: "listitemline",
-          });
-          values.forEach((val) => {
-            const li = el("li", { data: "value", class: "listitemtext" });
-            li.innerHTML = val;
-            ul.appendChild(li);
-          });
+    const listItems = el(
+      "div",
+      { module: "listItems", class: "listitemitems w-richtext" },
+      ul
+    );
+    const listWrapper = el(
+      "div",
+      { module: "list", class: `listmodulelist ${orientation}` },
+      [detailsEl, listItems]
+    );
 
-          const listItems = el(
-            "div",
-            { module: "listItems", class: "listitemitems w-richtext" },
-            ul
-          );
-          const listWrapper = el(
-            "div",
-            { module: "list", class: `listmodulelist ${orientation}` },
-            [detailsEl, listItems]
-          );
+    const template = el(
+      "div",
+      { module: "template", class: "listmoduletemplate" },
+      [header, listWrapper]
+    );
 
-          return el(
-            "div",
-            { module: "template", class: "listmoduletemplate" },
-            [header, listWrapper]
-          );
-        }
+    // apply height if defined
+    if (height && !isNaN(height)) {
+      template.style.minHeight = `${height}px`;
+    }
 
-        (data.listModule || []).forEach((item) => {
-          const target = document.getElementById(String(item.id));
-          if (!target) {
-            console.warn(`listModule: No element found with id="${item.id}"`);
-            return;
-          }
+    return template;
+  }
 
-          const moduleEl = buildListModule({
-            label: item.label,
-            details: item.details,
-            values: item.values,
-            orientation: "vertical",
-            color: elementColor.tableColor,
-          });
+  (data.listModule || []).forEach((item) => {
+    const target = document.getElementById(String(item.id));
+    if (!target) {
+      console.warn(`listModule: No element found with id="${item.id}"`);
+      return;
+    }
 
-          target.appendChild(moduleEl);
-        });
-      }
+    const moduleEl = buildListModule({
+      label: item.label,
+      details: item.details,
+      values: item.values,
+      orientation: "vertical",
+      color: elementColor.tableColor,
+      height: item.height, // pass height from JSON
+    });
+
+    target.appendChild(moduleEl);
+  });
+}
+
 
       staticData(data, statementElement);
       standardTables(data);
