@@ -1244,11 +1244,12 @@ qs("#zoomIn")?.addEventListener("click", () => {
 updateZoom();
 
 
-    // Employee selector buttons (ID starts with "000")
-    const empBtns = qsa('[id^="000"]');
-    const setActiveButton = (id) => {
-      empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
-    };
+    // Employee selector buttons (ID starts with "Employee")
+const empBtns = qsa('[id^="Employee"]');
+const setActiveButton = (id) => {
+  empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
+};
+
 
     empBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
