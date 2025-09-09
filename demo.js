@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
     const hash = window.location.hash;
-    window.location.href = pathname + "?" + params.toString() + hash;
+    //window.location.href = pathname + "?" + params.toString() + hash;
   };
 
   const params = qs();
