@@ -1218,29 +1218,31 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Zoom controls
-    const zoomLevelEl = qs("#zoomLevel");
-    const updateZoom = () => {
-      qsa('[item="page"]').forEach((el) => {
-        el.style.zoom = scale;
-      });
-      if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
-    };
+   let scale = 0.7;
+   const zoomLevelEl = qs("#zoomLevel");
+   const updateZoom = () => {
+   qsa('[item="page"]').forEach((el) => {
+    el.style.zoom = scale;
+  });
+   if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
+  };
 
-    qs("#fullScreen")?.addEventListener("click", () => {
-      qs("#editorPanel")?.classList.toggle("hidden");
-    });
+qs("#fullScreen")?.addEventListener("click", () => {
+  qs("#editorPanel")?.classList.toggle("hidden");
+});
 
-    qs("#zoomOut")?.addEventListener("click", () => {
-      scale = Math.max(0.1, scale - 0.1);
-      updateZoom();
-    });
+qs("#zoomOut")?.addEventListener("click", () => {
+  scale = Math.max(0.1, scale - 0.1);
+  updateZoom();
+});
 
-    qs("#zoomIn")?.addEventListener("click", () => {
-      scale = Math.min(2, scale + 0.1);
-      updateZoom();
-    });
+qs("#zoomIn")?.addEventListener("click", () => {
+  scale = Math.min(2, scale + 0.1);
+  updateZoom();
+});
 
-    updateZoom();
+updateZoom();
+
 
     // Employee selector buttons (ID starts with "000")
     const empBtns = qsa('[id^="000"]');
