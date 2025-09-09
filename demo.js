@@ -1,59 +1,68 @@
-//Load Status Initiated
+ // Load Status
 let isLoaded = false;
-console.log(isLoaded);
+console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-//Demo
 document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
-    const hash = window.location.hash; // preserve #…
+    const hash = window.location.hash;
     window.location.href = pathname + "?" + params.toString() + hash;
   };
 
+  const params = qs();
+
+  // Handle Design Buttons
   const designBtns = document.querySelectorAll('[id^="design-"]');
-  designBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      nav(`/design/design-${idNum}`, qs());
+  if (designBtns.length) {
+    designBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        nav(`/design/design-${idNum}`, params);
+      });
     });
-  });
 
+    const pathMatch = window.location.pathname.match(/design-(\d+)$/);
+    if (pathMatch) {
+      const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
+      if (activeDesign) {
+        designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+      }
+    }
+  }
+
+  // Handle Employee Buttons
   const empBtns = document.querySelectorAll('[id^="employee-"]');
-  empBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const idNum = btn.id.split("-")[1];
-      const params = qs();
-      params.set("ek", idNum);
-      nav(window.location.pathname, params);
+  if (empBtns.length) {
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const idNum = btn.id.split("-")[1];
+        const newParams = new URLSearchParams(window.location.search);
+        newParams.set("ek", idNum);
+        nav(window.location.pathname, newParams);
+      });
     });
-  });
 
-  const pathMatch = window.location.pathname.match(/design-(\d+)$/);
-  if (pathMatch) {
-    const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
-    if (activeDesign)
-      designBtns.forEach((b) =>
-        b.classList.toggle("active", b === activeDesign)
-      );
-  }
-  const ek = qs().get("ek");
-  if (ek) {
-    const activeEmp = document.getElementById(`employee-${ek}`);
-    if (activeEmp)
-      empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+    const ek = params.get("ek");
+    if (ek) {
+      const activeEmp = document.getElementById(`employee-${ek}`);
+      if (activeEmp) {
+        empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
+      }
+    }
   }
 
+  // Handle Demo Element
   const demoEl = document.getElementById("demo");
-  if (demoEl) demoEl.style.display = qs().get("demo") === "true" ? "" : "none";
+  if (demoEl) {
+    demoEl.style.display = params.get("demo") === "true" ? "" : "none";
+  }
 });
 
+// Convert HEX to RGB string
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
-    hex = hex
-      .split("")
-      .map((c) => c + c)
-      .join("");
+    hex = hex.split("").map((c) => c + c).join("");
   }
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -62,12 +71,8 @@ function hexToRgb(hex) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function formatCurrency(
-  value,
-  element = null,
-  decimalFlag = null,
-  isCurrency = true
-) {
+// Format numbers to currency strings
+function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
   if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
 
   const isDynamic = element?.getAttribute?.("number") === "dynamic";
@@ -84,11 +89,12 @@ function formatCurrency(
   return isCurrency ? `$${formatted}` : formatted;
 }
 
+// Render donut chart with gradient and legend
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
-  const chartContainer = document.querySelector(`#${chartId}`);
+  const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
 
-  if (!Array.isArray(categoryGroup)) return;
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
 
   legendContainer.innerHTML = "";
 
@@ -100,6 +106,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     const color = hexToRgb(category.color);
     const end = start + value;
 
+    // Create item layout
     const itemDiv = document.createElement("div");
     itemDiv.setAttribute("category", "item");
     itemDiv.classList.add("moduledonutindex");
@@ -133,33 +140,40 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     start = end;
   });
 
-  chartContainer.style.background = `conic-gradient(${gradientParts.join(
-    ", "
-  )})`;
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
 
+// Apply color values from a map to cloned element
 function applyElementColors(clone, colorMap) {
-  if (!clone) return;
+  if (!clone || !colorMap) return;
+
   clone.querySelectorAll("[element]").forEach((el) => {
-    const elementType = el.getAttribute("element");
-    const colorAttr = el.getAttribute("color");
-    const cssColor = colorMap?.[colorAttr];
+    const type = el.getAttribute("element");
+    const colorKey = el.getAttribute("color");
+    const cssColor = colorMap[colorKey];
     if (!cssColor) return;
 
-    if (elementType === "text") {
+    if (type === "text") {
       el.style.color = cssColor;
-    } else if (elementType === "block") {
+    } else if (type === "block") {
       el.style.backgroundColor = cssColor;
-    } else if (elementType === "stroke") {
-      el.style.borderColor = elementType;
+    } else if (type === "stroke") {
+      el.style.borderColor = cssColor;
     }
   });
 }
 
 //Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
-  // === Get query parameters from current URL ===
   const urlParams = new URLSearchParams(window.location.search);
+
+  if (!urlParams.has("ek")) {
+    urlParams.set("ek", "000000");
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    window.location.replace(newUrl);
+    return; 
+  }
+
   const key = urlParams.get("key");
   const cpid = urlParams.get("cpid");
   const yr = urlParams.get("yr");
@@ -181,17 +195,15 @@ document.addEventListener("DOMContentLoaded", () => {
     ek,
   }).toString();
 
-  if (test) {
-    fetchUrl = "https://compstatementdemo.netlify.app/test.json";
-  } else {
-    fetchUrl = `${baseUrl}?${queryParams}`;
-  }
+  if (!key) {
+  fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
+} else {
+  fetchUrl = `${baseUrl}?${queryParams}`;
+}
 
   fetch(fetchUrl)
     .then((response) => response.json())
     .then((data) => {
-      document.title = data.companyName;
-
       const statementElement = [
         "companyName",
         "companyRepName",
@@ -265,15 +277,21 @@ document.addEventListener("DOMContentLoaded", () => {
           //el.style.height = data.companyLogoHeight + "px";
         });
 
-        const signature = document.querySelector('[data="companySignature"]');
-        if (!signature) {
-          signature.style.display = "none";
+        const signatureElements = document.querySelectorAll(
+          '[data="companySignature"]'
+        );
+
+        if (!data.companySignature || !signatureElements.length) {
+          signatureElements.forEach((el) => (el.style.display = "none"));
         } else {
-          signature.setAttribute("src", data.companySignature);
+          signatureElements.forEach((el) => {
+            el.setAttribute("src", data.companySignature);
+            el.style.display = "";
+          });
         }
       }
 
-      if (!data.employeeFirstName)
+      if (statementElement.companyWelcome)
         document.querySelectorAll(`[static="welcome"]`).forEach((el) => {
           el.style.display = "none";
         });
@@ -287,193 +305,187 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) {
           console.error("No Standard Table Slots Found");
+          return;
         }
 
         data.standardTables.forEach((table) => {
-          const container = document.querySelector(`#standard${table.id}`);
-          if (!container) return;
+          const containers = document.querySelectorAll(`#standard${table.id}`);
+          if (!containers.length) return;
 
-          // Clear container
-          container.innerHTML = "";
+          containers.forEach((container) => {
+            container.innerHTML = "";
 
-          const showCol1 = !!table.column1Name;
-          const showCol2 = !!table.column2Name;
-          const showCol3 = !!table.column3Name;
+            const showCol1 = !!table.column1Name;
+            const showCol2 = !!table.column2Name;
+            const showCol3 = !!table.column3Name;
 
-          const tableWrapper = tableContent.cloneNode(true);
+            const tableWrapper = tableContent.cloneNode(true);
 
-          const tableNameEl = tableWrapper.querySelector('[table="name"]');
-          if (tableNameEl) tableNameEl.textContent = table.name || "";
+            const tableNameEl = tableWrapper.querySelector('[table="name"]');
+            if (tableNameEl) tableNameEl.textContent = table.name || "";
 
-          const headerCol1 = tableWrapper.querySelector(
-            '[table="summaryHeaderCol1"]'
-          );
-          const headerCol2 = tableWrapper.querySelector(
-            '[table="summaryHeaderCol2"]'
-          );
-          const headerCol3 = tableWrapper.querySelector(
-            '[table="summaryHeaderCol3"]'
-          );
-
-          if (!showCol1 && headerCol1) headerCol1.remove();
-          else if (headerCol1) headerCol1.textContent = table.column1Name;
-
-          if (!showCol2 && headerCol2) headerCol2.remove();
-          else if (headerCol2) headerCol2.textContent = table.column2Name;
-
-          if (!showCol3 && headerCol3) headerCol3.remove();
-          else if (headerCol3) headerCol3.textContent = table.column3Name;
-
-          const categoryListContainer =
-            tableWrapper.querySelector(".standardtablelist");
-
-          table.categories.forEach((category) => {
-            const categoryClone = categoryEntryTemplate.cloneNode(true);
-            categoryClone.removeAttribute("id");
-
-            const existingList = categoryClone.querySelector("#categoryList");
-            if (existingList) existingList.remove();
-            const existingSubtotal = categoryClone.querySelector(
-              '[category="subtotal"]'
+            const headerCol1 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol1"]'
             );
-            if (existingSubtotal) existingSubtotal.remove();
+            const headerCol2 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol2"]'
+            );
+            const headerCol3 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol3"]'
+            );
 
-            const categoryName =
-              categoryClone.querySelector('[category="name"]');
-            const categoryIcon =
-              categoryClone.querySelector('[category="icon"]');
-            if (categoryIcon)
-              categoryIcon.style.backgroundColor = category.color;
-            if (categoryName) categoryName.textContent = category.label;
+            if (!showCol1 && headerCol1) headerCol1.remove();
+            else if (headerCol1) headerCol1.textContent = table.column1Name;
 
-            const categoryList = document.createElement("div");
-            categoryList.classList.add("standardtablelinewrapper");
+            if (!showCol2 && headerCol2) headerCol2.remove();
+            else if (headerCol2) headerCol2.textContent = table.column2Name;
 
-            category.items.forEach((lineitem, index) => {
-              const lineClone = document.createElement("div");
-              lineClone.classList.add("standardtablelineitem");
-              if (index % 2 === 1) lineClone.classList.add("alternate");
+            if (!showCol3 && headerCol3) headerCol3.remove();
+            else if (headerCol3) headerCol3.textContent = table.column3Name;
 
-              const labelDiv = document.createElement("div");
-              labelDiv.setAttribute("line", "item");
-              labelDiv.className = "standardtablelinelabel";
-              labelDiv.textContent = lineitem.label;
+            const categoryListContainer =
+              tableWrapper.querySelector(".standardtablelist");
 
-              const valueWrapper = document.createElement("div");
-              valueWrapper.className = "standardtablelabels";
+            table.categories.forEach((category) => {
+              const categoryClone = categoryEntryTemplate.cloneNode(true);
+              categoryClone.removeAttribute("id");
+
+              const existingList = categoryClone.querySelector("#categoryList");
+              if (existingList) existingList.remove();
+
+              const existingSubtotal = categoryClone.querySelector(
+                '[category="subtotal"]'
+              );
+              if (existingSubtotal) existingSubtotal.remove();
+
+              const categoryName =
+                categoryClone.querySelector('[category="name"]');
+              const categoryIcon =
+                categoryClone.querySelector('[category="icon"]');
+              if (categoryIcon)
+                categoryIcon.style.backgroundColor = category.color;
+              if (categoryName) categoryName.textContent = category.label;
+
+              const categoryList = document.createElement("div");
+              categoryList.classList.add("standardtablelinewrapper");
+
+              category.items.forEach((lineitem, index) => {
+                const lineClone = document.createElement("div");
+                lineClone.classList.add("standardtablelineitem");
+                if (index % 2 === 1) lineClone.classList.add("alternate");
+
+                const labelDiv = document.createElement("div");
+                labelDiv.setAttribute("line", "item");
+                labelDiv.className = "standardtablelinelabel";
+                labelDiv.textContent = lineitem.label;
+
+                const valueWrapper = document.createElement("div");
+                valueWrapper.className = "standardtablelabels";
+
+                if (showCol1) {
+                  const col1Div = document.createElement("div");
+                  col1Div.setAttribute("line", "col1");
+                  col1Div.setAttribute("number", "dynamic");
+                  col1Div.className = "standardtablevalue";
+                  col1Div.textContent = formatCurrency(
+                    lineitem.col1_value,
+                    col1Div,
+                    table.isDecimal
+                  );
+                  valueWrapper.appendChild(col1Div);
+                }
+
+                if (showCol2) {
+                  const col2Div = document.createElement("div");
+                  col2Div.setAttribute("line", "col2");
+                  col2Div.setAttribute("number", "dynamic");
+                  col2Div.className = "standardtablevalue";
+                  col2Div.textContent = formatCurrency(
+                    lineitem.col2_value,
+                    col2Div,
+                    table.isDecimal
+                  );
+                  valueWrapper.appendChild(col2Div);
+                }
+
+                if (showCol3) {
+                  const col3Div = document.createElement("div");
+                  col3Div.setAttribute("line", "col3");
+                  col3Div.setAttribute("number", "dynamic");
+                  col3Div.className = "standardtablevalue";
+                  col3Div.textContent = formatCurrency(
+                    lineitem.col3_value,
+                    col3Div,
+                    table.isDecimal
+                  );
+                  valueWrapper.appendChild(col3Div);
+                }
+
+                lineClone.appendChild(labelDiv);
+                lineClone.appendChild(valueWrapper);
+                categoryList.appendChild(lineClone);
+              });
+
+              const subtotalClone = document.createElement("div");
+              subtotalClone.classList.add("standardtablesubtotalwrapper");
+              subtotalClone.setAttribute("category", "subtotal");
+
+              const subLabel = document.createElement("div");
+              subLabel.className = "standardtablesubtotallabel";
+              subLabel.textContent = table.totalLineName || "Subtotal";
+
+              const subWrapper = document.createElement("div");
+              subWrapper.className = "standardtablelabels";
 
               if (showCol1) {
-                const col1Div = document.createElement("div");
-                col1Div.setAttribute("line", "col1");
-                col1Div.setAttribute("number", "dynamic");
-                col1Div.className = "standardtablevalue";
-                col1Div.textContent = formatCurrency(
-                  lineitem.col1_value,
-                  col1Div,
+                const subCol1 = document.createElement("div");
+                subCol1.setAttribute("subtotal", "col1");
+                subCol1.setAttribute("number", "dynamic");
+                subCol1.className = "standardtablesubtotalvalue";
+                subCol1.textContent = formatCurrency(
+                  category.col1_subtotal,
+                  subCol1,
                   table.isDecimal
                 );
-                valueWrapper.appendChild(col1Div);
+                subWrapper.appendChild(subCol1);
               }
 
               if (showCol2) {
-                const col2Div = document.createElement("div");
-                col2Div.setAttribute("line", "col2");
-                col2Div.setAttribute("number", "dynamic");
-                col2Div.className = "standardtablevalue";
-                col2Div.textContent = formatCurrency(
-                  lineitem.col2_value,
-                  col2Div,
+                const subCol2 = document.createElement("div");
+                subCol2.setAttribute("subtotal", "col2");
+                subCol2.setAttribute("number", "dynamic");
+                subCol2.className = "standardtablesubtotalvalue";
+                subCol2.textContent = formatCurrency(
+                  category.col2_subtotal,
+                  subCol2,
                   table.isDecimal
                 );
-                valueWrapper.appendChild(col2Div);
+                subWrapper.appendChild(subCol2);
               }
 
               if (showCol3) {
-                const col3Div = document.createElement("div");
-                col3Div.setAttribute("line", "col3");
-                col3Div.setAttribute("number", "dynamic");
-                col3Div.className = "standardtablevalue";
-                col3Div.textContent = formatCurrency(
-                  lineitem.col3_value,
-                  col3Div,
+                const subCol3 = document.createElement("div");
+                subCol3.setAttribute("subtotal", "col3");
+                subCol3.setAttribute("number", "dynamic");
+                subCol3.className = "standardtablesubtotalvalue";
+                subCol3.textContent = formatCurrency(
+                  category.col3_subtotal,
+                  subCol3,
                   table.isDecimal
                 );
-                valueWrapper.appendChild(col3Div);
+                subWrapper.appendChild(subCol3);
               }
 
-              lineClone.appendChild(labelDiv);
-              lineClone.appendChild(valueWrapper);
-              categoryList.appendChild(lineClone);
+              subtotalClone.appendChild(subLabel);
+              subtotalClone.appendChild(subWrapper);
+              categoryList.appendChild(subtotalClone);
+
+              categoryClone.appendChild(categoryList);
+              categoryListContainer.appendChild(categoryClone);
             });
 
-            // Subtotal
-            const subtotalClone = document.createElement("div");
-            subtotalClone.classList.add("standardtablesubtotalwrapper");
-            subtotalClone.setAttribute("category", "subtotal");
-
-            const subLabel = document.createElement("div");
-            subLabel.className = "standardtablesubtotallabel";
-            subLabel.textContent = table.totalLineName || "Subtotal";
-
-            const subWrapper = document.createElement("div");
-            subWrapper.className = "standardtablelabels";
-
-            if (showCol1) {
-              const subCol1 = document.createElement("div");
-              subCol1.setAttribute("subtotal", "col1");
-              subCol1.setAttribute("number", "dynamic");
-              subCol1.className = "standardtablesubtotalvalue";
-              subCol1.textContent = formatCurrency(
-                category.col1_subtotal,
-                subCol1,
-                table.isDecimal
-              );
-              subWrapper.appendChild(subCol1);
-            }
-
-            if (showCol2) {
-              const subCol2 = document.createElement("div");
-              subCol2.setAttribute("subtotal", "col2");
-              subCol2.setAttribute("number", "dynamic");
-              subCol2.className = "standardtablesubtotalvalue";
-              subCol2.textContent = formatCurrency(
-                category.col2_subtotal,
-                subCol2,
-                table.isDecimal
-              );
-              subWrapper.appendChild(subCol2);
-            }
-
-            if (showCol3) {
-              const subCol3 = document.createElement("div");
-              subCol3.setAttribute("subtotal", "col3");
-              subCol3.setAttribute("number", "dynamic");
-              subCol3.className = "standardtablesubtotalvalue";
-              subCol3.textContent = formatCurrency(
-                category.col3_subtotal,
-                subCol3,
-                table.isDecimal
-              );
-              subWrapper.appendChild(subCol3);
-            }
-
-            subtotalClone.appendChild(subLabel);
-            subtotalClone.appendChild(subWrapper);
-
-            // Description
-            const descriptionText = document.createElement("div");
-            descriptionText.classList.add("ptodisclaimer");
-            descriptionText.textContent = "Test";
-
-            categoryList.appendChild(subtotalClone);
-            //categoryList.appendChild(descriptionText);
-
-            categoryClone.appendChild(categoryList);
-
-            categoryListContainer.appendChild(categoryClone);
+            container.appendChild(tableWrapper);
           });
-
-          container.appendChild(tableWrapper);
         });
       }
 
@@ -637,36 +649,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
       function modules(data) {
         if (!Array.isArray(data.modules) || data.modules.length === 0) {
-          const moduleWrapper = document.querySelector(".modulewrapper");
-          if (moduleWrapper) moduleWrapper.remove();
-        } else {
-          const moduleData = data.modules || [];
-          const validIds = new Set(moduleData.map((mod) => mod.id));
-          const allModuleContainers =
-            document.querySelectorAll(".moduletemplate");
+          const moduleWrappers = document.querySelectorAll(".moduletemplate");
+          moduleWrappers.forEach((el) => (el.style.display = "none"));
+          return;
+        }
 
-          allModuleContainers.forEach((el) => {
-            const id = el.id?.trim();
-            if (!validIds.has(id)) {
-              el.style.display = "none";
-            }
-          });
+        const moduleData = data.modules || [];
+        const validIds = new Set(moduleData.map((mod) => mod.id));
 
-          if (moduleData.length === 0) {
-            allModuleContainers.forEach((el) => {
-              el.style.display = "none";
-            });
-          } else if (moduleData.length === 1) {
-            const validId = moduleData[0].id;
-            allModuleContainers.forEach((el) => {
-              if (el.id !== validId) {
-                el.style.display = "none";
-              }
-            });
+        const allModuleContainers =
+          document.querySelectorAll(".moduletemplate");
+        allModuleContainers.forEach((el) => {
+          const id = el.id?.trim();
+          if (!validIds.has(id)) {
+            el.style.display = "none";
           }
-          data.modules.forEach((module) => {
-            const moduleContainer = document.getElementById(module.id);
-            if (!moduleContainer) return;
+        });
+
+        moduleData.forEach((module) => {
+          const containers = document.querySelectorAll(`#${module.id}`);
+          if (!containers.length) return;
+
+          containers.forEach((moduleContainer) => {
+            moduleContainer.style.display = "";
 
             const labelEl = moduleContainer.querySelector('[module="label"]');
             if (labelEl) {
@@ -757,7 +762,7 @@ document.addEventListener("DOMContentLoaded", () => {
               moduleContainer.style.display = "none";
             }
           });
-        }
+        });
       }
 
       function donutCharts(data) {
@@ -937,9 +942,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function loadDisplay(data) {
-        const loader = document.getElementById("loadElement");
-        loader.classList.add("loaded");
-
         const renderParam = new URLSearchParams(window.location.search).get(
           "render"
         );
@@ -966,16 +968,25 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
+        // 🔧 FIX: Declare local params + getCurrentDesign
+        const params = new URLSearchParams(window.location.search);
+        const getCurrentDesign = () => params.get("design") || "1";
+
         const coverEl = document.querySelector("#pageCover");
-        const showCover = data.coverSheet;
+        const showCover =
+          params.get("cover") === "true" && getCurrentDesign() !== "2";
 
         if (coverEl) {
-          if (showCover === false) {
-            coverEl.style.display = "none";
-          } else {
-            coverEl.style.display = "";
-          }
+          coverEl.style.display = showCover ? "" : "none";
         }
+
+        setTimeout(() => {
+          const loader = document.getElementById("loader");
+          if (loader) {
+            loader.classList.add("finished");
+            //loader.style.display = "none";
+          }
+        }, 500);
       }
 
       function standaloneDisclaimer(disclaimer, id) {
@@ -986,100 +997,6 @@ document.addEventListener("DOMContentLoaded", () => {
         standDisclaimer.textContent = disclaimer;
 
         container.appendChild(standDisclaimer);
-      }
-
-      function listModule(data) {
-        function buildListModule({
-          label = "Additional Benefits",
-          details = "",
-          values = ["[Bullet Point]"],
-          orientation = "vertical",
-          color = elementColor.tableColor,
-        } = {}) {
-          const el = (tag, attrs = {}, children = []) => {
-            const node = document.createElement(tag);
-            Object.entries(attrs).forEach(([k, v]) => {
-              if (k === "class" || k === "className") node.className = v;
-              else node.setAttribute(k, v);
-            });
-            (Array.isArray(children) ? children : [children]).forEach((c) => {
-              if (c == null) return;
-              node.appendChild(
-                typeof c === "string" ? document.createTextNode(c) : c
-              );
-            });
-            return node;
-          };
-
-          const heading = el(
-            "div",
-            { data: "label", class: "listmoduleheading" },
-            label
-          );
-          const header = el(
-            "div",
-            { module: "header", class: "listmoduleheader" },
-            heading
-          );
-
-          header.style.backgroundColor = color;
-
-          const detailsEl = el("div", {
-            data: "details",
-            class: "listdescription",
-          });
-          if (details) {
-            detailsEl.textContent = details;
-          } else {
-            detailsEl.style.display = "none";
-          }
-
-          const ul = el("ul", {
-            data: "values",
-            role: "list",
-            class: "listitemline",
-          });
-          values.forEach((val) => {
-            const li = el("li", { data: "value", class: "listitemtext" });
-            li.innerHTML = val;
-            ul.appendChild(li);
-          });
-
-          const listItems = el(
-            "div",
-            { module: "listItems", class: "listitemitems w-richtext" },
-            ul
-          );
-          const listWrapper = el(
-            "div",
-            { module: "list", class: `listmodulelist ${orientation}` },
-            [detailsEl, listItems]
-          );
-
-          return el(
-            "div",
-            { module: "template", class: "listmoduletemplate" },
-            [header, listWrapper]
-          );
-        }
-
-        (data.listModule || []).forEach((item) => {
-          const target = document.getElementById(String(item.id));
-          if (!target) {
-            console.warn(`listModule: No element found with id="${item.id}"`);
-            return;
-          }
-
-          const moduleEl = buildListModule({
-            label: item.label,
-            details: item.details,
-            values: item.values,
-            orientation: "vertical",
-            color: elementColor.tableColor,
-          });
-
-          target.appendChild(moduleEl);
-        });
       }
 
       staticData(data, statementElement);
@@ -1093,12 +1010,16 @@ document.addEventListener("DOMContentLoaded", () => {
       contactsLists(data.benefitContacts, '[contacts="providers"]');
       //standaloneDisclaimer(data.booleantable3_disclaimer, "booleantable3");
       loadDisplay(data);
-      listModule(data);
 
       const spans = document.querySelectorAll("span");
       spans.forEach((span) => {
         span.style.color = elementColor.primaryColor;
         span.style.fontWeight = "bold";
+
+        const dataKey = span.getAttribute("data");
+        if (dataKey && data[dataKey] !== undefined) {
+          span.textContent = data[dataKey];
+        }
       });
 
       const primaryColors = document.querySelectorAll('[color="primaryColor"]');
@@ -1175,13 +1096,246 @@ document.addEventListener("DOMContentLoaded", () => {
 
       //Load Status Finished
       isLoaded = true;
-      console.log(isLoaded);
+      if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
     })
     .catch((error) => {
       const errorCheck = error.message.includes("Unexpected token");
       alert(errorCheck ? "No User Found" : error);
     });
 });
+
+(() => {
+  // Utility functions for selecting elements
+  const qs = (sel) => document.querySelector(sel);
+  const qsa = (sel) => document.querySelectorAll(sel);
+  const params = new URLSearchParams(window.location.search);
+  let scale = 1; // Initial zoom level
+
+  // Update the URL parameter without reloading the page
+  const setParam = (key, value) => {
+    params.set(key, value);
+    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+  };
+
+  // Toggle "active" class for an element
+  const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
+
+  // Get currently selected design (defaults to "1")
+  const getCurrentDesign = () => params.get("design") || "1";
+
+  // Toggle between design 1 and design 2, and apply visibility logic
+  const applyDesignSwitch = (val) => {
+    ["1", "2"].forEach((d) => {
+      const show = d === val;
+      qsa(`[design="${d}"]`).forEach((el) => {
+        el.style.display = show ? "" : "none";
+      });
+    });
+
+    toggleActive("design1", val === "1");
+    toggleActive("design2", val === "2");
+
+    if (val === "2") setParam("cover", "false");
+
+    setParam("design", val);
+    updateExtras();
+  };
+
+  // Apply toggle logic for optional elements (cover, company, benefits)
+  const updateExtras = () => {
+    const design = getCurrentDesign();
+    const isDesign2 = design === "2";
+
+    // Disable cover toggle buttons when design 2 is active
+    qs("#coverTrue")?.classList.toggle("disabled", isDesign2);
+    qs("#coverFalse")?.classList.toggle("disabled", isDesign2);
+
+    // Show/hide company and benefits sections
+    ["benefits", "company"].forEach((key) => {
+      const enabled = params.get(key) === "true";
+      toggleActive(`${key}Page`, enabled);
+
+      qsa(`[design="${key}"]`).forEach((el) => {
+        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        el.style.display = enabled && match ? "" : "none";
+      });
+    });
+
+    // Show/hide cover section based on logic
+    const showCover = params.get("cover") === "true" && !isDesign2;
+    toggleActive("coverTrue", showCover);
+    toggleActive("coverFalse", !showCover);
+
+    qsa('[component="cover"]').forEach((el) => {
+      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      el.style.display = showCover && match ? "" : "none";
+    });
+  };
+
+  // Toggle specific section (company or benefits)
+  const toggleExtra = (key) => {
+    const current = params.get(key) === "true";
+    setParam(key, (!current).toString());
+    updateExtras();
+  };
+
+  // Apply cover toggle based on user action (but block on design 2)
+  const applyCoverToggle = (val) => {
+    if (getCurrentDesign() === "2" && val === "true") return;
+    setParam("cover", val);
+    updateExtras();
+  };
+
+  // Set up all button click listeners and initialize design view
+  const initDesignControls = () => {
+    qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
+    qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
+    qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
+    qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
+    qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
+    qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
+
+    // Auto-correct cover value on design 2
+    const currentDesign = getCurrentDesign();
+    if (currentDesign === "2" && params.get("cover") !== "false") {
+      setParam("cover", "false");
+    }
+
+    applyDesignSwitch(currentDesign);
+  };
+
+  // DOM Ready
+  document.addEventListener("DOMContentLoaded", () => {
+    // Display design number
+    const designParam = params.get("design");
+    if (designParam) {
+      const label = qs("#designNumber");
+      if (label) label.textContent = `Design #${designParam}`;
+    }
+
+    // Zoom controls
+    const zoomLevelEl = qs("#zoomLevel");
+    const updateZoom = () => {
+      qsa('[item="page"]').forEach((el) => {
+        el.style.zoom = scale;
+      });
+      if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    qs("#fullScreen")?.addEventListener("click", () => {
+      qs("#editorPanel")?.classList.toggle("hidden");
+    });
+
+    qs("#zoomOut")?.addEventListener("click", () => {
+      scale = Math.max(0.1, scale - 0.1);
+      updateZoom();
+    });
+
+    qs("#zoomIn")?.addEventListener("click", () => {
+      scale = Math.min(2, scale + 0.1);
+      updateZoom();
+    });
+
+    updateZoom();
+
+    // Employee selector buttons (ID starts with "000")
+    const empBtns = qsa('[id^="000"]');
+    const setActiveButton = (id) => {
+      empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
+    };
+
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        params.set("ek", btn.id);
+        window.location.href = `${location.pathname}?${params.toString()}${location.hash}`;
+      });
+    });
+
+    let ek = params.get("ek");
+    if (!ek || !document.getElementById(ek)) {
+      ek = "000000";
+      params.set("ek", ek);
+      window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
+    }
+    setActiveButton(ek);
+
+    // Scroll to component when clicking top nav buttons
+    const scrollToComponent = (btnId, key) => {
+      qs("#" + btnId)?.addEventListener("click", () => {
+        const target = qs(`[design="${key}"]`);
+        if (target) {
+          const offset = target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
+          qs("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
+        }
+      });
+    };
+
+    scrollToComponent("benefitsPage", "benefits");
+    scrollToComponent("companyPage", "company");
+
+    // Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+  });
+
+  // Generate preview URL
+  const getUrlWithPreviewParam = () => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("preview")) {
+      url.searchParams.set("preview", "true");
+    }
+    return url.toString();
+  };
+
+  // Share via email
+  qs("#shareEmail")?.addEventListener("click", () => {
+    const subject = `Design #${params.get("design")} Preview`;
+    const body = `Here is a preview of Compensation Statement Design #${params.get("design")}:\n\n${getUrlWithPreviewParam()}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+
+  // Copy preview link to clipboard
+  qs("#copyButton")?.addEventListener("click", () => {
+    const url = getUrlWithPreviewParam();
+    navigator.clipboard.writeText(url).then(() => {
+      const icon = qs("#copyIcon");
+      const alert = qs("#copyAlert");
+      if (icon && alert) {
+        icon.style.display = "none";
+        alert.style.display = "block";
+        setTimeout(() => {
+          icon.style.display = "flex";
+          alert.style.display = "none";
+        }, 5000);
+      }
+    });
+  });
+
+  // "Edit" button clears preview params and redirects
+  qs("#editButton")?.addEventListener("click", () => {
+    params.delete("preview");
+    params.delete("key");
+    const newUrl = `${location.origin}${location.pathname}?${params}${location.hash}`;
+    window.location.href = newUrl;
+  });
+
+  // Initial setup
+  initDesignControls();
+})();
 
 (() => {
   // Utility functions for selecting elements
