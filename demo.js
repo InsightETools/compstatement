@@ -201,6 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchUrl = `${baseUrl}?${queryParams}`;
 }
 
+ console.log(fetchUrl);
+
   fetch(fetchUrl)
     .then((response) => response.json())
     .then((data) => {
