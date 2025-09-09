@@ -3,10 +3,11 @@ let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
 document.addEventListener("DOMContentLoaded", () => {
+ /*
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
     const hash = window.location.hash;
-    //window.location.href = pathname + "?" + params.toString() + hash;
+    window.location.href = pathname + "?" + params.toString() + hash;
   };
 
   const params = qs();
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
   }
+  */
 
   // Handle Employee Buttons
   const empBtns = document.querySelectorAll('[id^="employee-"]');
@@ -41,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nav(window.location.pathname, newParams);
       });
     });
-
+/*
     const ek = params.get("ek");
     if (ek) {
       const activeEmp = document.getElementById(`employee-${ek}`);
@@ -57,6 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
     demoEl.style.display = params.get("demo") === "true" ? "" : "none";
   }
 });
+*/
 
 // Convert HEX to RGB string
 function hexToRgb(hex) {
@@ -165,6 +168,7 @@ function applyElementColors(clone, colorMap) {
 
 //Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
+ /*
   const urlParams = new URLSearchParams(window.location.search);
 
   if (!urlParams.has("ek")) {
@@ -202,6 +206,8 @@ document.addEventListener("DOMContentLoaded", () => {
 }
 
  console.log(fetchUrl);
+ */
+ fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
   fetch(fetchUrl)
     .then((response) => response.json())
