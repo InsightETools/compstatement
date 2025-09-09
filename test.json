@@ -127,6 +127,15 @@
         "Service Award Program",
         "Professional development training"
       ]
+    },{
+      "id": "module14",
+      "height": 350,
+      "label": "Additional Boonies",
+      "details": "This is another description",
+      "values": [
+        "100% tuition reimbursement up to <span>$5,000</span>",
+        "Short-term Disability coverage at no cost"
+      ]
     }
   ],
   "standardTables": [
