@@ -1210,12 +1210,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // DOM Ready
   document.addEventListener("DOMContentLoaded", () => {
-    // Display design number
+   /* 
+   // Display design number
     const designParam = params.get("design");
     if (designParam) {
       const label = qs("#designNumber");
       if (label) label.textContent = `Design #${designParam}`;
     }
+    */
 
     // Zoom controls
    let scale = 0.7;
@@ -1284,11 +1286,13 @@ const setActiveButton = (id) => {
     const hasKey = params.has("key");
     const isPreview = params.has("preview");
 
+   /*
     if (hasKey || isPreview) {
       qs("#editorPanel")?.classList.add("hidden");
       qs("#fullScreen")?.classList.add("hidden");
       qs("#pagesWrapper")?.classList.add("centered");
     }
+    */
 
     if (!hasKey && !isPreview) {
       qs("#editButton")?.classList.add("hidden");
