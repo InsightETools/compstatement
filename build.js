@@ -486,6 +486,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Build the provided "standard table" HTML using the listModule-style builder (el)
 // Expects: data.standardTables[] with the same shape you already use
 function standardTableWithListMethod(data) {
+    console.log("New");
   const el = (tag, attrs = {}, children = []) => {
     const node = document.createElement(tag);
     Object.entries(attrs).forEach(([k, v]) => {
