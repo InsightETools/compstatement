@@ -1480,7 +1480,7 @@ function modulesWithBuilder(data) {
             staticData(data, statementElement);
             //standardTables(data);
             booleanTables(data);
-            modules(data);
+            //modules(data);
             donutCharts(data);
             benefitsList(data);
             holidaysList(data);
