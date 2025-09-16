@@ -282,6 +282,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     el.style.display = "none";
                 });
 
+            /*
             function standardTables(data) {
                 const categoryEntryTemplate = document.querySelector("#categoryEntry");
                 const baseTableTemplate = document.querySelector("#tableTemplate");
@@ -480,6 +481,164 @@ document.addEventListener("DOMContentLoaded", () => {
                     container.appendChild(tableWrapper);
                 });
             }
+            */
+
+            // Build the provided "standard table" HTML using the listModule-style builder (el)
+// Expects: data.standardTables[] with the same shape you already use
+function standardTableWithListMethod(data) {
+  const el = (tag, attrs = {}, children = []) => {
+    const node = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k === "class" || k === "className") node.className = v;
+      else if (k === "style" && typeof v === "object") {
+        Object.assign(node.style, v);
+      } else node.setAttribute(k, v);
+    });
+    (Array.isArray(children) ? children : [children]).forEach((c) => {
+      if (c == null) return;
+      node.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return node;
+  };
+
+  const px10 = { fontSize: "10px", lineHeight: "12px" };
+  const pad5 = { paddingTop: "5px", paddingBottom: "5px" };
+
+  (data.standardTables || []).forEach((table) => {
+    const container = document.querySelector(`#standard${table.id}`);
+    if (!container) return;
+
+    // Clear target
+    container.innerHTML = "";
+
+    const showCol1 = !!table.column1Name;
+    const showCol2 = !!table.column2Name;
+    const showCol3 = !!table.column3Name;
+
+    // --- Header ---
+    const tableNameEl = el("div", { table: "name", class: "standardtablename" }, table.name || "");
+    const headerLabels = el("div", { class: "standardtablelabels" }, [
+      showCol1 ? el("div", { table: "summaryHeaderCol1", class: "standardtablelabel" }, table.column1Name) : null,
+      showCol2 ? el("div", { table: "summaryHeaderCol2", class: "standardtablelabel" }, table.column2Name) : null,
+      showCol3 ? el("div", { table: "summaryHeaderCol3", class: "standardtablelabel" }, table.column3Name) : null,
+    ]);
+
+    const headerInner = el(
+      "div",
+      {
+        element: "block",
+        color: "tableColor",
+        class: "standardtableheader",
+        style: { backgroundColor: (elementColor && elementColor.tableColor) || "rgb(0, 64, 108)" },
+      },
+      [tableNameEl, headerLabels]
+    );
+
+    const headerWrap = el("div", { class: "standardtablewrap" }, headerInner);
+    const wrapper = el("div", { class: "standardtablewrapper" }, headerWrap);
+
+    // --- List container ---
+    const listContainer = el("div", { table: "list", class: "standardtablelist" });
+
+    // --- Categories ---
+    (table.categories || []).forEach((category) => {
+      const categoriesBlock = el("div", { category: "list", class: "standardtablecategories" });
+
+      // Category header
+      const catIcon = el("div", {
+        category: "icon",
+        chartcomp: "color",
+        class: "standardtableicon",
+        style: { backgroundColor: category.color || (elementColor && elementColor.accentColor) || "rgb(184,146,55)" },
+      });
+      const catName = el("div", { category: "name", class: "lineitemlabel category" }, category.label || "");
+      const catNameWrap = el("div", { class: "standardtablecategoryname" }, [catIcon, catName]);
+      const catHeader = el("div", { class: "standardtablecategory", style: pad5 }, catNameWrap);
+
+      categoriesBlock.appendChild(catHeader);
+
+      // Lines
+      const lineWrapper = el("div", { class: "standardtablelinewrapper" });
+
+      (category.items || []).forEach((lineitem, index) => {
+        const lineItem = el("div", { class: `standardtablelineitem${index % 2 === 1 ? " alternate" : ""}` });
+
+        const labelDiv = el("div", { line: "item", class: "standardtablelinelabel", style: px10 }, lineitem.label || "");
+
+        const valuesWrap = el("div", { class: "standardtablelabels" }, [
+          showCol1
+            ? el(
+                "div",
+                { line: "col1", number: "dynamic", class: "standardtablevalue", style: px10 },
+                formatCurrency(lineitem.col1_value, null, table.isDecimal)
+              )
+            : null,
+          showCol2
+            ? el(
+                "div",
+                { line: "col2", number: "dynamic", class: "standardtablevalue", style: px10 },
+                formatCurrency(lineitem.col2_value, null, table.isDecimal)
+              )
+            : null,
+          showCol3
+            ? el(
+                "div",
+                { line: "col3", number: "dynamic", class: "standardtablevalue", style: px10 },
+                formatCurrency(lineitem.col3_value, null, table.isDecimal)
+              )
+            : null,
+        ]);
+
+        lineItem.appendChild(labelDiv);
+        lineItem.appendChild(valuesWrap);
+        lineWrapper.appendChild(lineItem);
+      });
+
+      // Subtotal
+      const subtotalWrap = el(
+        "div",
+        { class: "standardtablesubtotalwrapper", category: "subtotal", style: pad5 },
+        [
+          el("div", { class: "standardtablesubtotallabel", style: px10 }, table.totalLineName || "Total"),
+          el("div", { class: "standardtablelabels" }, [
+            showCol1
+              ? el(
+                  "div",
+                  { subtotal: "col1", number: "dynamic", class: "standardtablesubtotalvalue", style: px10 },
+                  formatCurrency(category.col1_subtotal, null, table.isDecimal)
+                )
+              : null,
+            showCol2
+              ? el(
+                  "div",
+                  { subtotal: "col2", number: "dynamic", class: "standardtablesubtotalvalue", style: px10 },
+                  formatCurrency(category.col2_subtotal, null, table.isDecimal)
+                )
+              : null,
+            showCol3
+              ? el(
+                  "div",
+                  { subtotal: "col3", number: "dynamic", class: "standardtablesubtotalvalue", style: px10 },
+                  formatCurrency(category.col3_subtotal, null, table.isDecimal)
+                )
+              : null,
+          ]),
+        ]
+      );
+
+      lineWrapper.appendChild(subtotalWrap);
+      categoriesBlock.appendChild(lineWrapper);
+
+      // Append category block
+      listContainer.appendChild(categoriesBlock);
+    });
+
+    // Append list to wrapper and to DOM
+    wrapper.appendChild(listContainer);
+    container.appendChild(wrapper);
+  });
+}
+
 
             function booleanTables(data) {
                 const tableTemplate = document.querySelector("#booleanTableTemplate");
@@ -1108,7 +1267,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
             staticData(data, statementElement);
-            standardTables(data);
+            //standardTables(data);
             booleanTables(data);
             modules(data);
             donutCharts(data);
@@ -1119,6 +1278,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //standaloneDisclaimer(data.booleantable3_disclaimer, "booleantable3");
             loadDisplay(data);
             listModule(data);
+            standardTableWithListMethod(data);
 
             const spans = document.querySelectorAll("span");
             spans.forEach((span) => {
