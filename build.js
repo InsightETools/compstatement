@@ -992,6 +992,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.appendChild(standDisclaimer);
             }
 
+            //List Module
             function listModule(data) {
                 function buildListModule({
                     label = "Additional Benefits",
