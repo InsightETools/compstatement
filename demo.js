@@ -1110,28 +1110,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
 (() => {
   // Utility functions for selecting elements
-  const qs = (sel) => document.querySelector(sel);
+  const qs  = (sel) => document.querySelector(sel);
   const qsa = (sel) => document.querySelectorAll(sel);
   const params = new URLSearchParams(window.location.search);
   let scale = 1; // Initial zoom level
 
-  // Update the URL parameter without reloading the page
+  // Update the URL parameter without reloading the page (preserve hash)
   const setParam = (key, value) => {
     params.set(key, value);
-    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+    history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
   };
 
   // Toggle "active" class for an element
   const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
 
-  // Get currently selected design (defaults to "1")
+  // Helpers to read current params
   const getCurrentDesign = () => params.get("design") || "1";
-
-  // Get currently selected layout (defaults to "1")
   const getCurrentLayout = () => params.get("layout") || "1";
+
+  // Enable/disable layout buttons by class only (as requested)
+  const setLayoutButtonsDisabled = (disabled) => {
+    qs("#layout1")?.classList.toggle("disabled", disabled);
+    qs("#layout2")?.classList.toggle("disabled", disabled);
+  };
 
   // Apply layout subclass logic
   const applyLayout = (val) => {
+    // If design=2, layout controls are disabled and layout param should not be set
+    if (getCurrentDesign() === "2") return;
+
     const isTwo = val === "2";
     qsa('[layout="dynamic"]').forEach((el) => {
       if (isTwo) {
@@ -1142,7 +1149,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     qs("#layout1")?.classList.toggle("active", !isTwo);
-    qs("#layout2")?.classList.toggle("active", isTwo);
+    qs("#layout2")?.classList.toggle("active",  isTwo);
 
     setParam("layout", val);
   };
@@ -1163,6 +1170,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setParam("design", val);
     updateExtras();
+
+    // NEW: layout behavior depending on design
+    if (val === "2") {
+      // Disable layout buttons and remove layout param; also clear any applied layout2 classes
+      setLayoutButtonsDisabled(true);
+      params.delete("layout");
+      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+      qsa('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
+      qs("#layout1")?.classList.remove("active");
+      qs("#layout2")?.classList.remove("active");
+    } else {
+      // Re-enable layout buttons and enforce layout=1 in the URL, applying layout1 state
+      setLayoutButtonsDisabled(false);
+      setParam("layout", "1");
+      applyLayout("1");
+    }
   };
 
   // Apply toggle logic for optional elements (cover, company, benefits)
@@ -1210,7 +1233,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateExtras();
   };
 
-  // Set up all button click listeners and initialize design view
+  // Set up all button click listeners and initialize design & layout view
   const initDesignControls = () => {
     qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
     qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
@@ -1219,7 +1242,7 @@ document.addEventListener("DOMContentLoaded", () => {
     qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
     qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
-    // Layout buttons
+    // Layout buttons (they’ll be ignored if design=2 due to guard in applyLayout)
     qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
     qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
 
@@ -1229,12 +1252,20 @@ document.addEventListener("DOMContentLoaded", () => {
       setParam("cover", "false");
     }
 
+    // Apply current design first, which will manage layout button state & param per rules
     applyDesignSwitch(currentDesign);
 
-    // Always ensure layout is set
-    const currentLayout = getCurrentLayout();
-    if (!params.has("layout")) setParam("layout", "1");
-    applyLayout(currentLayout);
+    // If design=1, ensure layout param exists and apply the current layout (default to 1)
+    if (currentDesign === "1") {
+      if (!params.has("layout")) setParam("layout", "1");
+      applyLayout(getCurrentLayout());
+      setLayoutButtonsDisabled(false);
+    } else {
+      // Design 2: ensure layout param removed and buttons disabled
+      setLayoutButtonsDisabled(true);
+      params.delete("layout");
+      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+    }
   };
 
   // DOM Ready
