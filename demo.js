@@ -1127,6 +1127,263 @@ document.addEventListener("DOMContentLoaded", () => {
   // Get currently selected design (defaults to "1")
   const getCurrentDesign = () => params.get("design") || "1";
 
+  // Get currently selected layout (defaults to "1")
+  const getCurrentLayout = () => params.get("layout") || "1";
+
+  // Apply layout subclass logic
+  const applyLayout = (val) => {
+    const isTwo = val === "2";
+    qsa('[layout="dynamic"]').forEach((el) => {
+      if (isTwo) {
+        el.classList.add("layout2");
+      } else {
+        el.classList.remove("layout2");
+      }
+    });
+
+    qs("#layout1")?.classList.toggle("active", !isTwo);
+    qs("#layout2")?.classList.toggle("active", isTwo);
+
+    setParam("layout", val);
+  };
+
+  // Toggle between design 1 and design 2, and apply visibility logic
+  const applyDesignSwitch = (val) => {
+    ["1", "2"].forEach((d) => {
+      const show = d === val;
+      qsa(`[design="${d}"]`).forEach((el) => {
+        el.style.display = show ? "" : "none";
+      });
+    });
+
+    toggleActive("design1", val === "1");
+    toggleActive("design2", val === "2");
+
+    if (val === "2") setParam("cover", "false");
+
+    setParam("design", val);
+    updateExtras();
+  };
+
+  // Apply toggle logic for optional elements (cover, company, benefits)
+  const updateExtras = () => {
+    const design = getCurrentDesign();
+    const isDesign2 = design === "2";
+
+    // Disable cover toggle buttons when design 2 is active
+    qs("#coverTrue")?.classList.toggle("disabled", isDesign2);
+    qs("#coverFalse")?.classList.toggle("disabled", isDesign2);
+
+    // Show/hide company and benefits sections
+    ["benefits", "company"].forEach((key) => {
+      const enabled = params.get(key) === "true";
+      toggleActive(`${key}Page`, enabled);
+
+      qsa(`[design="${key}"]`).forEach((el) => {
+        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        el.style.display = enabled && match ? "" : "none";
+      });
+    });
+
+    // Show/hide cover section based on logic
+    const showCover = params.get("cover") === "true" && !isDesign2;
+    toggleActive("coverTrue", showCover);
+    toggleActive("coverFalse", !showCover);
+
+    qsa('[component="cover"]').forEach((el) => {
+      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      el.style.display = showCover && match ? "" : "none";
+    });
+  };
+
+  // Toggle specific section (company or benefits)
+  const toggleExtra = (key) => {
+    const current = params.get(key) === "true";
+    setParam(key, (!current).toString());
+    updateExtras();
+  };
+
+  // Apply cover toggle based on user action (but block on design 2)
+  const applyCoverToggle = (val) => {
+    if (getCurrentDesign() === "2" && val === "true") return;
+    setParam("cover", val);
+    updateExtras();
+  };
+
+  // Set up all button click listeners and initialize design view
+  const initDesignControls = () => {
+    qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
+    qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
+    qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
+    qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
+    qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
+    qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
+
+    // Layout buttons
+    qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
+    qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
+
+    // Auto-correct cover value on design 2
+    const currentDesign = getCurrentDesign();
+    if (currentDesign === "2" && params.get("cover") !== "false") {
+      setParam("cover", "false");
+    }
+
+    applyDesignSwitch(currentDesign);
+
+    // Always ensure layout is set
+    const currentLayout = getCurrentLayout();
+    if (!params.has("layout")) setParam("layout", "1");
+    applyLayout(currentLayout);
+  };
+
+  // DOM Ready
+  document.addEventListener("DOMContentLoaded", () => {
+    // Zoom controls
+    let scale = 0.7;
+    const zoomLevelEl = qs("#zoomLevel");
+    const updateZoom = () => {
+      qsa('[item="page"]').forEach((el) => {
+        el.style.zoom = scale;
+      });
+      if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    qs("#fullScreen")?.addEventListener("click", () => {
+      qs("#editorPanel")?.classList.toggle("hidden");
+    });
+
+    qs("#zoomOut")?.addEventListener("click", () => {
+      scale = Math.max(0.1, scale - 0.1);
+      updateZoom();
+    });
+
+    qs("#zoomIn")?.addEventListener("click", () => {
+      scale = Math.min(2, scale + 0.1);
+      updateZoom();
+    });
+
+    updateZoom();
+
+    // Employee selector buttons (ID starts with "Employee")
+    const empBtns = qsa('[id^="Employee"]');
+    const setActiveButton = (id) => {
+      empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
+    };
+
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        params.set("ek", btn.id);
+        window.location.href = `${location.pathname}?${params.toString()}${location.hash}`;
+      });
+    });
+
+    let ek = params.get("ek");
+    if (!ek || !document.getElementById(ek)) {
+      ek = "EmployeeA";
+      params.set("ek", ek);
+      window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
+    }
+    setActiveButton(ek);
+
+    // Scroll to component when clicking top nav buttons
+    const scrollToComponent = (btnId, key) => {
+      qs("#" + btnId)?.addEventListener("click", () => {
+        const target = qs(`[design="${key}"]`);
+        if (target) {
+          const offset = target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
+          qs("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
+        }
+      });
+    };
+
+    scrollToComponent("benefitsPage", "benefits");
+    scrollToComponent("companyPage", "company");
+
+    // Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+  });
+
+  // Generate preview URL
+  const getUrlWithPreviewParam = () => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("preview")) {
+      url.searchParams.set("preview", "true");
+    }
+    return url.toString();
+  };
+
+  // Share via email
+  qs("#shareEmail")?.addEventListener("click", () => {
+    const subject = `Design #${params.get("design")} Preview`;
+    const body = `Here is a preview of Compensation Statement Design #${params.get("design")}:\n\n${getUrlWithPreviewParam()}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  });
+
+  // Copy preview link to clipboard
+  qs("#copyButton")?.addEventListener("click", () => {
+    const url = getUrlWithPreviewParam();
+    navigator.clipboard.writeText(url).then(() => {
+      const icon = qs("#copyIcon");
+      const alert = qs("#copyAlert");
+      if (icon && alert) {
+        icon.style.display = "none";
+        alert.style.display = "block";
+        setTimeout(() => {
+          icon.style.display = "flex";
+          alert.style.display = "none";
+        }, 5000);
+      }
+    });
+  });
+
+  // "Edit" button clears preview params and redirects
+  qs("#editButton")?.addEventListener("click", () => {
+    params.delete("preview");
+    params.delete("key");
+    const newUrl = `${location.origin}${location.pathname}?${params}${location.hash}`;
+    window.location.href = newUrl;
+  });
+
+  // Initial setup
+  initDesignControls();
+})();
+
+/*
+(() => {
+  // Utility functions for selecting elements
+  const qs = (sel) => document.querySelector(sel);
+  const qsa = (sel) => document.querySelectorAll(sel);
+  const params = new URLSearchParams(window.location.search);
+  let scale = 1; // Initial zoom level
+
+  // Update the URL parameter without reloading the page
+  const setParam = (key, value) => {
+    params.set(key, value);
+    history.replaceState(null, "", `${location.pathname}?${params.toString()}`);
+  };
+
+  // Toggle "active" class for an element
+  const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
+
+  // Get currently selected design (defaults to "1")
+  const getCurrentDesign = () => params.get("design") || "1";
+
   // Toggle between design 1 and design 2, and apply visibility logic
   const applyDesignSwitch = (val) => {
     ["1", "2"].forEach((d) => {
@@ -1580,3 +1837,4 @@ const setActiveButton = (id) => {
   // Initial setup
   initDesignControls();
 })();
+*/
