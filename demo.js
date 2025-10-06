@@ -201,7 +201,7 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchUrl = `${baseUrl}?${queryParams}`;
 }
 
- console.log(fetchUrl);
+ //console.log(fetchUrl);
 
  fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
