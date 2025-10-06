@@ -112,6 +112,21 @@
   ],
   "modules": [
     {
+      "id": "module10",
+      "year": "",
+      "label": "",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": [
+        {
+          "label": "Annual Salary",
+          "type": "currency",
+          "value": "50000",
+          "description": "Description goes here"
+        }
+      ]
+    },{
       "id": "module11",
       "year": "2024",
       "label": "Time Off Snapshot",
