@@ -1108,7 +1108,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 });
 
-(() => {
+ (() => {
   // Utility functions for selecting elements
   const qs  = (sel) => document.querySelector(sel);
   const qsa = (sel) => document.querySelectorAll(sel);
@@ -1129,27 +1129,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const getCurrentLayout = () => params.get("layout") || "1";
   const getCurrentHeader = () => params.get("header") || "1";
 
-  // Enable/disable layout buttons
+  // Enable/disable layout buttons by class only
   const setLayoutButtonsDisabled = (disabled) => {
     qs("#layout1")?.classList.toggle("disabled", disabled);
     qs("#layout2")?.classList.toggle("disabled", disabled);
   };
-
-  // Enable/disable header buttons
-  const setHeaderButtonsDisabled = (disabled) => {
-    qs("#header1")?.classList.toggle("disabled", disabled);
-    qs("#header2")?.classList.toggle("disabled", disabled);
-  };
-
-  // Safe show/hide helper
-  const setDisplay = (el, show) => {
-    if (!el) return;
-    el.style.display = show ? "" : "none";
-  };
-
-  // Try to find the header content element for a given key ("header1" or "header2")
-  const getHeaderEl = (which) =>
-    qs(`[component="header"] #${which}`) || qs(`#${which}El`) || qs(`#${which}`);
 
   // Apply layout subclass logic
   const applyLayout = (val) => {
@@ -1168,20 +1152,20 @@ document.addEventListener("DOMContentLoaded", () => {
     setParam("layout", val);
   };
 
-  // Apply header show/hide logic
+  // SIMPLE header logic (per request):
+  // clicking #header1 -> header=1; clicking #header2 -> header=2
+  // header=1 hides #headerTwo; header=2 hides #headerOne
   const applyHeader = (val) => {
-    // If design=2, header controls are disabled and header param should not be set
-    if (getCurrentDesign() === "2") return;
+    const headerOneEl = document.getElementById("headerOne");
+    const headerTwoEl = document.getElementById("headerTwo");
 
-    const isTwo = val === "2";
-    const h1El = getHeaderEl("header1");
-    const h2El = getHeaderEl("header2");
-
-    setDisplay(h1El, !isTwo);
-    setDisplay(h2El,  isTwo);
-
-    qs("#header1")?.classList.toggle("active", !isTwo);
-    qs("#header2")?.classList.toggle("active",  isTwo);
+    if (val === "1") {
+      if (headerOneEl) headerOneEl.style.display = "";
+      if (headerTwoEl) headerTwoEl.style.display = "none";
+    } else if (val === "2") {
+      if (headerOneEl) headerOneEl.style.display = "none";
+      if (headerTwoEl) headerTwoEl.style.display = "";
+    }
 
     setParam("header", val);
   };
@@ -1203,7 +1187,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setParam("design", val);
     updateExtras();
 
-    // Layout behavior depending on design
+    // Layout behavior depending on design (unchanged)
     if (val === "2") {
       // Disable layout buttons and remove layout param; also clear any applied layout2 classes
       setLayoutButtonsDisabled(true);
@@ -1217,25 +1201,6 @@ document.addEventListener("DOMContentLoaded", () => {
       setLayoutButtonsDisabled(false);
       setParam("layout", "1");
       applyLayout("1");
-    }
-
-    // Header behavior depending on design
-    const h1El = getHeaderEl("header1");
-    const h2El = getHeaderEl("header2");
-    if (val === "2") {
-      // Disable header buttons, remove header param, and hide both header elements
-      setHeaderButtonsDisabled(true);
-      params.delete("header");
-      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
-      setDisplay(h1El, false);
-      setDisplay(h2El, false);
-      qs("#header1")?.classList.remove("active");
-      qs("#header2")?.classList.remove("active");
-    } else {
-      // Enable header buttons, set header=1 by default, and show header1/hide header2
-      setHeaderButtonsDisabled(false);
-      setParam("header", "1");
-      applyHeader("1");
     }
   };
 
@@ -1284,7 +1249,7 @@ document.addEventListener("DOMContentLoaded", () => {
     updateExtras();
   };
 
-  // Set up all button click listeners and initialize design & layout/header view
+  // Set up all button click listeners and initialize design/layout/header view
   const initDesignControls = () => {
     qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
     qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
@@ -1297,7 +1262,7 @@ document.addEventListener("DOMContentLoaded", () => {
     qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
     qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
 
-    // Header buttons (ignored if design=2 due to guard in applyHeader)
+    // Header buttons (simple behavior, independent of design)
     qs("#header1")?.addEventListener("click", () => applyHeader("1"));
     qs("#header2")?.addEventListener("click", () => applyHeader("2"));
 
@@ -1307,27 +1272,15 @@ document.addEventListener("DOMContentLoaded", () => {
       setParam("cover", "false");
     }
 
-    // Apply current design first, which will manage layout & header button state & params per rules
+    // Apply current design first (handles layout button state)
     applyDesignSwitch(currentDesign);
 
-    // If design=1, ensure defaults and apply current states
-    if (currentDesign === "1") {
-      if (!params.has("layout")) setParam("layout", "1");
-      applyLayout(getCurrentLayout());
+    // Defaults & initial application
+    if (!params.has("layout")) setParam("layout", "1");
+    applyLayout(getCurrentLayout());
 
-      if (!params.has("header")) setParam("header", "1");
-      applyHeader(getCurrentHeader());
-
-      setLayoutButtonsDisabled(false);
-      setHeaderButtonsDisabled(false);
-    } else {
-      // Design 2: ensure layout/header params removed and buttons disabled
-      setLayoutButtonsDisabled(true);
-      setHeaderButtonsDisabled(true);
-      params.delete("layout");
-      params.delete("header");
-      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
-    }
+    if (!params.has("header")) setParam("header", "1");
+    applyHeader(getCurrentHeader());
   };
 
   // DOM Ready
