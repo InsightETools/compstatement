@@ -61,7 +61,7 @@
       "type": "donut",
       "isDecimal": false,
       "label": "Total Compensation",
-      "description": "Employer contributions to your total compensation package, including benefits and cash",
+      "description": "",
       "disclaimer": "",
       "totalValue": 65000,
       "groups": [
@@ -82,12 +82,6 @@
           "label": "Protection",
           "color": "#466c8a",
           "value": 50
-        },
-        {
-          "relatedGroupId": 2,
-          "label": "Retirement",
-          "color": "#5ee1ff",
-          "value": 50
         }
       ]
     },
@@ -98,7 +92,7 @@
       "isDecimal": false,
       "label": "Total Benefits Costs",
       "description": "",
-      "disclaimer": "Disclaimer goes here",
+      "disclaimer": "",
       "totalValue": 15000,
       "groups": [
         {
@@ -117,22 +111,6 @@
     }
   ],
   "modules": [
-    {
-      "id": "module10",
-      "year": "",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Annual Salary",
-          "type": "currency",
-          "value": "50000",
-          "description": "Description goes here"
-        }
-      ]
-    },
     {
       "id": "module11",
       "year": "2024",
