@@ -1474,8 +1474,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const label = qs("#designNumber");
       if (label) label.textContent = `Design #${designParam}`;
     }
-    */
-
     // Zoom controls
    let scale = 0.7;
    const zoomLevelEl = qs("#zoomLevel");
@@ -1549,7 +1547,6 @@ const setActiveButton = (id) => {
       qs("#fullScreen")?.classList.add("hidden");
       qs("#pagesWrapper")?.classList.add("centered");
     }
-    */
 
     if (!hasKey && !isPreview) {
       qs("#editButton")?.classList.add("hidden");
@@ -1604,6 +1601,8 @@ const setActiveButton = (id) => {
   // Initial setup
   initDesignControls();
 })();
+
+
 
 (() => {
   // Utility functions for selecting elements
@@ -1837,4 +1836,5 @@ const setActiveButton = (id) => {
   // Initial setup
   initDesignControls();
 })();
+
 */
