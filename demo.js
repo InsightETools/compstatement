@@ -1221,8 +1221,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const isDesign2 = design === "2";
 
     // Disable cover toggle buttons when design 2 is active
-    qs("#coverTrue")?.classList.toggle("disabled", isDesign2);
-    qs("#coverFalse")?.classList.toggle("disabled", isDesign2);
+    qs("#cover1")?.classList.toggle("disabled", isDesign2);
+    qs("#noCover")?.classList.toggle("disabled", isDesign2);
 
     // Show/hide company and benefits sections
     ["benefits", "company"].forEach((key) => {
@@ -1237,8 +1237,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show/hide cover section based on logic
     const showCover = params.get("cover") === "true" && !isDesign2;
-    toggleActive("coverTrue", showCover);
-    toggleActive("coverFalse", !showCover);
+    toggleActive("cover1", showCover);
+    toggleActive("noCover", !showCover);
 
     qsa('[component="cover"]').forEach((el) => {
       const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
@@ -1264,8 +1264,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const initDesignControls = () => {
     qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
     qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
-    qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
-    qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
+    qs("#cover1")?.addEventListener("click", () => applyCoverToggle("true"));
+    qs("#noCover")?.addEventListener("click", () => applyCoverToggle("false"));
     qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
     qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
@@ -1524,8 +1524,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const isDesign2 = design === "2";
 
     // Disable cover toggle buttons when design 2 is active
-    qs("#coverTrue")?.classList.toggle("disabled", isDesign2);
-    qs("#coverFalse")?.classList.toggle("disabled", isDesign2);
+    qs("#cover1")?.classList.toggle("disabled", isDesign2);
+    qs("#noCover")?.classList.toggle("disabled", isDesign2);
 
     // Show/hide company and benefits sections
     ["benefits", "company"].forEach((key) => {
@@ -1540,8 +1540,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show/hide cover section based on logic
     const showCover = params.get("cover") === "true" && !isDesign2;
-    toggleActive("coverTrue", showCover);
-    toggleActive("coverFalse", !showCover);
+    toggleActive("cover1", showCover);
+    toggleActive("noCover", !showCover);
 
     qsa('[component="cover"]').forEach((el) => {
       const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
@@ -1567,8 +1567,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const initDesignControls = () => {
     qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
     qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
-    qs("#coverTrue")?.addEventListener("click", () => applyCoverToggle("true"));
-    qs("#coverFalse")?.addEventListener("click", () => applyCoverToggle("false"));
+    qs("#cover1")?.addEventListener("click", () => applyCoverToggle("true"));
+    qs("#noCover")?.addEventListener("click", () => applyCoverToggle("false"));
     qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
     qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
