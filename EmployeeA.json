@@ -10,8 +10,8 @@
     "noCover": true,
     "cover1": true,
     "cover2": true,
-    "benefitsPage": true,
-    "companyPage": true
+    "benefitsPage": false,
+    "companyPage": false
   },
   "companyName": "Demo Company",
   "coverSheet": true,
