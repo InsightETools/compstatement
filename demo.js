@@ -208,6 +208,17 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch(fetchUrl)
     .then((response) => response.json())
     .then((data) => {
+
+      function applyButtonStatus() {
+        if (!data.buttonStatus || typeof data.buttonStatus !== "object") return;
+        Object.entries(data.buttonStatus).forEach(([key, value]) => {
+          const btn = document.getElementById(key);
+          if (btn) {
+            btn.classList.toggle("disabled", !value);
+          }
+        });
+      }
+
       const statementElement = [
         "companyName",
         "companyRepName",
@@ -1097,7 +1108,7 @@ document.addEventListener("DOMContentLoaded", () => {
           applyStyles();
         }
       });
-
+      applyButtonStatus();
       //Load Status Finished
       isLoaded = true;
       if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
