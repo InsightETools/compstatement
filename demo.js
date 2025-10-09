@@ -1128,6 +1128,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const getCurrentDesign = () => params.get("design") || "1";
   const getCurrentLayout = () => params.get("layout") || "1";
   const getCurrentHeader = () => params.get("header") || "1";
+  const getCurrentCover  = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
+
 
   // Enable/disable layout buttons by class only
   const setLayoutButtonsDisabled = (disabled) => {
@@ -1158,27 +1160,54 @@ document.addEventListener("DOMContentLoaded", () => {
     setParam("layout", val);
   };
 
+ // Apply cover subclass logic
+  const applyCover = (val) => {
+    // If design=2, layout controls are disabled and layout param should not be set
+    if (getCurrentCover() === "2") return;
+
+    const isTwo = val === "2";
+    qsa('[cover="dynamic"]').forEach((el) => {
+      if (isTwo) el.classList.add("cover2");
+      else el.classList.remove("cover2");
+    });
+
+    qs("#cover2")?.classList.toggle("active", !isTwo);
+    qs("#cover2")?.classList.toggle("active",  isTwo);
+
+    setParam("cover", val);
+  };
+
   // SIMPLE header logic (requested behavior):
   // clicking #header1 -> header=1; clicking #header2 -> header=2
   // header=1 hides #headerTwo; header=2 hides #headerOne
-  const applyHeader = (val) => {
-    const headerOneEl = document.getElementById("headerOne");
-    const headerTwoEl = document.getElementById("headerTwo");
+  // Apply cover subclass logic (mirrors layout)
+  const applyCover = (val) => {
+  // Block when design=2 (same behavior as layout)
+  if (getCurrentDesign() === "2") return;
 
-    if (val === "1") {
-      if (headerOneEl) headerOneEl.style.display = "";
-      if (headerTwoEl) headerTwoEl.style.display = "none";
-    } else if (val === "2") {
-      if (headerOneEl) headerOneEl.style.display = "none";
-      if (headerTwoEl) headerTwoEl.style.display = "";
-    }
+  // Clear previous cover classes and apply the new one
+  const targetClass = `cover${val}`;
+  const allCoverClasses = ["cover0", "cover1", "cover2"];
 
-    // NEW: reflect active state on header buttons
-    qs("#header1")?.classList.toggle("active", val === "1");
-    qs("#header2")?.classList.toggle("active", val === "2");
+  qsa('[cover="dynamic"]').forEach((el) => {
+    allCoverClasses.forEach(c => el.classList.remove(c));
+    el.classList.add(targetClass);
+  });
 
-    setParam("header", val);
-  };
+  // Button active states
+  ["0", "1", "2"].forEach((k) => {
+    qs("#cover" + k)?.classList.toggle("active", k === val);
+  });
+  // If a numbered cover was chosen, ensure #noCover isn't active
+  qs("#noCover")?.classList.remove("active");
+
+  // Persist to URL (cover=0|1|2)
+  setParam("cover", val);
+
+  // Ensure cover section is visible when a numbered cover is set
+  updateExtras();
+};
+
 
   // Toggle between design 1 and design 2, and apply visibility logic
   const applyDesignSwitch = (val) => {
@@ -1213,38 +1242,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // NEW: header buttons disabled state follows same logic as layouts
     setHeaderButtonsDisabled(val === "2");
+
+   if (val === "2") {
+  setParam("cover", "false");
+  // Clear any applied cover classes and button states
+  qsa('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
+  ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+  qs("#noCover")?.classList.add("active");
+}
+
   };
 
   // Apply toggle logic for optional elements (cover, company, benefits)
-  const updateExtras = () => {
-    const design = getCurrentDesign();
-    const isDesign2 = design === "2";
+  // Apply toggle logic for optional elements (cover, company, benefits)
+const updateExtras = () => {
+  const design = getCurrentDesign();
+  const isDesign2 = design === "2";
 
-    // Disable cover toggle buttons when design 2 is active
-    qs("#cover1")?.classList.toggle("disabled", isDesign2);
-    qs("#noCover")?.classList.toggle("disabled", isDesign2);
+  // Disable cover variant buttons when design 2 is active
+  ["0", "1", "2"].forEach((k) => {
+    qs("#cover" + k)?.classList.toggle("disabled", isDesign2);
+  });
+  qs("#noCover")?.classList.toggle("disabled", isDesign2);
 
-    // Show/hide company and benefits sections
-    ["benefits", "company"].forEach((key) => {
-      const enabled = params.get(key) === "true";
-      toggleActive(`${key}Page`, enabled);
+  // Company & benefits visibility (unchanged)
+  ["benefits", "company"].forEach((key) => {
+    const enabled = params.get(key) === "true";
+    toggleActive(`${key}Page`, enabled);
 
-      qsa(`[design="${key}"]`).forEach((el) => {
-        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
-        el.style.display = enabled && match ? "" : "none";
-      });
-    });
-
-    // Show/hide cover section based on logic
-    const showCover = params.get("cover") === "true" && !isDesign2;
-    toggleActive("cover1", showCover);
-    toggleActive("noCover", !showCover);
-
-    qsa('[component="cover"]').forEach((el) => {
+    qsa(`[design="${key}"]`).forEach((el) => {
       const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
-      el.style.display = showCover && match ? "" : "none";
+      el.style.display = enabled && match ? "" : "none";
     });
-  };
+  });
+
+  // COVER VISIBILITY
+  // Show cover when cover != "false" and not design 2
+  const coverParam = getCurrentCover(); // "0" | "1" | "2" | "false"
+  const showCover = coverParam !== "false" && !isDesign2;
+
+  // Reflect active state on cover buttons
+  ["0", "1", "2"].forEach((k) => {
+    toggleActive("cover" + k, showCover && coverParam === k);
+  });
+  toggleActive("noCover", !showCover);
+
+  // Show/hide all cover components
+  qsa('[component="cover"]').forEach((el) => {
+    const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+    el.style.display = showCover && match ? "" : "none";
+  });
+};
+
 
   // Toggle specific section (company or benefits)
   const toggleExtra = (key) => {
@@ -1262,37 +1311,69 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set up all button click listeners and initialize design/layout/header view
   const initDesignControls = () => {
-    qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
-    qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
-    qs("#cover1")?.addEventListener("click", () => applyCoverToggle("true"));
-    qs("#noCover")?.addEventListener("click", () => applyCoverToggle("false"));
-    qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
-    qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
+  // Design
+  qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
+  qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
 
-    // Layout buttons (ignored if design=2 due to guard in applyLayout)
-    qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
-    qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
+  // COVER VARIANTS
+  qs("#cover0")?.addEventListener("click", () => applyCover("0"));
+  qs("#cover1")?.addEventListener("click", () => applyCover("1"));
+  qs("#cover2")?.addEventListener("click", () => applyCover("2"));
+  qs("#noCover")?.addEventListener("click", () => {
+    // Hide cover entirely
+    setParam("cover", "false");
+    // Clear active states on cover0/1/2
+    ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+    qs("#noCover")?.classList.add("active");
 
-    // Header buttons
-    qs("#header1")?.addEventListener("click", () => applyHeader("1"));
-    qs("#header2")?.addEventListener("click", () => applyHeader("2"));
+    // Remove cover classes from DOM (optional clean-up)
+    qsa('[cover="dynamic"]').forEach((el) => {
+      el.classList.remove("cover0", "cover1", "cover2");
+    });
 
-    // Auto-correct cover value on design 2
-    const currentDesign = getCurrentDesign();
-    if (currentDesign === "2" && params.get("cover") !== "false") {
-      setParam("cover", "false");
-    }
+    updateExtras();
+  });
 
-    // Apply current design first (handles button disabled states)
-    applyDesignSwitch(currentDesign);
+  // Pages
+  qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
+  qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
-    // Defaults & initial application
-    if (!params.has("layout")) setParam("layout", "1");
-    applyLayout(getCurrentLayout());
+  // Layout buttons (ignored if design=2 due to guard in applyLayout)
+  qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
+  qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
 
-    if (!params.has("header")) setParam("header", "1");
-    applyHeader(getCurrentHeader());
-  };
+  // Header buttons
+  qs("#header1")?.addEventListener("click", () => applyHeader("1"));
+  qs("#header2")?.addEventListener("click", () => applyHeader("2"));
+
+  // Auto-correct cover on design=2
+  const currentDesign = getCurrentDesign();
+  if (currentDesign === "2" && getCurrentCover() !== "false") {
+    setParam("cover", "false");
+  }
+
+  // Apply current design first (handles disabled states)
+  applyDesignSwitch(currentDesign);
+
+  // Defaults & initial application
+  if (!params.has("layout")) setParam("layout", "1");
+  applyLayout(getCurrentLayout());
+
+  if (!params.has("header")) setParam("header", "1");
+  applyHeader(getCurrentHeader());
+
+  // Default cover if not set: use cover0 and apply it
+  if (!params.has("cover")) {
+    setParam("cover", "0");
+  }
+  const c = getCurrentCover();
+  if (c !== "false") {
+    // Ensure DOM has correct cover class and button active state
+    applyCover(c);
+  } else {
+    updateExtras();
+  }
+};
 
   // DOM Ready
   document.addEventListener("DOMContentLoaded", () => {
