@@ -2,6 +2,17 @@
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
+// 🔒 Block clicks on disabled elements anywhere in the app
+(function installDisabledClickGuard(){
+  document.addEventListener("click", (e) => {
+    const el = e.target.closest(".disabled, [aria-disabled='true'], [disabled]");
+    if (el) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }, true);
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
   const qs = () => new URLSearchParams(window.location.search);
   const nav = (pathname, params) => {
@@ -196,40 +207,88 @@ document.addEventListener("DOMContentLoaded", () => {
   }).toString();
 
   if (!key) {
-  fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
-} else {
-  fetchUrl = `${baseUrl}?${queryParams}`;
-}
+    fetchUrl = `https://compstatementdemo.netlify.app/${ek}.json`;
+  } else {
+    fetchUrl = `${baseUrl}?${queryParams}`;
+  }
 
- //console.log(fetchUrl);
+  //console.log(fetchUrl);
 
- fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
+  fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
   fetch(fetchUrl)
     .then((response) => response.json())
     .then((data) => {
 
-    function applyButtonStatus() {
-      const bs = data?.buttonStatus;
-      if (!bs || typeof bs !== "object") return;
-      Object.entries(bs).forEach(([key, value]) => {
-        const btn = document.getElementById(key);
-        if (!btn) return;
-        const isDisabled = !Boolean(value);
-        // Toggle CSS subclass
-        btn.classList.toggle("disabled", isDisabled);
+      // 🔧 Make JSON-disabled buttons inert & visually disabled
+      function applyButtonStatus() {
+        const bs = data?.buttonStatus;
+        if (!bs || typeof bs !== "object") return;
 
-        // Set actual disabled attribute for real form controls
-         if ("disabled" in btn) {
-        btn.disabled = isDisabled;
-        } else {
-        // Non-form controls: reflect with aria-disabled
-        if (isDisabled) btn.setAttribute("aria-disabled", "true");
-        else btn.removeAttribute("aria-disabled");
+        Object.entries(bs).forEach(([id, enabled]) => {
+          const btn = document.getElementById(id);
+          if (!btn) return;
+
+          const isDisabled = !Boolean(enabled);
+
+          btn.classList.toggle("disabled", isDisabled);
+
+          if ("disabled" in btn) {
+            btn.disabled = isDisabled;
+          } else {
+            if (isDisabled) btn.setAttribute("aria-disabled", "true");
+            else btn.removeAttribute("aria-disabled");
+            btn.style.pointerEvents = isDisabled ? "none" : "";
+          }
+        });
+      }
+
+      // 🔗 Apply href to [data="companyURL"]
+      function applyCompanyURL() {
+        const url = data?.companyURL;
+        if (!url) return;
+        document.querySelectorAll('[data="companyURL"]').forEach((el) => {
+          if ("href" in el) el.href = url;
+          else el.setAttribute("href", url);
+        });
+      }
+
+      // 🖼️ Render cover images from array `coverContent`
+      function renderCoverContent() {
+        const list = Array.isArray(data?.coverContent)
+          ? data.coverContent.filter(Boolean)
+          : [];
+
+        const template = document.querySelector('img[data="coverContent"]');
+        if (!template || !template.parentNode) return;
+
+        const parent = template.parentNode;
+
+        // Remove any previously generated clones (keep template)
+        parent.querySelectorAll('img[data="coverContent-clone"]').forEach(n => n.remove());
+
+        if (list.length === 0) {
+          template.style.display = "none";
+          return;
         }
-      });
-    }
-      
+
+        // Use template purely as a hidden template
+        template.style.display = "none";
+
+        const frag = document.createDocumentFragment();
+        list.forEach((src, i) => {
+          const img = template.cloneNode(true);
+          img.setAttribute("data", "coverContent-clone");
+          img.removeAttribute("id");
+          img.style.display = "";
+          img.src = src;
+          if (!img.alt) img.alt = `Cover image ${i + 1}`;
+          frag.appendChild(img);
+        });
+
+        parent.appendChild(frag);
+      }
+
       const statementElement = [
         "companyName",
         "companyRepName",
@@ -536,7 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
           );
           const clone = boolTemplate?.cloneNode(true);
 
-        if (clone && cell?.hasAttribute("color")) {
+          if (clone && cell?.hasAttribute("color")) {
             const colorAttr = cell.getAttribute("color");
             const cssColor = elementColor?.[colorAttr];
             if (cssColor) {
@@ -1034,7 +1093,6 @@ document.addEventListener("DOMContentLoaded", () => {
       holidaysList(data);
       contactsLists(data.companyContacts, '[contacts="company"]');
       contactsLists(data.benefitContacts, '[contacts="providers"]');
-      //standaloneDisclaimer(data.booleantable3_disclaimer, "booleantable3");
       loadDisplay(data);
 
       const spans = document.querySelectorAll("span");
@@ -1119,7 +1177,12 @@ document.addEventListener("DOMContentLoaded", () => {
           applyStyles();
         }
       });
+
+      // New calls for added functionality
+      applyCompanyURL();
+      renderCoverContent();
       applyButtonStatus();
+
       //Load Status Finished
       isLoaded = true;
       if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
