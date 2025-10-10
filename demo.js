@@ -1,16 +1,20 @@
-// Load Status
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-// 🔒 Block clicks on disabled elements anywhere in the app
-(function installDisabledClickGuard(){
-  document.addEventListener("click", (e) => {
-    const el = e.target.closest(".disabled, [aria-disabled='true'], [disabled]");
-    if (el) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  }, true);
+(function installDisabledClickGuard() {
+  document.addEventListener(
+    "click",
+    (e) => {
+      const el = e.target.closest(
+        ".disabled, [aria-disabled='true'], [disabled]"
+      );
+      if (el) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    },
+    true
+  );
 })();
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -22,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const params = qs();
 
-  // Handle Design Buttons
   const designBtns = document.querySelectorAll('[id^="design-"]');
   if (designBtns.length) {
     designBtns.forEach((btn) => {
@@ -36,12 +39,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pathMatch) {
       const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
       if (activeDesign) {
-        designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+        designBtns.forEach((b) =>
+          b.classList.toggle("active", b === activeDesign)
+        );
       }
     }
   }
 
-  // Handle Employee Buttons
   const empBtns = document.querySelectorAll('[id^="employee-"]');
   if (empBtns.length) {
     empBtns.forEach((btn) => {
@@ -62,18 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle Demo Element
   const demoEl = document.getElementById("demo");
   if (demoEl) {
     demoEl.style.display = params.get("demo") === "true" ? "" : "none";
   }
 });
 
-// Convert HEX to RGB string
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
-    hex = hex.split("").map((c) => c + c).join("");
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
   }
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -82,8 +87,12 @@ function hexToRgb(hex) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-// Format numbers to currency strings
-function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
+function formatCurrency(
+  value,
+  element = null,
+  decimalFlag = null,
+  isCurrency = true
+) {
   if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
 
   const isDynamic = element?.getAttribute?.("number") === "dynamic";
@@ -100,12 +109,12 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
-// Render donut chart with gradient and legend
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
 
-  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup))
+    return;
 
   legendContainer.innerHTML = "";
 
@@ -117,7 +126,6 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     const color = hexToRgb(category.color);
     const end = start + value;
 
-    // Create item layout
     const itemDiv = document.createElement("div");
     itemDiv.setAttribute("category", "item");
     itemDiv.classList.add("moduledonutindex");
@@ -151,10 +159,11 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     start = end;
   });
 
-  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(
+    ", "
+  )})`;
 }
 
-// Apply color values from a map to cloned element
 function applyElementColors(clone, colorMap) {
   if (!clone || !colorMap) return;
 
@@ -174,15 +183,16 @@ function applyElementColors(clone, colorMap) {
   });
 }
 
-//Execute Tasks
 document.addEventListener("DOMContentLoaded", () => {
   const urlParams = new URLSearchParams(window.location.search);
 
   if (!urlParams.has("ek")) {
     urlParams.set("ek", "EmployeeA");
-    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${
+      window.location.hash
+    }`;
     window.location.replace(newUrl);
-    return; 
+    return;
   }
 
   const key = urlParams.get("key");
@@ -212,15 +222,12 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchUrl = `${baseUrl}?${queryParams}`;
   }
 
-  //console.log(fetchUrl);
-
-  fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
+  fetchUrl =
+    "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
   fetch(fetchUrl)
     .then((response) => response.json())
     .then((data) => {
-
-      // 🔧 Make JSON-disabled buttons inert & visually disabled
       function applyButtonStatus() {
         const bs = data?.buttonStatus;
         if (!bs || typeof bs !== "object") return;
@@ -243,17 +250,17 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
 
-      // 🔗 Apply href to [data="companyURL"]
       function applyExplorerURL() {
         const url = data?.explorerUrl;
         if (!url) return;
         document.querySelectorAll('[data="explorerUrl"]').forEach((el) => {
           if ("href" in el) el.href = url;
           else el.setAttribute("href", url);
+          el.setAttribute("target", "_blank");
+          el.setAttribute("rel", "noopener noreferrer");
         });
       }
 
-      // 🖼️ Render cover images from array `coverContent`
       function renderCoverContent() {
         const list = Array.isArray(data?.coverContent)
           ? data.coverContent.filter(Boolean)
@@ -264,15 +271,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const parent = template.parentNode;
 
-        // Remove any previously generated clones (keep template)
-        parent.querySelectorAll('img[data="coverContent-clone"]').forEach(n => n.remove());
+        parent
+          .querySelectorAll('img[data="coverContent-clone"]')
+          .forEach((n) => n.remove());
 
         if (list.length === 0) {
           template.style.display = "none";
           return;
         }
 
-        // Use template purely as a hidden template
         template.style.display = "none";
 
         const frag = document.createDocumentFragment();
@@ -329,7 +336,6 @@ document.addEventListener("DOMContentLoaded", () => {
         tableColor: data.tableColor,
       };
 
-      //Apply Colors
       Object.entries(elementColor).forEach(([attr, color]) => {
         document.querySelectorAll(`[color="${attr}"]`).forEach((el) => {
           const elementType = el.getAttribute("element");
@@ -1053,7 +1059,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         }
 
-        // 🔧 FIX: Declare local params + getCurrentDesign
         const params = new URLSearchParams(window.location.search);
         const getCurrentDesign = () => params.get("design") || "1";
 
@@ -1118,7 +1123,6 @@ document.addEventListener("DOMContentLoaded", () => {
         secondaryColors.style.color = elementColor.secondaryColor;
       });
 
-      //Check Overflow
       document.querySelectorAll('[item="page"]').forEach((page) => {
         const lineElements = page.querySelectorAll(
           ".standardtablelinelabel, .standardtablevalue, .standardtablesubtotallabel, .standardtablesubtotalvalue"
@@ -1178,14 +1182,16 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       });
 
-      // New calls for added functionality
       applyExplorerURL();
       renderCoverContent();
       applyButtonStatus();
 
-      //Load Status Finished
       isLoaded = true;
-      if(isLoaded == true){console.log("Finished")}else{console.log("Loading Failed")}
+      if (isLoaded == true) {
+        console.log("Finished");
+      } else {
+        console.log("Loading Failed");
+      }
     })
     .catch((error) => {
       const errorCheck = error.message.includes("Unexpected token");
@@ -1194,42 +1200,39 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 (() => {
-  // Utility functions for selecting elements
-  const qs  = (sel) => document.querySelector(sel);
+  const qs = (sel) => document.querySelector(sel);
   const qsa = (sel) => document.querySelectorAll(sel);
   const params = new URLSearchParams(window.location.search);
   let scale = 1; // Initial zoom level
 
-  // Update the URL parameter without reloading the page (preserve hash)
   const setParam = (key, value) => {
     params.set(key, value);
-    history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+    history.replaceState(
+      null,
+      "",
+      `${location.pathname}?${params.toString()}${location.hash}`
+    );
   };
 
-  // Toggle "active" class for an element
-  const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
+  const toggleActive = (id, isActive) =>
+    qs("#" + id)?.classList.toggle("active", isActive);
 
-  // Helpers to read current params
   const getCurrentDesign = () => params.get("design") || "1";
   const getCurrentLayout = () => params.get("layout") || "1";
   const getCurrentHeader = () => params.get("header") || "1";
-  const getCurrentCover  = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
+  const getCurrentCover = () => params.get("cover") ?? "0";
 
-  // Enable/disable layout buttons by class only
   const setLayoutButtonsDisabled = (disabled) => {
     qs("#layout1")?.classList.toggle("disabled", disabled);
     qs("#layout2")?.classList.toggle("disabled", disabled);
   };
 
-  // NEW: Enable/disable header buttons by class only (matches layout logic)
   const setHeaderButtonsDisabled = (disabled) => {
     qs("#header1")?.classList.toggle("disabled", disabled);
     qs("#header2")?.classList.toggle("disabled", disabled);
   };
 
-  // Apply layout subclass logic
   const applyLayout = (val) => {
-    // If design=2, layout controls are disabled and layout param should not be set
     if (getCurrentDesign() === "2") return;
 
     const isTwo = val === "2";
@@ -1239,14 +1242,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     qs("#layout1")?.classList.toggle("active", !isTwo);
-    qs("#layout2")?.classList.toggle("active",  isTwo);
+    qs("#layout2")?.classList.toggle("active", isTwo);
 
     setParam("layout", val);
   };
 
-  // SIMPLE header logic (requested behavior):
-  // clicking #header1 -> header=1; clicking #header2 -> header=2
-  // header=1 hides #headerTwo; header=2 hides #headerOne
   const applyHeader = (val) => {
     const headerOneEl = document.getElementById("headerOne");
     const headerTwoEl = document.getElementById("headerTwo");
@@ -1259,42 +1259,33 @@ document.addEventListener("DOMContentLoaded", () => {
       if (headerTwoEl) headerTwoEl.style.display = "";
     }
 
-    // reflect active state on header buttons
     qs("#header1")?.classList.toggle("active", val === "1");
     qs("#header2")?.classList.toggle("active", val === "2");
 
     setParam("header", val);
   };
 
-  // Apply cover subclass logic (mirrors layout)
   const applyCover = (val) => {
-    // Block when design=2 (same behavior as layout)
     if (getCurrentDesign() === "2") return;
 
-    // Clear previous cover classes and apply the new one
     const targetClass = `cover${val}`;
     const allCoverClasses = ["cover0", "cover1", "cover2"];
 
     qsa('[cover="dynamic"]').forEach((el) => {
-      allCoverClasses.forEach(c => el.classList.remove(c));
+      allCoverClasses.forEach((c) => el.classList.remove(c));
       el.classList.add(targetClass);
     });
 
-    // Button active states
     ["0", "1", "2"].forEach((k) => {
       qs("#cover" + k)?.classList.toggle("active", k === val);
     });
-    // If a numbered cover was chosen, ensure #noCover isn't active
     qs("#noCover")?.classList.remove("active");
 
-    // Persist to URL (cover=0|1|2)
     setParam("cover", val);
 
-    // Ensure cover section is visible when a numbered cover is set
     updateExtras();
   };
 
-  // Toggle between design 1 and design 2, and apply visibility logic
   const applyDesignSwitch = (val) => {
     ["1", "2"].forEach((d) => {
       const show = d === val;
@@ -1311,11 +1302,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setParam("design", val);
     updateExtras();
 
-    // Layout behavior depending on design (unchanged)
     if (val === "2") {
       setLayoutButtonsDisabled(true);
       params.delete("layout");
-      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+      history.replaceState(
+        null,
+        "",
+        `${location.pathname}?${params.toString()}${location.hash}`
+      );
       qsa('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
       qs("#layout1")?.classList.remove("active");
       qs("#layout2")?.classList.remove("active");
@@ -1325,90 +1319,83 @@ document.addEventListener("DOMContentLoaded", () => {
       applyLayout("1");
     }
 
-    // NEW: header buttons disabled state follows same logic as layouts
     setHeaderButtonsDisabled(val === "2");
 
     if (val === "2") {
       setParam("cover", "false");
-      // Clear any applied cover classes and button states
-      qsa('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
-      ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+      qsa('[cover="dynamic"]').forEach((el) =>
+        el.classList.remove("cover0", "cover1", "cover2")
+      );
+      ["0", "1", "2"].forEach((k) =>
+        qs("#cover" + k)?.classList.remove("active")
+      );
       qs("#noCover")?.classList.add("active");
     }
   };
 
-  // Apply toggle logic for optional elements (cover, company, benefits)
   const updateExtras = () => {
     const design = getCurrentDesign();
     const isDesign2 = design === "2";
 
-    // Disable cover variant buttons when design 2 is active
     ["0", "1", "2"].forEach((k) => {
       qs("#cover" + k)?.classList.toggle("disabled", isDesign2);
     });
     qs("#noCover")?.classList.toggle("disabled", isDesign2);
 
-    // Company & benefits visibility (unchanged)
     ["benefits", "company"].forEach((key) => {
       const enabled = params.get(key) === "true";
       toggleActive(`${key}Page`, enabled);
 
       qsa(`[design="${key}"]`).forEach((el) => {
-        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        const match =
+          !el.getAttribute("designgroup") ||
+          el.getAttribute("designgroup") === design;
         el.style.display = enabled && match ? "" : "none";
       });
     });
 
-    // COVER VISIBILITY
-    // Show cover when cover != "false" and not design 2
-    const coverParam = getCurrentCover(); // "0" | "1" | "2" | "false"
+    const coverParam = getCurrentCover();
     const showCover = coverParam !== "false" && !isDesign2;
 
-    // Reflect active state on cover buttons
     ["0", "1", "2"].forEach((k) => {
       toggleActive("cover" + k, showCover && coverParam === k);
     });
     toggleActive("noCover", !showCover);
 
-    // Show/hide all cover components
     qsa('[component="cover"]').forEach((el) => {
-      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      const match =
+        !el.getAttribute("designgroup") ||
+        el.getAttribute("designgroup") === design;
       el.style.display = showCover && match ? "" : "none";
     });
   };
 
-  // Toggle specific section (company or benefits)
   const toggleExtra = (key) => {
     const current = params.get(key) === "true";
     setParam(key, (!current).toString());
     updateExtras();
   };
 
-  // Apply cover toggle based on user action (but block on design 2)
   const applyCoverToggle = (val) => {
     if (getCurrentDesign() === "2" && val === "true") return;
     setParam("cover", val);
     updateExtras();
   };
 
-  // Set up all button click listeners and initialize design/layout/header view
   const initDesignControls = () => {
-    // Design
     qs("#design1")?.addEventListener("click", () => applyDesignSwitch("1"));
     qs("#design2")?.addEventListener("click", () => applyDesignSwitch("2"));
 
-    // COVER VARIANTS
     qs("#cover0")?.addEventListener("click", () => applyCover("0"));
     qs("#cover1")?.addEventListener("click", () => applyCover("1"));
     qs("#cover2")?.addEventListener("click", () => applyCover("2"));
     qs("#noCover")?.addEventListener("click", () => {
-      // Hide cover entirely
       setParam("cover", "false");
-      // Clear active states on cover0/1/2
-      ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+      ["0", "1", "2"].forEach((k) =>
+        qs("#cover" + k)?.classList.remove("active")
+      );
       qs("#noCover")?.classList.add("active");
 
-      // Remove cover classes from DOM (optional clean-up)
       qsa('[cover="dynamic"]').forEach((el) => {
         el.classList.remove("cover0", "cover1", "cover2");
       });
@@ -1416,50 +1403,42 @@ document.addEventListener("DOMContentLoaded", () => {
       updateExtras();
     });
 
-    // Pages
-    qs("#benefitsPage")?.addEventListener("click", () => toggleExtra("benefits"));
+    qs("#benefitsPage")?.addEventListener("click", () =>
+      toggleExtra("benefits")
+    );
     qs("#companyPage")?.addEventListener("click", () => toggleExtra("company"));
 
-    // Layout buttons (ignored if design=2 due to guard in applyLayout)
     qs("#layout1")?.addEventListener("click", () => applyLayout("1"));
     qs("#layout2")?.addEventListener("click", () => applyLayout("2"));
 
-    // Header buttons
     qs("#header1")?.addEventListener("click", () => applyHeader("1"));
     qs("#header2")?.addEventListener("click", () => applyHeader("2"));
 
-    // Auto-correct cover on design=2
     const currentDesign = getCurrentDesign();
     if (currentDesign === "2" && getCurrentCover() !== "false") {
       setParam("cover", "false");
     }
 
-    // Apply current design first (handles disabled states)
     applyDesignSwitch(currentDesign);
 
-    // Defaults & initial application
     if (!params.has("layout")) setParam("layout", "1");
     applyLayout(getCurrentLayout());
 
     if (!params.has("header")) setParam("header", "1");
     applyHeader(getCurrentHeader());
 
-    // Default cover if not set: use cover0 and apply it
     if (!params.has("cover")) {
       setParam("cover", "0");
     }
     const c = getCurrentCover();
     if (c !== "false") {
-      // Ensure DOM has correct cover class and button active state
       applyCover(c);
     } else {
       updateExtras();
     }
   };
 
-  // DOM Ready
   document.addEventListener("DOMContentLoaded", () => {
-    // Zoom controls
     let scale = 0.7;
     const zoomLevelEl = qs("#zoomLevel");
     const updateZoom = () => {
@@ -1485,7 +1464,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateZoom();
 
-    // Employee selector buttons (ID starts with "Employee")
     const empBtns = qsa('[id^="Employee"]');
     const setActiveButton = (id) => {
       empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
@@ -1494,7 +1472,9 @@ document.addEventListener("DOMContentLoaded", () => {
     empBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         params.set("ek", btn.id);
-        window.location.href = `${location.pathname}?${params.toString()}${location.hash}`;
+        window.location.href = `${location.pathname}?${params.toString()}${
+          location.hash
+        }`;
       });
     });
 
@@ -1502,16 +1482,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ek || !document.getElementById(ek)) {
       ek = "EmployeeA";
       params.set("ek", ek);
-      window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
+      window.location.replace(
+        `${location.pathname}?${params.toString()}${location.hash}`
+      );
     }
     setActiveButton(ek);
 
-    // Scroll to component when clicking top nav buttons
     const scrollToComponent = (btnId, key) => {
       qs("#" + btnId)?.addEventListener("click", () => {
         const target = qs(`[design="${key}"]`);
         if (target) {
-          const offset = target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
+          const offset =
+            target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
           qs("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
         }
       });
@@ -1520,7 +1502,6 @@ document.addEventListener("DOMContentLoaded", () => {
     scrollToComponent("benefitsPage", "benefits");
     scrollToComponent("companyPage", "company");
 
-    // Auto-hide editor panel in preview or shared view
     const hasKey = params.has("key");
     const isPreview = params.has("preview");
 
@@ -1539,7 +1520,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Generate preview URL
   const getUrlWithPreviewParam = () => {
     const url = new URL(window.location.href);
     if (!url.searchParams.has("preview")) {
@@ -1548,14 +1528,16 @@ document.addEventListener("DOMContentLoaded", () => {
     return url.toString();
   };
 
-  // Share via email
   qs("#shareEmail")?.addEventListener("click", () => {
     const subject = `Design #${params.get("design")} Preview`;
-    const body = `Here is a preview of Compensation Statement Design #${params.get("design")}:\n\n${getUrlWithPreviewParam()}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const body = `Here is a preview of Compensation Statement Design #${params.get(
+      "design"
+    )}:\n\n${getUrlWithPreviewParam()}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
   });
 
-  // Copy preview link to clipboard
   qs("#copyButton")?.addEventListener("click", () => {
     const url = getUrlWithPreviewParam();
     navigator.clipboard.writeText(url).then(() => {
@@ -1572,7 +1554,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // "Edit" button clears preview params and redirects
   qs("#editButton")?.addEventListener("click", () => {
     params.delete("preview");
     params.delete("key");
@@ -1580,6 +1561,5 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = newUrl;
   });
 
-  // Initial setup
   initDesignControls();
 })();
