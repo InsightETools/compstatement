@@ -1,5 +1,6 @@
 {
   "explorerLogo": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/6809171f634ed03b8d799918_Insight%20e-Tools_Full%20Color.png",
+  "explorerUrl": "https://www.google.com:",
   "buttonStatus": {
     "design1": true,
     "design2": true,
@@ -14,6 +15,7 @@
     "companyPage": false
   },
   "companyName": "Demo Company",
+  "companyURL": "https://www.google.com",
   "coverSheet": true,
   "companyLogoCover": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
   "companyLogoCoverHeight": 50,
@@ -54,6 +56,9 @@
   "secondaryColor": "#00406c",
   "tableColor": "#00406c",
   "chartSize": "small",
+  "coverContent": [
+    "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68262886a38d4061efd39ced_shutterstock_341688425-1.jpg", "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68262886a38d4061efd39ced_shutterstock_341688425-1.jpg", "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68262886a38d4061efd39ced_shutterstock_341688425-1.jpg"
+  ],
   "listModule": [
     {
       "id": "module13",
