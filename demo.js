@@ -1179,7 +1179,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       // New calls for added functionality
-      applyCompanyURL();
+      applyExplorerURL();
       renderCoverContent();
       applyButtonStatus();
 
