@@ -209,16 +209,27 @@ document.addEventListener("DOMContentLoaded", () => {
     .then((response) => response.json())
     .then((data) => {
 
-      function applyButtonStatus() {
-        if (!data.buttonStatus || typeof data.buttonStatus !== "object") return;
-        Object.entries(data.buttonStatus).forEach(([key, value]) => {
-          const btn = document.getElementById(key);
-          if (btn) {
-            btn.classList.toggle("disabled", !value);
-          }
-        });
-      }
+    function applyButtonStatus() {
+      const bs = data?.buttonStatus;
+      if (!bs || typeof bs !== "object") return;
+      Object.entries(bs).forEach(([key, value]) => {
+        const btn = document.getElementById(key);
+        if (!btn) return;
+        const isDisabled = !Boolean(value);
+        // Toggle CSS subclass
+        btn.classList.toggle("disabled", isDisabled);
 
+        // Set actual disabled attribute for real form controls
+         if ("disabled" in btn) {
+        btn.disabled = isDisabled;
+        } else {
+        // Non-form controls: reflect with aria-disabled
+        if (isDisabled) btn.setAttribute("aria-disabled", "true");
+        else btn.removeAttribute("aria-disabled");
+        }
+      });
+    }
+      
       const statementElement = [
         "companyName",
         "companyRepName",
