@@ -25,7 +25,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (pathMatch) {
       const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
       if (activeDesign) {
-        designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+        designBtns.forEach((b) =>
+          b.classList.toggle("active", b === activeDesign)
+        );
       }
     }
   }
@@ -62,7 +64,10 @@ document.addEventListener("DOMContentLoaded", () => {
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) {
-    hex = hex.split("").map((c) => c + c).join("");
+    hex = hex
+      .split("")
+      .map((c) => c + c)
+      .join("");
   }
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;
@@ -72,7 +77,12 @@ function hexToRgb(hex) {
 }
 
 // Format numbers to currency strings
-function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
+function formatCurrency(
+  value,
+  element = null,
+  decimalFlag = null,
+  isCurrency = true
+) {
   if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
 
   const isDynamic = element?.getAttribute?.("number") === "dynamic";
@@ -94,7 +104,8 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
 
-  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup))
+    return;
 
   legendContainer.innerHTML = "";
 
@@ -140,7 +151,9 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     start = end;
   });
 
-  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(
+    ", "
+  )})`;
 }
 
 // Apply color values from a map to cloned element
@@ -169,9 +182,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!urlParams.has("ek")) {
     urlParams.set("ek", "EmployeeA");
-    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${
+      window.location.hash
+    }`;
     window.location.replace(newUrl);
-    return; 
+    return;
   }
 
   const key = urlParams.get("key");
@@ -203,7 +218,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   //console.log(fetchUrl);
 
-  fetchUrl = "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
+  fetchUrl =
+    "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
   fetch(fetchUrl)
     .then((response) => response.json())
@@ -248,7 +264,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // === Cover Content (array of image URLs) ===
       function applyCoverContent() {
-        const arr = Array.isArray(data?.coverContent) ? data.coverContent : null;
+        const arr = Array.isArray(data?.coverContent)
+          ? data.coverContent
+          : null;
         if (!arr || arr.length === 0) return;
 
         const templateImg = document.querySelector('img[data="coverContent"]');
@@ -344,7 +362,9 @@ document.addEventListener("DOMContentLoaded", () => {
           el.style.justifyContent = "flex-end";
         });
 
-        const signatureElements = document.querySelectorAll('[data="companySignature"]');
+        const signatureElements = document.querySelectorAll(
+          '[data="companySignature"]'
+        );
         if (!data.companySignature || !signatureElements.length) {
           signatureElements.forEach((el) => (el.style.display = "none"));
         } else {
@@ -363,7 +383,9 @@ document.addEventListener("DOMContentLoaded", () => {
       function standardTables(data) {
         const categoryEntryTemplate = document.querySelector("#categoryEntry");
         const baseTableTemplate = document.querySelector("#tableTemplate");
-        const tableContent = baseTableTemplate.querySelector(".standardtablewrapper");
+        const tableContent = baseTableTemplate.querySelector(
+          ".standardtablewrapper"
+        );
 
         if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) {
           console.error("No Standard Table Slots Found");
@@ -386,9 +408,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const tableNameEl = tableWrapper.querySelector('[table="name"]');
             if (tableNameEl) tableNameEl.textContent = table.name || "";
 
-            const headerCol1 = tableWrapper.querySelector('[table="summaryHeaderCol1"]');
-            const headerCol2 = tableWrapper.querySelector('[table="summaryHeaderCol2"]');
-            const headerCol3 = tableWrapper.querySelector('[table="summaryHeaderCol3"]');
+            const headerCol1 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol1"]'
+            );
+            const headerCol2 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol2"]'
+            );
+            const headerCol3 = tableWrapper.querySelector(
+              '[table="summaryHeaderCol3"]'
+            );
 
             if (!showCol1 && headerCol1) headerCol1.remove();
             else if (headerCol1) headerCol1.textContent = table.column1Name;
@@ -399,7 +427,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!showCol3 && headerCol3) headerCol3.remove();
             else if (headerCol3) headerCol3.textContent = table.column3Name;
 
-            const categoryListContainer = tableWrapper.querySelector(".standardtablelist");
+            const categoryListContainer =
+              tableWrapper.querySelector(".standardtablelist");
 
             table.categories.forEach((category) => {
               const categoryClone = categoryEntryTemplate.cloneNode(true);
@@ -408,12 +437,17 @@ document.addEventListener("DOMContentLoaded", () => {
               const existingList = categoryClone.querySelector("#categoryList");
               if (existingList) existingList.remove();
 
-              const existingSubtotal = categoryClone.querySelector('[category="subtotal"]');
+              const existingSubtotal = categoryClone.querySelector(
+                '[category="subtotal"]'
+              );
               if (existingSubtotal) existingSubtotal.remove();
 
-              const categoryName = categoryClone.querySelector('[category="name"]');
-              const categoryIcon = categoryClone.querySelector('[category="icon"]');
-              if (categoryIcon) categoryIcon.style.backgroundColor = category.color;
+              const categoryName =
+                categoryClone.querySelector('[category="name"]');
+              const categoryIcon =
+                categoryClone.querySelector('[category="icon"]');
+              if (categoryIcon)
+                categoryIcon.style.backgroundColor = category.color;
               if (categoryName) categoryName.textContent = category.label;
 
               const categoryList = document.createElement("div");
@@ -437,7 +471,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   col1Div.setAttribute("line", "col1");
                   col1Div.setAttribute("number", "dynamic");
                   col1Div.className = "standardtablevalue";
-                  col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
+                  col1Div.textContent = formatCurrency(
+                    lineitem.col1_value,
+                    col1Div,
+                    table.isDecimal
+                  );
                   valueWrapper.appendChild(col1Div);
                 }
 
@@ -446,7 +484,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   col2Div.setAttribute("line", "col2");
                   col2Div.setAttribute("number", "dynamic");
                   col2Div.className = "standardtablevalue";
-                  col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
+                  col2Div.textContent = formatCurrency(
+                    lineitem.col2_value,
+                    col2Div,
+                    table.isDecimal
+                  );
                   valueWrapper.appendChild(col2Div);
                 }
 
@@ -455,7 +497,11 @@ document.addEventListener("DOMContentLoaded", () => {
                   col3Div.setAttribute("line", "col3");
                   col3Div.setAttribute("number", "dynamic");
                   col3Div.className = "standardtablevalue";
-                  col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
+                  col3Div.textContent = formatCurrency(
+                    lineitem.col3_value,
+                    col3Div,
+                    table.isDecimal
+                  );
                   valueWrapper.appendChild(col3Div);
                 }
 
@@ -480,7 +526,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 subCol1.setAttribute("subtotal", "col1");
                 subCol1.setAttribute("number", "dynamic");
                 subCol1.className = "standardtablesubtotalvalue";
-                subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
+                subCol1.textContent = formatCurrency(
+                  category.col1_subtotal,
+                  subCol1,
+                  table.isDecimal
+                );
                 subWrapper.appendChild(subCol1);
               }
 
@@ -489,7 +539,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 subCol2.setAttribute("subtotal", "col2");
                 subCol2.setAttribute("number", "dynamic");
                 subCol2.className = "standardtablesubtotalvalue";
-                subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
+                subCol2.textContent = formatCurrency(
+                  category.col2_subtotal,
+                  subCol2,
+                  table.isDecimal
+                );
                 subWrapper.appendChild(subCol2);
               }
 
@@ -498,7 +552,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 subCol3.setAttribute("subtotal", "col3");
                 subCol3.setAttribute("number", "dynamic");
                 subCol3.className = "standardtablesubtotalvalue";
-                subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
+                subCol3.textContent = formatCurrency(
+                  category.col3_subtotal,
+                  subCol3,
+                  table.isDecimal
+                );
                 subWrapper.appendChild(subCol3);
               }
 
@@ -517,8 +575,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       function booleanTables(data) {
         const tableTemplate = document.querySelector("#booleanTableTemplate");
-        const rowTemplateWrapper = document.querySelector("#booleanCategoryEntry");
-        const rowTemplate = rowTemplateWrapper?.querySelector('[category="line"]');
+        const rowTemplateWrapper = document.querySelector(
+          "#booleanCategoryEntry"
+        );
+        const rowTemplate =
+          rowTemplateWrapper?.querySelector('[category="line"]');
 
         if (!tableTemplate || !rowTemplateWrapper || !rowTemplate) {
           console.error(`No Boolean Table Slot Found`);
@@ -528,7 +589,9 @@ document.addEventListener("DOMContentLoaded", () => {
         rowTemplateWrapper.style.display = "none";
 
         function createBoolSVG(value, cell) {
-          const boolTemplate = rowTemplate.querySelector(`[boolvalue="${value ? "true" : "false"}"]`);
+          const boolTemplate = rowTemplate.querySelector(
+            `[boolvalue="${value ? "true" : "false"}"]`
+          );
           const clone = boolTemplate?.cloneNode(true);
 
           if (clone && cell?.hasAttribute("color")) {
@@ -571,13 +634,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isMissing) {
               hiddenColumns.push(columnAttr);
-              tableClone.querySelectorAll(`[column="${columnAttr}"]`).forEach((el) => el.remove());
+              tableClone
+                .querySelectorAll(`[column="${columnAttr}"]`)
+                .forEach((el) => el.remove());
             } else {
               const totalKey = labelKey.replace("Name", "Total");
               const totalEl = tableClone.querySelector(`[table="${totalKey}"]`);
               if (totalEl) {
                 totalEl.setAttribute("number", "dynamic");
-                totalEl.textContent = formatCurrency(tableData[totalKey], totalEl, tableData.isDecimal);
+                totalEl.textContent = formatCurrency(
+                  tableData[totalKey],
+                  totalEl,
+                  tableData.isDecimal
+                );
               }
             }
           }
@@ -604,11 +673,17 @@ document.addEventListener("DOMContentLoaded", () => {
               if (match) {
                 const idx = match[1].toLowerCase();
                 const columnAttr =
-                  idx === "0" ? "zero" :
-                  idx === "bool" ? "bool" :
-                  idx === "1" ? "one" :
-                  idx === "2" ? "two" :
-                  idx === "3" ? "three" : "";
+                  idx === "0"
+                    ? "zero"
+                    : idx === "bool"
+                    ? "bool"
+                    : idx === "1"
+                    ? "one"
+                    : idx === "2"
+                    ? "two"
+                    : idx === "3"
+                    ? "three"
+                    : "";
 
                 if (hiddenColumns.includes(columnAttr) || value == null) {
                   if (cell) cell.remove();
@@ -626,7 +701,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 const icon = createBoolSVG(value, cell);
                 if (icon) cell.appendChild(icon);
               } else if (cell?.hasAttribute("number")) {
-                cell.textContent = formatCurrency(value, cell, tableData.isDecimal);
+                cell.textContent = formatCurrency(
+                  value,
+                  cell,
+                  tableData.isDecimal
+                );
               } else if (cell) {
                 cell.textContent = value;
               }
@@ -641,7 +720,11 @@ document.addEventListener("DOMContentLoaded", () => {
             .querySelectorAll('.booleantabletotalvalue[number="dynamic"]')
             .forEach((el) => {
               const value = el.textContent?.replace(/[^0-9.-]+/g, "") || "0";
-              el.textContent = formatCurrency(parseFloat(value), el, tableData.isDecimal);
+              el.textContent = formatCurrency(
+                parseFloat(value),
+                el,
+                tableData.isDecimal
+              );
             });
         });
       }
@@ -656,7 +739,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const moduleData = data.modules || [];
         const validIds = new Set(moduleData.map((mod) => mod.id));
 
-        const allModuleContainers = document.querySelectorAll(".moduletemplate");
+        const allModuleContainers =
+          document.querySelectorAll(".moduletemplate");
         allModuleContainers.forEach((el) => {
           const id = el.id?.trim();
           if (!validIds.has(id)) {
@@ -678,14 +762,18 @@ document.addEventListener("DOMContentLoaded", () => {
               labelEl.style.display = value.trim() ? "" : "none";
             }
 
-            const descEl = moduleContainer.querySelector('[module="description"]');
+            const descEl = moduleContainer.querySelector(
+              '[module="description"]'
+            );
             if (descEl) {
               const value = module.description || "";
               descEl.textContent = value;
               descEl.style.display = value.trim() ? "" : "none";
             }
 
-            const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
+            const disclaimerEl = moduleContainer.querySelector(
+              '[module="disclaimer"]'
+            );
             if (disclaimerEl) {
               const value = module.disclaimer || "";
               disclaimerEl.textContent = value;
@@ -704,23 +792,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
             module.components.forEach((component) => {
               const value = component.value;
-              const isEmpty = value === null || value === undefined || value === "";
+              const isEmpty =
+                value === null || value === undefined || value === "";
               if (isEmpty) return;
 
               const componentClone = template.cloneNode(true);
               componentClone.style.display = "";
               componentClone.removeAttribute("id");
 
-              const labelComponentEl = componentClone.querySelector('[category="label"]');
+              const labelComponentEl =
+                componentClone.querySelector('[category="label"]');
               if (labelComponentEl) {
                 labelComponentEl.textContent = component.label || "";
-                labelComponentEl.style.display = component.label?.trim() ? "" : "none";
+                labelComponentEl.style.display = component.label?.trim()
+                  ? ""
+                  : "none";
               }
 
-              const valueEl = componentClone.querySelector('[category="value"]');
+              const valueEl =
+                componentClone.querySelector('[category="value"]');
               if (valueEl) {
                 const isCurrency = component.type === "currency";
-                const needsFormatting = ["currency", "number"].includes(component.type);
+                const needsFormatting = ["currency", "number"].includes(
+                  component.type
+                );
                 const formattedValue = needsFormatting
                   ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
                   : value;
@@ -730,7 +825,9 @@ document.addEventListener("DOMContentLoaded", () => {
               const unitEl = componentClone.querySelector('[category="unit"]');
               if (unitEl) {
                 unitEl.textContent = component.description || "";
-                unitEl.style.display = component.description?.trim() ? "" : "none";
+                unitEl.style.display = component.description?.trim()
+                  ? ""
+                  : "none";
               }
 
               listEl.appendChild(componentClone);
@@ -766,11 +863,17 @@ document.addEventListener("DOMContentLoaded", () => {
           chartEl.classList.add(data.chartSize || "small");
 
           clone.querySelector('[category="label"]').textContent = chart.label;
-          clone.querySelector('[category="description"]').textContent = chart.description;
-          clone.querySelector('[category="disclaimer"]').textContent = chart.disclaimer;
+          clone.querySelector('[category="description"]').textContent =
+            chart.description;
+          clone.querySelector('[category="disclaimer"]').textContent =
+            chart.disclaimer;
 
           const totalEl = clone.querySelector('[category="totalValue"]');
-          totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
+          totalEl.textContent = formatCurrency(
+            chart.totalValue,
+            totalEl,
+            chart.isDecimal
+          );
 
           const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
           chart.groups.forEach((group) => {
@@ -818,7 +921,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       function benefitsList(data) {
         const listContainer = document.querySelector('[benefit="list"]');
-        const wrapperTemplate = listContainer?.querySelector('[benefit="wrapper"]');
+        const wrapperTemplate = listContainer?.querySelector(
+          '[benefit="wrapper"]'
+        );
 
         if (!listContainer || !wrapperTemplate) {
           return;
@@ -873,8 +978,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function contactsLists(contactsData, listSelector) {
-        const listContainer = document.querySelector(`${listSelector} [contacts="list"]`);
-        const itemTemplate = listContainer?.querySelector('[contact="wrapper"]');
+        const listContainer = document.querySelector(
+          `${listSelector} [contacts="list"]`
+        );
+        const itemTemplate = listContainer?.querySelector(
+          '[contact="wrapper"]'
+        );
 
         if (!listContainer || !itemTemplate) {
           console.error(`No Contact List Slot Found`);
@@ -906,13 +1015,17 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       function loadDisplay(data) {
-        const renderParam = new URLSearchParams(window.location.search).get("render");
+        const renderParam = new URLSearchParams(window.location.search).get(
+          "render"
+        );
         if (renderParam === "true") {
           const body = document.body;
           body.classList.remove("design");
           body.classList.add("render");
 
-          const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
+          const pageElements = Array.from(
+            document.querySelectorAll('[element="page"]')
+          );
           pageElements.forEach((el) => body.appendChild(el));
 
           Array.from(body.children).forEach((child) => {
@@ -930,10 +1043,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const params = new URLSearchParams(window.location.search);
         const getCurrentDesign = () => params.get("design") || "1";
+        const coverParam = params.get("cover") ?? "0";
+        const isDesign2 = getCurrentDesign() === "2";
+
+        const showCover = coverParam !== "false" && !isDesign2;
 
         const coverEl = document.querySelector("#pageCover");
-        const showCover = params.get("cover") === "true" && getCurrentDesign() !== "2";
-
         if (coverEl) {
           coverEl.style.display = showCover ? "" : "none";
         }
@@ -984,7 +1099,9 @@ document.addEventListener("DOMContentLoaded", () => {
         el.style.color = elementColor.primaryColor;
       });
 
-      const secondaryColors = document.querySelectorAll('[color="secondaryColor"]');
+      const secondaryColors = document.querySelectorAll(
+        '[color="secondaryColor"]'
+      );
       secondaryColors.forEach((el) => {
         el.style.color = elementColor.secondaryColor;
       });
@@ -1027,7 +1144,10 @@ document.addEventListener("DOMContentLoaded", () => {
           const pageRect = page.getBoundingClientRect();
           return Array.from(page.children).some((child) => {
             const childRect = child.getBoundingClientRect();
-            return childRect.bottom > pageRect.bottom || childRect.right > pageRect.right;
+            return (
+              childRect.bottom > pageRect.bottom ||
+              childRect.right > pageRect.right
+            );
           });
         };
 
@@ -1035,7 +1155,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         while (
           isOverflowing() &&
-          (fontSize > minFontSize || lineHeight > minLineHeight || blockSpacing > minBlockSpacing)
+          (fontSize > minFontSize ||
+            lineHeight > minLineHeight ||
+            blockSpacing > minBlockSpacing)
         ) {
           if (fontSize > minFontSize) fontSize -= 1;
           if (lineHeight > minLineHeight) lineHeight -= 1;
@@ -1049,7 +1171,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Load Status Finished
       isLoaded = true;
-      if (isLoaded == true) { console.log("Finished"); } else { console.log("Loading Failed"); }
+      if (isLoaded == true) {
+        console.log("Finished");
+      } else {
+        console.log("Loading Failed");
+      }
     })
     .catch((error) => {
       const errorCheck = error.message.includes("Unexpected token");
@@ -1059,7 +1185,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 (() => {
   // Utility functions for selecting elements
-  const qs  = (sel) => document.querySelector(sel);
+  const qs = (sel) => document.querySelector(sel);
   const qsa = (sel) => document.querySelectorAll(sel);
   const params = new URLSearchParams(window.location.search);
   let scale = 1; // Initial zoom level
@@ -1083,17 +1209,22 @@ document.addEventListener("DOMContentLoaded", () => {
   // Update the URL parameter without reloading the page (preserve hash)
   const setParam = (key, value) => {
     params.set(key, value);
-    history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+    history.replaceState(
+      null,
+      "",
+      `${location.pathname}?${params.toString()}${location.hash}`
+    );
   };
 
   // Toggle "active" class for an element
-  const toggleActive = (id, isActive) => qs("#" + id)?.classList.toggle("active", isActive);
+  const toggleActive = (id, isActive) =>
+    qs("#" + id)?.classList.toggle("active", isActive);
 
   // Helpers to read current params
   const getCurrentDesign = () => params.get("design") || "1";
   const getCurrentLayout = () => params.get("layout") || "1";
   const getCurrentHeader = () => params.get("header") || "1";
-  const getCurrentCover  = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
+  const getCurrentCover = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
 
   // Enable/disable layout buttons by class only
   const setLayoutButtonsDisabled = (disabled) => {
@@ -1127,7 +1258,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     qs("#layout1")?.classList.toggle("active", !isTwo);
-    qs("#layout2")?.classList.toggle("active",  isTwo);
+    qs("#layout2")?.classList.toggle("active", isTwo);
 
     setParam("layout", val);
   };
@@ -1160,7 +1291,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const allCoverClasses = ["cover0", "cover1", "cover2"];
 
     qsa('[cover="dynamic"]').forEach((el) => {
-      allCoverClasses.forEach(c => el.classList.remove(c));
+      allCoverClasses.forEach((c) => el.classList.remove(c));
       el.classList.add(targetClass);
     });
 
@@ -1197,7 +1328,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (val === "2") {
       setLayoutButtonsDisabled(true);
       params.delete("layout");
-      history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+      history.replaceState(
+        null,
+        "",
+        `${location.pathname}?${params.toString()}${location.hash}`
+      );
       qsa('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
       qs("#layout1")?.classList.remove("active");
       qs("#layout2")?.classList.remove("active");
@@ -1212,8 +1347,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (val === "2") {
       setParam("cover", "false");
-      qsa('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
-      ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+      qsa('[cover="dynamic"]').forEach((el) =>
+        el.classList.remove("cover0", "cover1", "cover2")
+      );
+      ["0", "1", "2"].forEach((k) =>
+        qs("#cover" + k)?.classList.remove("active")
+      );
       qs("#noCover")?.classList.add("active");
     }
   };
@@ -1239,7 +1378,9 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleActive(`${key}Page`, enabled);
 
       qsa(`[design="${key}"]`).forEach((el) => {
-        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        const match =
+          !el.getAttribute("designgroup") ||
+          el.getAttribute("designgroup") === design;
         el.style.display = enabled && match ? "" : "none";
       });
     });
@@ -1256,7 +1397,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Show/hide all cover components
     qsa('[component="cover"]').forEach((el) => {
-      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      const match =
+        !el.getAttribute("designgroup") ||
+        el.getAttribute("designgroup") === design;
       el.style.display = showCover && match ? "" : "none";
     });
   };
@@ -1270,17 +1413,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Apply state from URL params
   const applyStateFromParams = () => {
-    const design = getCurrentDesign();    // "1" | "2"
+    const design = getCurrentDesign(); // "1" | "2"
     applyDesignSwitch(design);
 
-    const header = getCurrentHeader();    // "1" | "2"
+    const header = getCurrentHeader(); // "1" | "2"
     applyHeader(header);
 
     if (design !== "2") {
-      const layout = getCurrentLayout();  // "1" | "2"
+      const layout = getCurrentLayout(); // "1" | "2"
       applyLayout(layout);
 
-      const cover = getCurrentCover();    // "0" | "1" | "2" | "false"
+      const cover = getCurrentCover(); // "0" | "1" | "2" | "false"
       if (cover !== "false") applyCover(cover);
       else updateExtras();
     } else {
@@ -1300,7 +1443,9 @@ document.addEventListener("DOMContentLoaded", () => {
     safeBind(qs("#cover2"), () => applyCover("2"));
     safeBind(qs("#noCover"), () => {
       setParam("cover", "false");
-      ["0", "1", "2"].forEach((k) => qs("#cover" + k)?.classList.remove("active"));
+      ["0", "1", "2"].forEach((k) =>
+        qs("#cover" + k)?.classList.remove("active")
+      );
       qs("#noCover")?.classList.add("active");
       qsa('[cover="dynamic"]').forEach((el) => {
         el.classList.remove("cover0", "cover1", "cover2");
@@ -1310,7 +1455,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Pages
     safeBind(qs("#benefitsPage"), () => toggleExtra("benefits"));
-    safeBind(qs("#companyPage"),  () => toggleExtra("company"));
+    safeBind(qs("#companyPage"), () => toggleExtra("company"));
 
     // Layout buttons (ignored if design=2 due to guard in applyLayout)
     safeBind(qs("#layout1"), () => applyLayout("1"));
@@ -1323,7 +1468,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Defaults only if params are missing (do not overwrite existing URL values)
     if (!params.has("layout")) setParam("layout", "1");
     if (!params.has("header")) setParam("header", "1");
-    if (!params.has("cover"))  setParam("cover",  "0");
+    if (!params.has("cover")) setParam("cover", "0");
 
     // Apply state now that handlers are ready
     applyStateFromParams();
@@ -1369,7 +1514,9 @@ document.addEventListener("DOMContentLoaded", () => {
     empBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
         params.set("ek", btn.id);
-        window.location.href = `${location.pathname}?${params.toString()}${location.hash}`;
+        window.location.href = `${location.pathname}?${params.toString()}${
+          location.hash
+        }`;
       });
     });
 
@@ -1377,7 +1524,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!ek || !document.getElementById(ek)) {
       ek = "EmployeeA";
       params.set("ek", ek);
-      window.location.replace(`${location.pathname}?${params.toString()}${location.hash}`);
+      window.location.replace(
+        `${location.pathname}?${params.toString()}${location.hash}`
+      );
     }
     setActiveButton(ek);
 
@@ -1386,7 +1535,8 @@ document.addEventListener("DOMContentLoaded", () => {
       qs("#" + btnId)?.addEventListener("click", () => {
         const target = qs(`[design="${key}"]`);
         if (target) {
-          const offset = target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
+          const offset =
+            target.offsetTop - (qs("#pagesWrapper")?.offsetTop || 0);
           qs("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
         }
       });
@@ -1426,8 +1576,12 @@ document.addEventListener("DOMContentLoaded", () => {
   // Share via email
   qs("#shareEmail")?.addEventListener("click", () => {
     const subject = `Design #${params.get("design")} Preview`;
-    const body = `Here is a preview of Compensation Statement Design #${params.get("design")}:\n\n${getUrlWithPreviewParam()}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const body = `Here is a preview of Compensation Statement Design #${params.get(
+      "design"
+    )}:\n\n${getUrlWithPreviewParam()}`;
+    window.location.href = `mailto:?subject=${encodeURIComponent(
+      subject
+    )}&body=${encodeURIComponent(body)}`;
   });
 
   // Copy preview link to clipboard
