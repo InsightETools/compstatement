@@ -245,9 +245,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // 🔗 Apply href to [data="companyURL"]
       function applyCompanyURL() {
-        const url = data?.companyURL;
+        const url = data?.explorerUrl;
         if (!url) return;
-        document.querySelectorAll('[data="companyURL"]').forEach((el) => {
+        document.querySelectorAll('[data="explorerUrl"]').forEach((el) => {
           if ("href" in el) el.href = url;
           else el.setAttribute("href", url);
         });
