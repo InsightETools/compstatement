@@ -244,10 +244,10 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 🔗 Apply href to [data="companyURL"]
-      function applyCompanyURL() {
-        const url = data?.explorerUrl;
+      function applyExplorerURL() {
+        const url = data?.explorerURL;
         if (!url) return;
-        document.querySelectorAll('[data="explorerUrl"]').forEach((el) => {
+        document.querySelectorAll('[data="explorerURL"]').forEach((el) => {
           if ("href" in el) el.href = url;
           else el.setAttribute("href", url);
         });
