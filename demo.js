@@ -227,11 +227,13 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 // =====================
 async function renderAll(data) {
   // --- Clear/prepare dynamic zones (avoid duplicates on re-render) ---
-  document.querySelectorAll(".modulewrapper")?.forEach((w) => {
-    [...w.children].forEach((c) => {
-      if (c.id !== "moduleDonutTemplate") c.remove();
-    });
+  document.querySelectorAll(".modulewrapper")?.forEach((wrapper) => {
+  Array.from(wrapper.children).forEach((child) => {
+    // Keep the template by id or data attribute
+    if (child.id === "moduleDonutTemplate" || child.getAttribute?.("data-template") === "donut") return;
+    child.remove();
   });
+});
   document.querySelectorAll('[contacts="list"]')?.forEach((l) => (l.innerHTML = ""));
   const benefitList = document.querySelector('[benefit="list"]');
   if (benefitList) benefitList.innerHTML = benefitList.innerHTML; // keep wrapper structure
@@ -757,30 +759,42 @@ async function renderAll(data) {
     });
   }
 
-  function donutCharts() {
-    const donutTemplate = document.getElementById("moduleDonutTemplate");
-    const moduleWrapper = document.querySelector(".modulewrapper");
-    if (!donutTemplate || !moduleWrapper) return;
+  ffunction donutCharts() {
+  const donutTemplate = document.getElementById("moduleDonutTemplate");
+  const moduleWrapper = document.querySelector(".modulewrapper");
+  if (!donutTemplate || !moduleWrapper) return;
 
-    (data.charts || []).forEach((chart) => {
-      const clone = donutTemplate.cloneNode(true);
-      clone.style.display = "";
-      clone.id = "";
+  // Ensure template is hidden but present for cloning
+  donutTemplate.style.display = "none";
 
-      const chartId = `chart_${chart.id}`;
-      const chartEl = clone.querySelector(".moduledonutchart");
+  (data.charts || []).forEach((chart) => {
+    // clone
+    const clone = donutTemplate.cloneNode(true);
+    clone.style.display = "";      // show clone
+    clone.removeAttribute("id");   // avoid duplicate ids
+
+    // wire up ids + text
+    const chartId = `chart_${chart.id}`;
+    const chartEl = clone.querySelector(".moduledonutchart");
+    if (chartEl) {
       chartEl.id = chartId;
-      chartEl.classList.add(data.chartSize || "small");
+      if (data.chartSize) chartEl.classList.add(data.chartSize);
+    }
 
-      clone.querySelector('[category="label"]').textContent = chart.label;
-      clone.querySelector('[category="description"]').textContent = chart.description;
-      clone.querySelector('[category="disclaimer"]').textContent = chart.disclaimer;
+    const labelEl = clone.querySelector('[category="label"]');
+    const descEl  = clone.querySelector('[category="description"]');
+    const discEl  = clone.querySelector('[category="disclaimer"]');
+    const totalEl = clone.querySelector('[category="totalValue"]');
 
-      const totalEl = clone.querySelector('[category="totalValue"]');
-      totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
+    if (labelEl) labelEl.textContent = chart.label ?? "";
+    if (descEl)  descEl.textContent  = chart.description ?? "";
+    if (discEl)  discEl.textContent  = chart.disclaimer ?? "";
+    if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
 
-      const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
-      chart.groups.forEach((group) => {
+    // build legend/index
+    const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
+    if (indexWrapper) {
+      (chart.groups || []).forEach((group) => {
         const item = document.createElement("div");
         item.classList.add("moduledonutindex");
         item.setAttribute("category", "item");
@@ -810,15 +824,18 @@ async function renderAll(data) {
         item.appendChild(value);
         indexWrapper.appendChild(item);
       });
+    }
 
-      moduleWrapper.appendChild(clone);
+    // append to wrapper
+    moduleWrapper.appendChild(clone);
 
-      renderDonutChart({
-        chartId,
-        categoryGroup: chart.groups,
-        containerSelector: `#${chartId} + .moduledonutindexwrapper`,
-      });
+    // paint conic gradient
+    renderDonutChart({
+      chartId,
+      categoryGroup: chart.groups,
+      containerSelector: `#${chartId} + .moduledonutindexwrapper`,
     });
+  });
 
     donutTemplate.remove();
   }
