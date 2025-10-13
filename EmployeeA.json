@@ -150,13 +150,13 @@
         {
           "label": "",
           "type": "currency",
-          "value": "",
+          "value": "20000",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "",
+          "value": "30000",
           "description": "Description goes here"
         }
       ]
