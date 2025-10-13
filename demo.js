@@ -1549,12 +1549,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const hasKey = params.has("key");
     const isPreview = params.has("preview");
 
+/*
     if (hasKey || isPreview) {
       qs("#editorPanel")?.classList.add("hidden");
       qs("#fullScreen")?.classList.add("hidden");
       qs("#pagesWrapper")?.classList.add("centered");
     }
-
+*/
+    
     if (!hasKey && !isPreview) {
       qs("#editButton")?.classList.add("hidden");
     }
