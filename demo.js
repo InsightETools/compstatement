@@ -759,7 +759,7 @@ async function renderAll(data) {
     });
   }
 
-  ffunction donutCharts() {
+  function donutCharts() {
   const donutTemplate = document.getElementById("moduleDonutTemplate");
   const moduleWrapper = document.querySelector(".modulewrapper");
   if (!donutTemplate || !moduleWrapper) return;
