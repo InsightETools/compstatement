@@ -160,6 +160,33 @@
           "description": "Description goes here"
         }
       ]
+    }, {
+      "id": "module12",
+      "year": "2024",
+      "label": "Time Off Snapshot",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": [
+        {
+          "label": "",
+          "type": "currency",
+          "value": "50000",
+          "description": "Description goes here"
+        },
+        {
+          "label": "",
+          "type": "currency",
+          "value": "20000",
+          "description": "Description goes here"
+        },
+        {
+          "label": "",
+          "type": "currency",
+          "value": "30000",
+          "description": "Description goes here"
+        }
+      ]
     },
     {
       "id": "module13",
