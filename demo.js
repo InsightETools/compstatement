@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let queryParams;
 
   baseUrl =
-    "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
+    "https://www.insightetools.com/compStatements/js/demo.js";
   queryParams = new URLSearchParams({
     usecors: "1",
     key,
@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   //console.log(fetchUrl);
 
   fetchUrl =
-    "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
+    "https://www.insightetools.com/compStatements/js/demo.js";
 
   fetch(fetchUrl)
     .then((response) => response.json())
