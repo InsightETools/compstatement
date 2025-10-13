@@ -44,7 +44,7 @@ function buildFetchUrlFromParams() {
   const ek     = p.get("ek") || "EmployeeA";
   const layout = p.get("layout");
 
-  // If you have a dynamic live endpoint when key present:
+  // Live endpoint when key present:
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
 
   if (!key) {
@@ -111,6 +111,58 @@ window.applyOverflow = function () {
     }
   });
 };
+
+// -----------------------------
+// Button state fusion (JSON+UI)
+// -----------------------------
+const _jsonDisabled = new Map();    // id -> bool (true means disabled due to JSON)
+const _designDisabled = new Map();  // id -> bool (true means disabled due to design)
+const _allKnownButtons = new Set(); // discovered once
+
+function _collectButtons() {
+  document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
+    _allKnownButtons.add(el.id);
+  });
+  // include likely controls even if not button tags
+  [
+    "design1","design2","layout1","layout2","header1","header2",
+    "cover0","cover1","cover2","noCover","benefitsPage","companyPage"
+  ].forEach(id => { if (document.getElementById(id)) _allKnownButtons.add(id); });
+}
+
+function _setBtnDisabled(id, disabled) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle("disabled", !!disabled);
+  el.toggleAttribute("disabled", !!disabled);
+  el.setAttribute("aria-disabled", String(!!disabled));
+}
+
+function _applyEffectiveButtonStates() {
+  _allKnownButtons.forEach((id) => {
+    const jsonDis = !!_jsonDisabled.get(id);
+    const desDis  = !!_designDisabled.get(id);
+    _setBtnDisabled(id, jsonDis || desDis);
+  });
+}
+
+function computeDesignConstraintsAndApply() {
+  _designDisabled.clear();
+
+  const params = getParams();
+  const design = params.get("design") || "1";
+  const isDesign2 = design === "2";
+
+  // Hard-disabled when design=2
+  const forceOffIds = [
+    "layout1","layout2",
+    "cover0","cover1","cover2","noCover",
+    "header1","header2"
+  ];
+  forceOffIds.forEach(id => { if (isDesign2) _designDisabled.set(id, true); });
+
+  _applyEffectiveButtonStates();
+}
 
 // ------------------------------
 // Fetch + render (single entrypoint)
@@ -226,35 +278,29 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 // R E N D E R   A L L
 // =====================
 async function renderAll(data) {
-  // --- Clear/prepare dynamic zones (avoid duplicates on re-render) ---
-  // Clear only prior donut clones in *every* wrapper; keep each wrapper's template
+  // --- Clean donut clones in every wrapper but keep template(s) ---
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
-  const template =
-    wrapper.querySelector("#moduleDonutTemplate") ||
-    wrapper.querySelector('[data-template="donut"]');
-
-  Array.from(wrapper.children).forEach((child) => {
-    if (template && child === template) return; // keep template
-    child.remove();
+    const template =
+      wrapper.querySelector("#moduleDonutTemplate") ||
+      wrapper.querySelector('[data-template="donut"]');
+    Array.from(wrapper.children).forEach((child) => {
+      if (template && child === template) return;
+      child.remove();
+    });
+    if (template) template.style.display = "none"; // keep template, hidden
   });
-
-  if (template) template.style.display = "none"; // keep but hide template
-});
-  document.querySelectorAll('[contacts="list"]')?.forEach((l) => (l.innerHTML = ""));
-  const benefitList = document.querySelector('[benefit="list"]');
-  if (benefitList) benefitList.innerHTML = benefitList.innerHTML; // keep wrapper structure
 
   // ---- Local helpers WITH access to "data" ----
   function applyButtonStatus() {
-    if (!data.buttonStatus || typeof data.buttonStatus !== "object") return;
-    Object.entries(data.buttonStatus).forEach(([key, value]) => {
-      const btn = document.getElementById(key);
-      if (!btn) return;
-      const disabled = !value;
-      btn.classList.toggle("disabled", disabled);
-      btn.toggleAttribute("disabled", disabled);
-      btn.setAttribute("aria-disabled", String(disabled));
-    });
+    _jsonDisabled.clear();
+    const map = data?.buttonStatus;
+    if (map && typeof map === "object") {
+      Object.entries(map).forEach(([id, enabled]) => {
+        const disabled = !enabled; // JSON 'false' means disabled
+        _jsonDisabled.set(id, !!disabled);
+      });
+    }
+    _applyEffectiveButtonStates();
   }
 
   function applyCompanyURL() {
@@ -766,110 +812,99 @@ async function renderAll(data) {
   }
 
   function donutCharts() {
-  // Helper: is an element actually visible?
-  const isVisible = (el) => {
-    if (!el) return false;
-    const style = window.getComputedStyle(el);
-    return style.display !== "none" && style.visibility !== "hidden" && el.offsetParent !== null;
-  };
+    const isVisible = (el) => {
+      if (!el) return false;
+      const style = window.getComputedStyle(el);
+      return style.display !== "none" && style.visibility !== "hidden" && el.offsetParent !== null;
+    };
 
-  // Find all currently visible module wrappers (layout may hide some)
-  const wrappers = Array.from(document.querySelectorAll(".modulewrapper")).filter(isVisible);
-  if (!wrappers.length) return;
+    const wrappers = Array.from(document.querySelectorAll(".modulewrapper")).filter(isVisible);
+    if (!wrappers.length) return;
 
-  const charts = Array.isArray(data.charts) ? data.charts : [];
-  if (!charts.length) return;
+    const charts = Array.isArray(data.charts) ? data.charts : [];
+    if (!charts.length) return;
 
-  wrappers.forEach((wrapper, wIdx) => {
-    // Prefer a template inside the wrapper; fall back to a global one
-    const templateInWrapper =
-      wrapper.querySelector("#moduleDonutTemplate") ||
-      wrapper.querySelector('[data-template="donut"]');
+    wrappers.forEach((wrapper, wIdx) => {
+      const templateInWrapper =
+        wrapper.querySelector("#moduleDonutTemplate") ||
+        wrapper.querySelector('[data-template="donut"]');
 
-    // If no template in this wrapper, try a global template (outside)
-    const globalTemplate =
-      document.getElementById("moduleDonutTemplate") ||
-      document.querySelector('[data-template="donut"]');
+      const globalTemplate =
+        document.getElementById("moduleDonutTemplate") ||
+        document.querySelector('[data-template="donut"]');
 
-    const template = templateInWrapper || globalTemplate;
-    if (!template) return;
+      const template = templateInWrapper || globalTemplate;
+      if (!template) return;
 
-    // Ensure the template is hidden but present for cloning
-    template.style.display = "none";
+      template.style.display = "none";
 
-    charts.forEach((chart, cIdx) => {
-      const clone = template.cloneNode(true);
-      clone.style.display = "";
-      clone.removeAttribute("id"); // avoid duplicate IDs
+      charts.forEach((chart, cIdx) => {
+        const clone = template.cloneNode(true);
+        clone.style.display = "";
+        clone.removeAttribute("id");
 
-      // Unique chart id per wrapper + chart index
-      const chartId = `chart_${String(chart.id ?? cIdx)}__w${wIdx}`;
-      const chartEl = clone.querySelector(".moduledonutchart");
-      if (chartEl) {
-        chartEl.id = chartId;
-        // apply optional size
-        if (data.chartSize) chartEl.classList.add(data.chartSize);
-      }
+        const chartId = `chart_${String(chart.id ?? cIdx)}__w${wIdx}`;
+        const chartEl = clone.querySelector(".moduledonutchart");
+        if (chartEl) {
+          chartEl.id = chartId;
+          if (data.chartSize) chartEl.classList.add(data.chartSize);
+        }
 
-      // Text bits
-      const labelEl = clone.querySelector('[category="label"]');
-      const descEl  = clone.querySelector('[category="description"]');
-      const discEl  = clone.querySelector('[category="disclaimer"]');
-      const totalEl = clone.querySelector('[category="totalValue"]');
+        const labelEl = clone.querySelector('[category="label"]');
+        const descEl  = clone.querySelector('[category="description"]');
+        const discEl  = clone.querySelector('[category="disclaimer"]');
+        const totalEl = clone.querySelector('[category="totalValue"]');
 
-      if (labelEl) labelEl.textContent = chart.label ?? "";
-      if (descEl)  descEl.textContent  = chart.description ?? "";
-      if (discEl)  discEl.textContent  = chart.disclaimer ?? "";
-      if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
+        if (labelEl) labelEl.textContent = chart.label ?? "";
+        if (descEl)  descEl.textContent  = chart.description ?? "";
+        if (discEl)  discEl.textContent  = chart.disclaimer ?? "";
+        if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
 
-      // Legend/index
-      const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
-      if (indexWrapper) {
-        indexWrapper.innerHTML = "";
-        (chart.groups || []).forEach((group) => {
-          const item = document.createElement("div");
-          item.classList.add("moduledonutindex");
-          item.setAttribute("category", "item");
+        const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
+        if (indexWrapper) {
+          indexWrapper.innerHTML = "";
+          (chart.groups || []).forEach((group) => {
+            const item = document.createElement("div");
+            item.classList.add("moduledonutindex");
+            item.setAttribute("category", "item");
 
-          const icon = document.createElement("div");
-          icon.classList.add("moduleindexcategorywrapper");
-          icon.setAttribute("category", "icon");
+            const icon = document.createElement("div");
+            icon.classList.add("moduleindexcategorywrapper");
+            icon.setAttribute("category", "icon");
 
-          const colorBox = document.createElement("div");
-          colorBox.classList.add("chart-color");
-          colorBox.style.backgroundColor = hexToRgb(group.color);
+            const colorBox = document.createElement("div");
+            colorBox.classList.add("chart-color");
+            colorBox.style.backgroundColor = hexToRgb(group.color);
 
-          const label = document.createElement("div");
-          label.classList.add("componentsmalllabel");
-          label.setAttribute("category", "name");
-          label.textContent = group.label;
+            const label = document.createElement("div");
+            label.classList.add("componentsmalllabel");
+            label.setAttribute("category", "name");
+            label.textContent = group.label;
 
-          icon.appendChild(colorBox);
-          icon.appendChild(label);
+            icon.appendChild(colorBox);
+            icon.appendChild(label);
 
-          const value = document.createElement("div");
-          value.classList.add("moduledonutindexvalue");
-          value.setAttribute("category", "value");
-          value.textContent = `${group.value}%`;
+            const value = document.createElement("div");
+            value.classList.add("moduledonutindexvalue");
+            value.setAttribute("category", "value");
+            value.textContent = `${group.value}%`;
 
-          item.appendChild(icon);
-          item.appendChild(value);
-          indexWrapper.appendChild(item);
+            item.appendChild(icon);
+            item.appendChild(value);
+            indexWrapper.appendChild(item);
+          });
+        }
+
+        wrapper.appendChild(clone);
+
+        renderDonutChart({
+          chartId,
+          categoryGroup: chart.groups,
+          containerSelector: `#${chartId} + .moduledonutindexwrapper`,
         });
-      }
-
-      // Append into the current, visible wrapper
-      wrapper.appendChild(clone);
-
-      // Paint conic gradient for this instance
-      renderDonutChart({
-        chartId,
-        categoryGroup: chart.groups,
-        containerSelector: `#${chartId} + .moduledonutindexwrapper`,
       });
     });
-  });
-}
+  }
 
   function benefitsList() {
     const listContainer = document.querySelector('[benefit="list"]');
@@ -991,7 +1026,8 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
 
-  // Finalize buttons after everything is in place
+  // Button state: design constraints first, then JSON merge
+  computeDesignConstraintsAndApply();
   applyButtonStatus();
 }
 
@@ -1019,27 +1055,10 @@ async function renderAll(data) {
   const getCurrentHeader = () => getParams().get("header") || "1";
   const getCurrentCover  = () => getParams().get("cover") ?? "0";
 
-  const setLayoutButtonsDisabled = (disabled) => {
-    $("#layout1")?.classList.toggle("disabled", disabled);
-    $("#layout2")?.classList.toggle("disabled", disabled);
-    $("#layout1")?.toggleAttribute("disabled", disabled);
-    $("#layout2")?.toggleAttribute("disabled", disabled);
-    $("#layout1")?.setAttribute("aria-disabled", String(disabled));
-    $("#layout2")?.setAttribute("aria-disabled", String(disabled));
-  };
-
-  const setHeaderButtonsDisabled = (disabled) => {
-    $("#header1")?.classList.toggle("disabled", disabled);
-    $("#header2")?.classList.toggle("disabled", disabled);
-    $("#header1")?.toggleAttribute("disabled", disabled);
-    $("#header2")?.toggleAttribute("disabled", disabled);
-    $("#header1")?.setAttribute("aria-disabled", String(disabled));
-    $("#header2")?.setAttribute("aria-disabled", String(disabled));
-  };
-
   // Layout application (with optional reload)
   const applyLayout = (val, { reload = true } = {}) => {
     if (getCurrentDesign() === "2") return; // blocked in design 2
+
     const isTwo = val === "2";
     $$('[layout="dynamic"]').forEach((el) => {
       if (isTwo) el.classList.add("layout2");
@@ -1051,9 +1070,14 @@ async function renderAll(data) {
 
     setParam("layout", val);
 
-    if (reload) debouncedReloadFromParams();
+    // Update design constraints (in case state depends on layout)
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
 
     if (typeof window.applyOverflow === "function") window.applyOverflow();
+    try { donutCharts(); } catch {}
+
+    if (reload) debouncedReloadFromParams();
   };
 
   // Header (UI-only unless your API depends on it)
@@ -1073,7 +1097,11 @@ async function renderAll(data) {
     $("#header2")?.classList.toggle("active", val === "2");
 
     setParam("header", val);
-    // If your backend cares about header, you can:
+
+    if (typeof window.applyOverflow === "function") window.applyOverflow();
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+    // If header changes endpoint, uncomment next:
     // debouncedReloadFromParams();
   };
 
@@ -1094,7 +1122,10 @@ async function renderAll(data) {
 
     setParam("cover", val);
     updateExtras();
-    // If cover changes your endpoint, uncomment:
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+    // If cover affects endpoint:
     // debouncedReloadFromParams();
   };
 
@@ -1114,25 +1145,19 @@ async function renderAll(data) {
     updateExtras();
 
     if (val === "2") {
-      setLayoutButtonsDisabled(true);
       const p = getParams();
       p.delete("layout");
       history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
       $$('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
       $("#layout1")?.classList.remove("active");
       $("#layout2")?.classList.remove("active");
-      setHeaderButtonsDisabled(true);
-
-      setParam("cover", "false");
-      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
-      ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
-      $("#noCover")?.classList.add("active");
     } else {
-      setLayoutButtonsDisabled(false);
       if (!getParams().has("layout")) setParam("layout", "1");
       applyLayout(getCurrentLayout(), { reload: false }); // keep single reload point
-      setHeaderButtonsDisabled(false);
     }
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
 
     if (reload) debouncedReloadFromParams();
   };
@@ -1175,6 +1200,8 @@ async function renderAll(data) {
     const current = getParams().get(key) === "true";
     setParam(key, (!current).toString());
     updateExtras();
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
   };
 
   // Apply state from URL to UI (single reload afterwards)
@@ -1196,6 +1223,9 @@ async function renderAll(data) {
       updateExtras();
     }
 
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
     // Single reload after state laid out
     debouncedReloadFromParams();
   };
@@ -1204,13 +1234,15 @@ async function renderAll(data) {
   // DOM Ready: wire up UI/UX
   // ------------------------
   document.addEventListener("DOMContentLoaded", () => {
+    _collectButtons();
+    computeDesignConstraintsAndApply();
+
     // Top design nav (optional)
     const designBtns = document.querySelectorAll('[id^="design-"]');
     if (designBtns.length) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          // preserve params/hash
           const params = getParams();
           history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
           setParam("design", idNum);
@@ -1308,30 +1340,34 @@ async function renderAll(data) {
       window.location.href = newUrl;
     });
 
-    // Buttons
-    safeBind($("#design1"), () => applyDesignSwitch("1"));
-    safeBind($("#design2"), () => applyDesignSwitch("2"));
+    // Button handlers
+    const safeBindClick = (id, fn) => safeBind($("#" + id), fn);
 
-    safeBind($("#cover0"), () => applyCover("0"));
-    safeBind($("#cover1"), () => applyCover("1"));
-    safeBind($("#cover2"), () => applyCover("2"));
-    safeBind($("#noCover"), () => {
+    safeBindClick("design1", () => applyDesignSwitch("1"));
+    safeBindClick("design2", () => applyDesignSwitch("2"));
+
+    safeBindClick("cover0", () => applyCover("0"));
+    safeBindClick("cover1", () => applyCover("1"));
+    safeBindClick("cover2", () => applyCover("2"));
+    safeBindClick("noCover", () => {
       setParam("cover", "false");
       ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
       $("#noCover")?.classList.add("active");
       $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
       updateExtras();
+      computeDesignConstraintsAndApply();
+      _applyEffectiveButtonStates();
       // debouncedReloadFromParams(); // uncomment if cover affects endpoint
     });
 
-    safeBind($("#benefitsPage"), () => toggleExtra("benefits"));
-    safeBind($("#companyPage"), () => toggleExtra("company"));
+    safeBindClick("benefitsPage", () => toggleExtra("benefits"));
+    safeBindClick("companyPage", () => toggleExtra("company"));
 
-    safeBind($("#layout1"), () => applyLayout("1"));
-    safeBind($("#layout2"), () => applyLayout("2"));
+    safeBindClick("layout1", () => applyLayout("1"));
+    safeBindClick("layout2", () => applyLayout("2"));
 
-    safeBind($("#header1"), () => applyHeader("1"));
-    safeBind($("#header2"), () => applyHeader("2"));
+    safeBindClick("header1", () => applyHeader("1"));
+    safeBindClick("header2", () => applyHeader("2"));
 
     // Ensure baseline params exist (don’t overwrite if present)
     if (!getParams().has("layout")) setParam("layout", "1");
@@ -1348,4 +1384,3 @@ async function renderAll(data) {
     });
   });
 })();
-
