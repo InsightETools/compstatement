@@ -195,6 +195,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const ck = urlParams.get("ck");
   const ek = urlParams.get("ek");
   const test = urlParams.get("test");
+  const layout = urlParams.get("layout");
   let baseUrl;
   let fetchUrl;
   let queryParams;
@@ -208,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     yr,
     ck,
     ek,
+    layout,
   }).toString();
 
   if (!key) {
