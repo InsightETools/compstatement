@@ -322,6 +322,8 @@ document.addEventListener("DOMContentLoaded", () => {
         "lookaheadMessage",
         "employeeTitle",
         "employeeSalary",
+        "hireDate",
+        "position"
       ];
 
       const elementColor = {
