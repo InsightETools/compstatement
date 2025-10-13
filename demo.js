@@ -219,7 +219,7 @@ document.addEventListener("DOMContentLoaded", () => {
   //console.log(fetchUrl);
 
   fetchUrl =
-    "https://www.insightetools.com/compStatements/js/demo.js";
+    "https://raw.githubusercontent.com/InsightETools/compstatement/refs/heads/main/EmployeeA.json";
 
   fetch(fetchUrl)
     .then((response) => response.json())
