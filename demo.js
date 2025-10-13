@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let queryParams;
 
   baseUrl =
-    "https://www.insightetools.com/compStatements/js/demo.js";
+    "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
   queryParams = new URLSearchParams({
     usecors: "1",
     key,
