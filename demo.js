@@ -1233,7 +1233,7 @@ window.applyOverflow();
 
   // Helpers to read current params
   const getCurrentDesign = () => params.get("design") || "1";
-  const getCurrentLayout = () => params.get("layout") || "2";
+  const getCurrentLayout = () => params.get("layout") || "1";
   const getCurrentHeader = () => params.get("header") || "1";
   const getCurrentCover = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
 
@@ -1271,7 +1271,7 @@ const applyLayout = (val) => {
   qs("#layout1")?.classList.toggle("active", !isTwo);
   qs("#layout2")?.classList.toggle("active", isTwo);
 
-  setParam("layout", val);
+  setParam("layout", 2);
 
   // NEW: ensure overflow logic re-applies after layout changes
   if (typeof window.applyOverflow === "function") {
