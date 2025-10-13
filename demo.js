@@ -1355,10 +1355,9 @@ const applyLayout = (val) => {
       qs("#layout2")?.classList.remove("active");
     } else {
       setLayoutButtonsDisabled(false);
-      setParam("layout", "1");
-      applyLayout("1");
+      if (!params.has("layout")) setParam("layout", "1");
+      applyLayout(getCurrentLayout());
     }
-
     // header buttons disabled state follows same logic as layouts
     setHeaderButtonsDisabled(val === "2");
 
