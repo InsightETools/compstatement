@@ -1115,64 +1115,70 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       //Check Overflow
-      document.querySelectorAll('[item="page"]').forEach((page) => {
-        const lineElements = page.querySelectorAll(
-          ".standardtablelinelabel, .standardtablevalue, .standardtablesubtotallabel, .standardtablesubtotalvalue"
-        );
+// Check Overflow (extracted to a global so we can call it after layout changes)
+window.applyOverflow = function () {
+  document.querySelectorAll('[item="page"]').forEach((page) => {
+    const lineElements = page.querySelectorAll(
+      ".standardtablelinelabel, .standardtablevalue, .standardtablesubtotallabel, .standardtablesubtotalvalue"
+    );
 
-        const blockElements = page.querySelectorAll(
-          ".standardtablesubtotalwrapper, .standardtablecategory"
-        );
+    const blockElements = page.querySelectorAll(
+      ".standardtablesubtotalwrapper, .standardtablecategory"
+    );
 
-        const maxFontSize = 10;
-        const minFontSize = 8;
-        let fontSize = maxFontSize;
+    const maxFontSize = 10;
+    const minFontSize = 8;
+    let fontSize = maxFontSize;
 
-        const maxLineHeight = 12;
-        const minLineHeight = 8;
-        let lineHeight = maxLineHeight;
+    const maxLineHeight = 12;
+    const minLineHeight = 8;
+    let lineHeight = maxLineHeight;
 
-        const maxBlockSpacing = 5;
-        const minBlockSpacing = 2;
-        let blockSpacing = maxBlockSpacing;
+    const maxBlockSpacing = 5;
+    const minBlockSpacing = 2;
+    let blockSpacing = maxBlockSpacing;
 
-        const applyStyles = () => {
-          lineElements.forEach((el) => {
-            el.style.fontSize = `${fontSize}px`;
-            el.style.lineHeight = `${lineHeight}px`;
-          });
-
-          blockElements.forEach((el) => {
-            el.style.paddingTop = `${blockSpacing}px`;
-            el.style.paddingBottom = `${blockSpacing}px`;
-          });
-        };
-
-        const isOverflowing = () => {
-          const pageRect = page.getBoundingClientRect();
-          return Array.from(page.children).some((child) => {
-            const childRect = child.getBoundingClientRect();
-            return (
-              childRect.bottom > pageRect.bottom ||
-              childRect.right > pageRect.right
-            );
-          });
-        };
-
-        applyStyles();
-
-        while (
-          isOverflowing() &&
-          (fontSize > minFontSize ||
-            lineHeight > minLineHeight ||
-            blockSpacing > minBlockSpacing)
-        ) {
-          if (fontSize > minFontSize) fontSize -= 1;
-          if (lineHeight > minLineHeight) lineHeight -= 1;
-          if (blockSpacing > minBlockSpacing) blockSpacing -= 1;
-          applyStyles();
-        }
+    const applyStyles = () => {
+      lineElements.forEach((el) => {
+        el.style.fontSize = `${fontSize}px`;
+        el.style.lineHeight = `${lineHeight}px`;
       });
+
+      blockElements.forEach((el) => {
+        el.style.paddingTop = `${blockSpacing}px`;
+        el.style.paddingBottom = `${blockSpacing}px`;
+      });
+    };
+
+    const isOverflowing = () => {
+      const pageRect = page.getBoundingClientRect();
+      return Array.from(page.children).some((child) => {
+        const childRect = child.getBoundingClientRect();
+        return (
+          childRect.bottom > pageRect.bottom || childRect.right > pageRect.right
+        );
+      });
+    };
+
+    applyStyles();
+
+    while (
+      isOverflowing() &&
+      (fontSize > minFontSize ||
+        lineHeight > minLineHeight ||
+        blockSpacing > minBlockSpacing)
+    ) {
+      if (fontSize > minFontSize) fontSize -= 1;
+      if (lineHeight > minLineHeight) lineHeight -= 1;
+      if (blockSpacing > minBlockSpacing) blockSpacing -= 1;
+      applyStyles();
+    }
+  });
+};
+
+// Run once after initial render
+window.applyOverflow();
+
 
       // Apply JSON button status (disables + inert behavior)
       applyButtonStatus();
@@ -1255,21 +1261,26 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Apply layout subclass logic
-  const applyLayout = (val) => {
-    // If design=2, layout controls are disabled and layout param should not be set
-    if (getCurrentDesign() === "2") return;
+const applyLayout = (val) => {
+  // If design=2, layout controls are disabled and layout param should not be set
+  if (getCurrentDesign() === "2") return;
 
-    const isTwo = val === "2";
-    qsa('[layout="dynamic"]').forEach((el) => {
-      if (isTwo) el.classList.add("layout2");
-      else el.classList.remove("layout2");
-    });
+  const isTwo = val === "2";
+  qsa('[layout="dynamic"]').forEach((el) => {
+    if (isTwo) el.classList.add("layout2");
+    else el.classList.remove("layout2");
+  });
 
-    qs("#layout1")?.classList.toggle("active", !isTwo);
-    qs("#layout2")?.classList.toggle("active", isTwo);
+  qs("#layout1")?.classList.toggle("active", !isTwo);
+  qs("#layout2")?.classList.toggle("active", isTwo);
 
-    setParam("layout", val);
-  };
+  setParam("layout", val);
+
+  // NEW: ensure overflow logic re-applies after layout changes
+  if (typeof window.applyOverflow === "function") {
+    window.applyOverflow();
+  }
+};
 
   // SIMPLE header logic:
   const applyHeader = (val) => {
