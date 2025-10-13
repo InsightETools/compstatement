@@ -364,6 +364,12 @@ document.addEventListener("DOMContentLoaded", () => {
           el.style.justifyContent = "flex-end";
         });
 
+        document.querySelectorAll('[data="explorerLogo"]').forEach((el) => {
+          el.setAttribute("src", data.explorerLogo);
+          el.style.display = "flex";
+          el.style.justifyContent = "flex-end";
+        });
+
         const signatureElements = document.querySelectorAll(
           '[data="companySignature"]'
         );
