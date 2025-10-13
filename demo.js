@@ -6,16 +6,18 @@
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-// ---------- Small utilities ----------
+// ---------------------
+// Basic DOM + URL utils
+// ---------------------
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
-  const params = getParams();
-  if (value === null || value === undefined) params.delete(key);
-  else params.set(key, value);
-  history.replaceState(null, "", `${location.pathname}?${params.toString()}${location.hash}`);
+  const p = getParams();
+  if (value === null || value === undefined) p.delete(key);
+  else p.set(key, value);
+  history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
 
 const toggleActive = (id, isActive) => $("#" + id)?.classList.toggle("active", !!isActive);
@@ -28,7 +30,9 @@ const debounced = (fn, ms = 60) => {
   };
 };
 
-// ---------- Build fetch URL from current params ----------
+// ------------------------------------------
+// Build fetch URL based on current parameters
+// ------------------------------------------
 let currentFetchController = null;
 
 function buildFetchUrlFromParams() {
@@ -40,11 +44,11 @@ function buildFetchUrlFromParams() {
   const ek     = p.get("ek") || "EmployeeA";
   const layout = p.get("layout");
 
-  // Primary endpoint (when key exists)
+  // If you have a dynamic live endpoint when key present:
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
 
   if (!key) {
-    // Demo file by employee
+    // Demo/local by employee
     return `https://compstatementdemo.netlify.app/${ek}.json`;
   }
 
@@ -56,34 +60,32 @@ function buildFetchUrlFromParams() {
   return `${baseUrl}?${qp.toString()}`;
 }
 
-// ---------- Overflow shrink (global) ----------
+// -------------------
+// Overflow controller
+// -------------------
 window.applyOverflow = function () {
   document.querySelectorAll('[item="page"]').forEach((page) => {
-    const lineElements = page.querySelectorAll(
+    const lineEls = page.querySelectorAll(
       ".standardtablelinelabel, .standardtablevalue, .standardtablesubtotallabel, .standardtablesubtotalvalue"
     );
-    const blockElements = page.querySelectorAll(
+    const blockEls = page.querySelectorAll(
       ".standardtablesubtotalwrapper, .standardtablecategory"
     );
 
-    const maxFontSize = 10;
-    const minFontSize = 8;
+    const maxFontSize = 10, minFontSize = 8;
+    const maxLineHeight = 12, minLineHeight = 8;
+    const maxBlockSpacing = 5, minBlockSpacing = 2;
+
     let fontSize = maxFontSize;
-
-    const maxLineHeight = 12;
-    const minLineHeight = 8;
     let lineHeight = maxLineHeight;
-
-    const maxBlockSpacing = 5;
-    const minBlockSpacing = 2;
     let blockSpacing = maxBlockSpacing;
 
     const applyStyles = () => {
-      lineElements.forEach((el) => {
+      lineEls.forEach((el) => {
         el.style.fontSize = `${fontSize}px`;
         el.style.lineHeight = `${lineHeight}px`;
       });
-      blockElements.forEach((el) => {
+      blockEls.forEach((el) => {
         el.style.paddingTop = `${blockSpacing}px`;
         el.style.paddingBottom = `${blockSpacing}px`;
       });
@@ -92,13 +94,12 @@ window.applyOverflow = function () {
     const isOverflowing = () => {
       const pageRect = page.getBoundingClientRect();
       return Array.from(page.children).some((child) => {
-        const childRect = child.getBoundingClientRect();
-        return childRect.bottom > pageRect.bottom || childRect.right > pageRect.right;
+        const r = child.getBoundingClientRect();
+        return r.bottom > pageRect.bottom || r.right > pageRect.right;
       });
     };
 
     applyStyles();
-
     while (
       isOverflowing() &&
       (fontSize > minFontSize || lineHeight > minLineHeight || blockSpacing > minBlockSpacing)
@@ -111,13 +112,15 @@ window.applyOverflow = function () {
   });
 };
 
-// ---------- Fetch + render orchestrator ----------
+// ------------------------------
+// Fetch + render (single entrypoint)
+// ------------------------------
 const debouncedReloadFromParams = debounced(() => window.reloadFromParams(), 60);
 
 window.reloadFromParams = async () => {
   $("#loader")?.classList.remove("finished");
 
-  // Abort in-flight request
+  // Abort in-flight fetch
   if (currentFetchController) currentFetchController.abort();
   currentFetchController = new AbortController();
 
@@ -135,24 +138,24 @@ window.reloadFromParams = async () => {
     isLoaded = true;
     console.log("Finished");
     $("#loader")?.classList.add("finished");
-  } catch (error) {
-    if (error.name !== "AbortError") {
-      const errorCheck = error.message?.includes?.("Unexpected token");
-      alert(errorCheck ? "No User Found" : error);
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      const errorCheck = err.message?.includes?.("Unexpected token");
+      alert(errorCheck ? "No User Found" : err);
     }
   } finally {
     currentFetchController = null;
   }
 };
 
-// ---------- Helpers you already had ----------
+// ---------------------
+// Shared helper methods
+// ---------------------
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
   const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
   return `rgb(${r}, ${g}, ${b})`;
 }
 
@@ -210,7 +213,6 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
     iconDiv.appendChild(nameDiv);
     itemDiv.appendChild(iconDiv);
     itemDiv.appendChild(valueDiv);
-
     legendContainer.appendChild(itemDiv);
 
     gradientParts.push(`${color} ${start}% ${end}%`);
@@ -224,21 +226,17 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 // R E N D E R   A L L
 // =====================
 async function renderAll(data) {
-  // --- Clear dynamic zones to avoid duplicates on re-render ---
-  // (Adjust these clears to fit your DOM. The goal is to reset containers you repopulate.)
+  // --- Clear/prepare dynamic zones (avoid duplicates on re-render) ---
   document.querySelectorAll(".modulewrapper")?.forEach((w) => {
-    // Keep donut template if present; remove others
     [...w.children].forEach((c) => {
       if (c.id !== "moduleDonutTemplate") c.remove();
     });
   });
+  document.querySelectorAll('[contacts="list"]')?.forEach((l) => (l.innerHTML = ""));
+  const benefitList = document.querySelector('[benefit="list"]');
+  if (benefitList) benefitList.innerHTML = benefitList.innerHTML; // keep wrapper structure
 
-  document.querySelectorAll('[benefit="list"]')?.forEach((l) => (l.innerHTML = l.innerHTML)); // noop
-  document.querySelectorAll(".holidaylist")?.forEach((l) => (l.innerHTML = l.innerHTML)); // noop
-  document.querySelectorAll('[contacts="list"]')?.forEach((l) => (l.innerHTML = "")); // hard clear
-
-  // ---- Local helpers WITH access to data ----
-
+  // ---- Local helpers WITH access to "data" ----
   function applyButtonStatus() {
     if (!data.buttonStatus || typeof data.buttonStatus !== "object") return;
     Object.entries(data.buttonStatus).forEach(([key, value]) => {
@@ -253,23 +251,37 @@ async function renderAll(data) {
 
   function applyCompanyURL() {
     const url = data?.companyURL;
-    if (!url) return;
     document.querySelectorAll('[data="companyURL"]').forEach((el) => {
+      if (!url) {
+        if ("href" in el) {
+          el.removeAttribute("href");
+          el.setAttribute("aria-disabled", "true");
+        }
+        return;
+      }
       if ("href" in el) el.href = url;
       else el.setAttribute("href", url);
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener noreferrer");
+      el.removeAttribute("aria-disabled");
     });
   }
 
   function applyExplorerURL() {
     const url = data?.explorerUrl;
-    if (!url) return;
     document.querySelectorAll('[data="explorerUrl"]').forEach((el) => {
+      if (!url) {
+        if ("href" in el) {
+          el.removeAttribute("href");
+          el.setAttribute("aria-disabled", "true");
+        }
+        return;
+      }
       if ("href" in el) el.href = url;
       else el.setAttribute("href", url);
       el.setAttribute("target", "_blank");
       el.setAttribute("rel", "noopener noreferrer");
+      el.removeAttribute("aria-disabled");
     });
   }
 
@@ -278,7 +290,6 @@ async function renderAll(data) {
     if (!arr || arr.length === 0) return;
     const templateImg = document.querySelector('img[data="coverContent"]');
     if (!templateImg) return;
-
     const parent = templateImg.parentElement;
     if (!parent) return;
 
@@ -295,39 +306,12 @@ async function renderAll(data) {
   }
 
   const statementElement = [
-    "companyName",
-    "companyRepName",
-    "companyRepTitle",
-    "companyRepSignature",
-    "companySignatureText",
-    "companySignature",
-    "companyAttn",
-    "companyAddress",
-    "companyUnit",
-    "companyCity",
-    "companyState",
-    "companyZip",
-    "companyWelcome",
-    "companyMessage",
-    "employeeName",
-    "employeeFirstName",
-    "employeeAddress",
-    "employeeUnit",
-    "employeeCity",
-    "employeeState",
-    "employeeZip",
-    "statementTitle",
-    "statementRange",
-    "statementYear",
-    "statementDisclaimer",
-    "lookbackYear",
-    "lookbackMessage",
-    "lookaheadYear",
-    "lookaheadMessage",
-    "employeeTitle",
-    "employeeSalary",
-    "hireDate",
-    "position",
+    "companyName","companyRepName","companyRepTitle","companyRepSignature","companySignatureText",
+    "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
+    "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
+    "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
+    "statementDisclaimer","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
+    "employeeSalary","hireDate","position"
   ];
 
   const elementColor = {
@@ -343,21 +327,38 @@ async function renderAll(data) {
       });
     });
 
+    // Logos guarded (prevent src="undefined")
     document.querySelectorAll('[data="companyLogoCover"]').forEach((el) => {
-      el.setAttribute("src", data.companyLogoCover);
-      el.style.height = data.companyLogoCoverHeight + "px";
+      if (data.companyLogoCover) {
+        el.setAttribute("src", data.companyLogoCover);
+        if (data.companyLogoCoverHeight) el.style.height = data.companyLogoCoverHeight + "px";
+        el.style.display = "";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
     });
 
     document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
-      el.setAttribute("src", data.companyLogo);
-      el.style.display = "flex";
-      el.style.justifyContent = "flex-end";
+      if (data.companyLogo) {
+        el.setAttribute("src", data.companyLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
     });
 
     document.querySelectorAll('[data="explorerLogo"]').forEach((el) => {
-      el.setAttribute("src", data.explorerLogo);
-      el.style.display = "flex";
-      el.style.justifyContent = "flex-end";
+      if (data.explorerLogo) {
+        el.setAttribute("src", data.explorerLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
     });
 
     const signatureElements = document.querySelectorAll('[data="companySignature"]');
@@ -370,22 +371,13 @@ async function renderAll(data) {
       });
     }
 
-    if (statementElement.companyWelcome)
-      document.querySelectorAll(`[static="welcome"]`).forEach((el) => {
-        el.style.display = "none";
-      });
-
     // Apply basic color mappings
     Object.entries(elementColor).forEach(([attr, color]) => {
       document.querySelectorAll(`[color="${attr}"]`).forEach((el) => {
         const elementType = el.getAttribute("element");
-        if (elementType === "text") {
-          el.style.color = color;
-        } else if (elementType === "block") {
-          el.style.backgroundColor = color;
-        } else if (elementType === "stroke") {
-          el.style.borderColor = elementColor.primaryColor;
-        }
+        if (elementType === "text") el.style.color = color;
+        else if (elementType === "block") el.style.backgroundColor = color;
+        else if (elementType === "stroke") el.style.borderColor = elementColor.primaryColor;
       });
     });
 
@@ -394,9 +386,7 @@ async function renderAll(data) {
       span.style.color = elementColor.primaryColor;
       span.style.fontWeight = "bold";
       const dataKey = span.getAttribute("data");
-      if (dataKey && data[dataKey] !== undefined) {
-        span.textContent = data[dataKey];
-      }
+      if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
     });
 
     document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
@@ -411,10 +401,7 @@ async function renderAll(data) {
     const categoryEntryTemplate = document.querySelector("#categoryEntry");
     const baseTableTemplate = document.querySelector("#tableTemplate");
     const tableContent = baseTableTemplate?.querySelector(".standardtablewrapper");
-    if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) {
-      console.error("No Standard Table Slots Found");
-      return;
-    }
+    if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) return;
 
     (data.standardTables || []).forEach((table) => {
       const containers = document.querySelectorAll(`#standard${table.id}`);
@@ -486,7 +473,6 @@ async function renderAll(data) {
               col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
               valueWrapper.appendChild(col1Div);
             }
-
             if (showCol2) {
               const col2Div = document.createElement("div");
               col2Div.setAttribute("line", "col2");
@@ -495,7 +481,6 @@ async function renderAll(data) {
               col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
               valueWrapper.appendChild(col2Div);
             }
-
             if (showCol3) {
               const col3Div = document.createElement("div");
               col3Div.setAttribute("line", "col3");
@@ -529,7 +514,6 @@ async function renderAll(data) {
             subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
             subWrapper.appendChild(subCol1);
           }
-
           if (showCol2) {
             const subCol2 = document.createElement("div");
             subCol2.setAttribute("subtotal", "col2");
@@ -538,7 +522,6 @@ async function renderAll(data) {
             subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
             subWrapper.appendChild(subCol2);
           }
-
           if (showCol3) {
             const subCol3 = document.createElement("div");
             subCol3.setAttribute("subtotal", "col3");
@@ -565,19 +548,23 @@ async function renderAll(data) {
     const tableTemplate = document.querySelector("#booleanTableTemplate");
     const rowTemplateWrapper = document.querySelector("#booleanCategoryEntry");
     const rowTemplate = rowTemplateWrapper?.querySelector('[category="line"]');
-    if (!tableTemplate || !rowTemplateWrapper || !rowTemplate) {
-      console.error("No Boolean Table Slot Found");
-      return;
-    }
+    if (!tableTemplate || !rowTemplateWrapper || !rowTemplate) return;
 
     rowTemplateWrapper.style.display = "none";
 
-    function createBoolSVG(value, cell) {
+    const columnMap = {
+      column0Name: "zero",
+      columnBoolName: "bool",
+      column1Name: "one",
+      column2Name: "two",
+      column3Name: "three",
+    };
+
+    const createBoolSVG = (value, cell) => {
       const boolTemplate = rowTemplate.querySelector(
         `[boolvalue="${value ? "true" : "false"}"]`
       );
       const clone = boolTemplate?.cloneNode(true);
-
       if (clone && cell?.hasAttribute("color")) {
         const colorAttr = cell.getAttribute("color");
         const cssColor = elementColor?.[colorAttr];
@@ -589,14 +576,6 @@ async function renderAll(data) {
         }
       }
       return clone || document.createTextNode(value ? "\u2713" : "\u2717");
-    }
-
-    const columnMap = {
-      column0Name: "zero",
-      columnBoolName: "bool",
-      column1Name: "one",
-      column2Name: "two",
-      column3Name: "three",
     };
 
     (data.booleanTables || []).forEach((tableData) => {
@@ -649,7 +628,6 @@ async function renderAll(data) {
               idx === "1" ? "one" :
               idx === "2" ? "two" :
               idx === "3" ? "three" : "";
-
             if (hiddenColumns.includes(columnAttr) || value == null) {
               if (cell) cell.remove();
               return;
@@ -782,10 +760,7 @@ async function renderAll(data) {
   function donutCharts() {
     const donutTemplate = document.getElementById("moduleDonutTemplate");
     const moduleWrapper = document.querySelector(".modulewrapper");
-    if (!donutTemplate || !moduleWrapper) {
-      console.error("No Donut Chart Slot Found");
-      return;
-    }
+    if (!donutTemplate || !moduleWrapper) return;
 
     (data.charts || []).forEach((chart) => {
       const clone = donutTemplate.cloneNode(true);
@@ -867,9 +842,7 @@ async function renderAll(data) {
 
         const paragraphClass = descEl.className;
         const listItems = descEl.querySelectorAll("li");
-        listItems.forEach((li) => {
-          li.className = paragraphClass;
-        });
+        listItems.forEach((li) => (li.className = paragraphClass));
       }
 
       listContainer.appendChild(wrapperClone);
@@ -879,10 +852,7 @@ async function renderAll(data) {
   function holidaysList() {
     const holidayList = document.querySelector(".holidaylist");
     const holidayTemplate = holidayList?.querySelector(".holidaywrapper");
-    if (!holidayList || !holidayTemplate) {
-      console.error("No Holiday Slot Found");
-      return;
-    }
+    if (!holidayList || !holidayTemplate) return;
 
     holidayList.innerHTML = "";
 
@@ -904,20 +874,13 @@ async function renderAll(data) {
   function contactsLists(contactsData, listSelector) {
     const listContainer = document.querySelector(`${listSelector} [contacts="list"]`);
     const itemTemplate = listContainer?.querySelector('[contact="wrapper"]');
-
-    if (!listContainer || !itemTemplate) {
-      console.error(`No Contact List Slot Found`);
-      return;
-    }
+    if (!listContainer || !itemTemplate) return;
 
     listContainer.innerHTML = "";
 
     (contactsData || []).forEach((contact, index) => {
       const itemClone = itemTemplate.cloneNode(true);
-
-      if (index % 2 === 1) {
-        itemClone.classList.add("alternate");
-      }
+      if (index % 2 === 1) itemClone.classList.add("alternate");
 
       const nameEl = itemClone.querySelector('[contact="name"]');
       const descEl = itemClone.querySelector('[contact="description"]');
@@ -980,16 +943,14 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
 
-  // Buttons (from JSON) last so they reflect final state
+  // Finalize buttons after everything is in place
   applyButtonStatus();
 }
 
-// ===========================
-// UI Controls / State Binding
-// ===========================
+// =====================================
+// Controls + State sync (params <-> UI)
+// =====================================
 (function controls() {
-  const params = getParams();
-
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
 
@@ -1008,7 +969,7 @@ async function renderAll(data) {
   const getCurrentDesign = () => getParams().get("design") || "1";
   const getCurrentLayout = () => getParams().get("layout") || "1";
   const getCurrentHeader = () => getParams().get("header") || "1";
-  const getCurrentCover = () => getParams().get("cover") ?? "0";
+  const getCurrentCover  = () => getParams().get("cover") ?? "0";
 
   const setLayoutButtonsDisabled = (disabled) => {
     $("#layout1")?.classList.toggle("disabled", disabled);
@@ -1028,8 +989,8 @@ async function renderAll(data) {
     $("#header2")?.setAttribute("aria-disabled", String(disabled));
   };
 
-  // Layout application
-  const applyLayout = (val) => {
+  // Layout application (with optional reload)
+  const applyLayout = (val, { reload = true } = {}) => {
     if (getCurrentDesign() === "2") return; // blocked in design 2
 
     const isTwo = val === "2";
@@ -1043,14 +1004,12 @@ async function renderAll(data) {
 
     setParam("layout", val);
 
-    // Re-fetch data if layout affects the endpoint
-    debouncedReloadFromParams();
+    if (reload) debouncedReloadFromParams();
 
-    // Re-apply overflow pass
     if (typeof window.applyOverflow === "function") window.applyOverflow();
   };
 
-  // Header (only impacts UI unless your backend uses it; keep reload optional)
+  // Header (UI-only unless your API depends on it)
   const applyHeader = (val) => {
     const headerOneEl = document.getElementById("headerOne");
     const headerTwoEl = document.getElementById("headerTwo");
@@ -1067,11 +1026,11 @@ async function renderAll(data) {
     $("#header2")?.classList.toggle("active", val === "2");
 
     setParam("header", val);
-    // If header influences your endpoint, uncomment:
+    // If your backend cares about header, you can:
     // debouncedReloadFromParams();
   };
 
-  // Cover
+  // Cover variants
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
 
@@ -1083,15 +1042,52 @@ async function renderAll(data) {
       el.classList.add(targetClass);
     });
 
-    ["0", "1", "2"].forEach((k) => {
-      $("#cover" + k)?.classList.toggle("active", k === val);
-    });
+    ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
     $("#noCover")?.classList.remove("active");
 
     setParam("cover", val);
     updateExtras();
-    // If cover affects endpoint, uncomment:
+    // If cover changes your endpoint, uncomment:
     // debouncedReloadFromParams();
+  };
+
+  // Design switch (with optional reload)
+  const applyDesignSwitch = (val, { reload = true } = {}) => {
+    ["1", "2"].forEach((d) => {
+      const show = d === val;
+      $$(`[design="${d}"]`).forEach((el) => (el.style.display = show ? "" : "none"));
+    });
+
+    toggleActive("design1", val === "1");
+    toggleActive("design2", val === "2");
+
+    if (val === "2") setParam("cover", "false"); // force cover off
+
+    setParam("design", val);
+    updateExtras();
+
+    if (val === "2") {
+      setLayoutButtonsDisabled(true);
+      const p = getParams();
+      p.delete("layout");
+      history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
+      $$('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
+      $("#layout1")?.classList.remove("active");
+      $("#layout2")?.classList.remove("active");
+      setHeaderButtonsDisabled(true);
+
+      setParam("cover", "false");
+      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
+      ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
+      $("#noCover")?.classList.add("active");
+    } else {
+      setLayoutButtonsDisabled(false);
+      if (!getParams().has("layout")) setParam("layout", "1");
+      applyLayout(getCurrentLayout(), { reload: false }); // keep single reload point
+      setHeaderButtonsDisabled(false);
+    }
+
+    if (reload) debouncedReloadFromParams();
   };
 
   const updateExtras = () => {
@@ -1128,66 +1124,23 @@ async function renderAll(data) {
     });
   };
 
-  const applyDesignSwitch = (val) => {
-    ["1", "2"].forEach((d) => {
-      const show = d === val;
-      $$(`[design="${d}"]`).forEach((el) => {
-        el.style.display = show ? "" : "none";
-      });
-    });
-
-    toggleActive("design1", val === "1");
-    toggleActive("design2", val === "2");
-
-    if (val === "2") setParam("cover", "false"); // cover off in design 2
-
-    setParam("design", val);
-    updateExtras();
-
-    if (val === "2") {
-      setLayoutButtonsDisabled(true);
-      // do not keep layout param when design 2
-      const p = getParams();
-      p.delete("layout");
-      history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
-      $$('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
-      $("#layout1")?.classList.remove("active");
-      $("#layout2")?.classList.remove("active");
-
-      setHeaderButtonsDisabled(true);
-
-      setParam("cover", "false");
-      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
-      ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
-      $("#noCover")?.classList.add("active");
-    } else {
-      setLayoutButtonsDisabled(false);
-      // Keep existing layout if present; default to 1 if missing
-      if (!getParams().has("layout")) setParam("layout", "1");
-      applyLayout(getCurrentLayout());
-      setHeaderButtonsDisabled(false);
-    }
-
-    // If design changes the endpoint, reload:
-    debouncedReloadFromParams();
-  };
-
   const toggleExtra = (key) => {
     const current = getParams().get(key) === "true";
     setParam(key, (!current).toString());
     updateExtras();
   };
 
+  // Apply state from URL to UI (single reload afterwards)
   const applyStateFromParams = () => {
     const design = getCurrentDesign();
-    applyDesignSwitch(design);
+    applyDesignSwitch(design, { reload: false });
 
     const header = getCurrentHeader();
     applyHeader(header);
 
     if (design !== "2") {
       const layout = getCurrentLayout();
-      applyLayout(layout);
+      applyLayout(layout, { reload: false });
 
       const cover = getCurrentCover();
       if (cover !== "false") applyCover(cover);
@@ -1195,22 +1148,25 @@ async function renderAll(data) {
     } else {
       updateExtras();
     }
+
+    // Single reload after state laid out
+    debouncedReloadFromParams();
   };
 
-  // --------- Initial UI wiring ---------
+  // ------------------------
+  // DOM Ready: wire up UI/UX
+  // ------------------------
   document.addEventListener("DOMContentLoaded", () => {
-    // Top design buttons on a separate nav (kept from your original)
+    // Top design nav (optional)
     const designBtns = document.querySelectorAll('[id^="design-"]');
     if (designBtns.length) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          // Preserve current params/hash
+          // preserve params/hash
           const params = getParams();
           history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
-          // Apply and reload
           setParam("design", idNum);
-          debouncedReloadFromParams();
           applyStateFromParams();
         });
       });
@@ -1224,7 +1180,7 @@ async function renderAll(data) {
       }
     }
 
-    // Demo toggle (unchanged)
+    // Demo element visibility
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
@@ -1236,17 +1192,11 @@ async function renderAll(data) {
       if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
     };
     $("#fullScreen")?.addEventListener("click", () => $("#editorPanel")?.classList.toggle("hidden"));
-    $("#zoomOut")?.addEventListener("click", () => {
-      scale = Math.max(0.1, scale - 0.1);
-      updateZoom();
-    });
-    $("#zoomIn")?.addEventListener("click", () => {
-      scale = Math.min(2, scale + 0.1);
-      updateZoom();
-    });
+    $("#zoomOut")?.addEventListener("click", () => { scale = Math.max(0.1, scale - 0.1); updateZoom(); });
+    $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
 
-    // Employee buttons (no full reload anymore)
+    // Employee selector (IDs start with "Employee")
     const empBtns = $$('[id^="Employee"]');
     const setActiveEmpButton = (id) => {
       empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
@@ -1258,7 +1208,6 @@ async function renderAll(data) {
         debouncedReloadFromParams();
       });
     });
-
     let ek = getParams().get("ek");
     if (!ek || !document.getElementById(ek)) {
       ek = "EmployeeA";
@@ -1266,7 +1215,7 @@ async function renderAll(data) {
     }
     setActiveEmpButton(ek);
 
-    // Scroll to component (unchanged)
+    // Scroll to sections
     const scrollToComponent = (btnId, key) => {
       $("#" + btnId)?.addEventListener("click", () => {
         const target = $(`[design="${key}"]`);
@@ -1279,7 +1228,7 @@ async function renderAll(data) {
     scrollToComponent("benefitsPage", "benefits");
     scrollToComponent("companyPage", "company");
 
-    // Preview/share helpers (kept; no auto-hide here)
+    // Preview/share helpers
     const getUrlWithPreviewParam = () => {
       const url = new URL(window.location.href);
       if (!url.searchParams.has("preview")) url.searchParams.set("preview", "true");
@@ -1307,13 +1256,12 @@ async function renderAll(data) {
     });
     $("#editButton")?.addEventListener("click", () => {
       const p = getParams();
-      p.delete("preview");
-      p.delete("key");
+      p.delete("preview"); p.delete("key");
       const newUrl = `${location.origin}${location.pathname}?${p}${location.hash}`;
       window.location.href = newUrl;
     });
 
-    // Buttons for design/layout/header/cover/pages
+    // Buttons
     safeBind($("#design1"), () => applyDesignSwitch("1"));
     safeBind($("#design2"), () => applyDesignSwitch("2"));
 
@@ -1326,8 +1274,7 @@ async function renderAll(data) {
       $("#noCover")?.classList.add("active");
       $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
       updateExtras();
-      // If cover affects endpoint, uncomment:
-      // debouncedReloadFromParams();
+      // debouncedReloadFromParams(); // uncomment if cover affects endpoint
     });
 
     safeBind($("#benefitsPage"), () => toggleExtra("benefits"));
@@ -1339,54 +1286,19 @@ async function renderAll(data) {
     safeBind($("#header1"), () => applyHeader("1"));
     safeBind($("#header2"), () => applyHeader("2"));
 
-    // Defaults if missing (do not overwrite existing values)
+    // Ensure baseline params exist (don’t overwrite if present)
     if (!getParams().has("layout")) setParam("layout", "1");
     if (!getParams().has("header")) setParam("header", "1");
-    if (!getParams().has("cover")) setParam("cover", "0");
+    if (!getParams().has("cover"))  setParam("cover", "0");
+    if (!getParams().has("ek"))     setParam("ek", "EmployeeA");
 
-    // Apply UI state from params, then fetch+render
+    // Apply UI state, then single debounced fetch
     applyStateFromParams();
-    window.reloadFromParams();
 
-    // Keep in sync with back/forward
+    // Sync with back/forward
     window.addEventListener("popstate", () => {
       applyStateFromParams();
-      debouncedReloadFromParams();
     });
   });
 })();
 
-// -------------- Separate onload block you had for ek default + demo visibility --------------
-document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search);
-
-  if (!urlParams.has("ek")) {
-    urlParams.set("ek", "EmployeeA");
-    history.replaceState(null, "", `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
-  }
-
-  const empBtns = document.querySelectorAll('[id^="employee-"]');
-  if (empBtns.length) {
-    empBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const idNum = btn.id.split("-")[1];
-        const newParams = new URLSearchParams(window.location.search);
-        newParams.set("ek", idNum);
-        history.replaceState(null, "", `${window.location.pathname}?${newParams.toString()}${window.location.hash}`);
-        // Re-fetch with new ek
-        window.reloadFromParams?.();
-      });
-    });
-
-    const ek = urlParams.get("ek");
-    if (ek) {
-      const activeEmp = document.getElementById(`employee-${ek}`);
-      if (activeEmp) {
-        empBtns.forEach((b) => b.classList.toggle("active", b === activeEmp));
-      }
-    }
-  }
-
-  const demoEl = document.getElementById("demo");
-  if (demoEl) demoEl.style.display = urlParams.get("demo") === "true" ? "" : "none";
-});
