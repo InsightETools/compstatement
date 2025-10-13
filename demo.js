@@ -200,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let queryParams;
 
   baseUrl =
-    "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsFlat1.aspx";
+    "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
   queryParams = new URLSearchParams({
     usecors: "1",
     key,
