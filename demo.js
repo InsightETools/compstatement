@@ -1271,12 +1271,13 @@ const applyLayout = (val) => {
   qs("#layout1")?.classList.toggle("active", !isTwo);
   qs("#layout2")?.classList.toggle("active", isTwo);
 
-  setParam("layout", 2);
-
+  setParam("layout", val);
+/*
   // NEW: ensure overflow logic re-applies after layout changes
   if (typeof window.applyOverflow === "function") {
     window.applyOverflow();
   }
+  */
 };
 
   // SIMPLE header logic:
