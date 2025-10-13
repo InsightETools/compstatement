@@ -227,12 +227,18 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 // =====================
 async function renderAll(data) {
   // --- Clear/prepare dynamic zones (avoid duplicates on re-render) ---
-  document.querySelectorAll(".modulewrapper")?.forEach((wrapper) => {
+  // Clear only prior donut clones in *every* wrapper; keep each wrapper's template
+  document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
+  const template =
+    wrapper.querySelector("#moduleDonutTemplate") ||
+    wrapper.querySelector('[data-template="donut"]');
+
   Array.from(wrapper.children).forEach((child) => {
-    // Keep the template by id or data attribute
-    if (child.id === "moduleDonutTemplate" || child.getAttribute?.("data-template") === "donut") return;
+    if (template && child === template) return; // keep template
     child.remove();
   });
+
+  if (template) template.style.display = "none"; // keep but hide template
 });
   document.querySelectorAll('[contacts="list"]')?.forEach((l) => (l.innerHTML = ""));
   const benefitList = document.querySelector('[benefit="list"]');
@@ -760,85 +766,110 @@ async function renderAll(data) {
   }
 
   function donutCharts() {
-  const donutTemplate = document.getElementById("moduleDonutTemplate");
-  const moduleWrapper = document.querySelector(".modulewrapper");
-  if (!donutTemplate || !moduleWrapper) return;
+  // Helper: is an element actually visible?
+  const isVisible = (el) => {
+    if (!el) return false;
+    const style = window.getComputedStyle(el);
+    return style.display !== "none" && style.visibility !== "hidden" && el.offsetParent !== null;
+  };
 
-  // Ensure template is hidden but present for cloning
-  donutTemplate.style.display = "none";
+  // Find all currently visible module wrappers (layout may hide some)
+  const wrappers = Array.from(document.querySelectorAll(".modulewrapper")).filter(isVisible);
+  if (!wrappers.length) return;
 
-  (data.charts || []).forEach((chart) => {
-    // clone
-    const clone = donutTemplate.cloneNode(true);
-    clone.style.display = "";      // show clone
-    clone.removeAttribute("id");   // avoid duplicate ids
+  const charts = Array.isArray(data.charts) ? data.charts : [];
+  if (!charts.length) return;
 
-    // wire up ids + text
-    const chartId = `chart_${chart.id}`;
-    const chartEl = clone.querySelector(".moduledonutchart");
-    if (chartEl) {
-      chartEl.id = chartId;
-      if (data.chartSize) chartEl.classList.add(data.chartSize);
-    }
+  wrappers.forEach((wrapper, wIdx) => {
+    // Prefer a template inside the wrapper; fall back to a global one
+    const templateInWrapper =
+      wrapper.querySelector("#moduleDonutTemplate") ||
+      wrapper.querySelector('[data-template="donut"]');
 
-    const labelEl = clone.querySelector('[category="label"]');
-    const descEl  = clone.querySelector('[category="description"]');
-    const discEl  = clone.querySelector('[category="disclaimer"]');
-    const totalEl = clone.querySelector('[category="totalValue"]');
+    // If no template in this wrapper, try a global template (outside)
+    const globalTemplate =
+      document.getElementById("moduleDonutTemplate") ||
+      document.querySelector('[data-template="donut"]');
 
-    if (labelEl) labelEl.textContent = chart.label ?? "";
-    if (descEl)  descEl.textContent  = chart.description ?? "";
-    if (discEl)  discEl.textContent  = chart.disclaimer ?? "";
-    if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
+    const template = templateInWrapper || globalTemplate;
+    if (!template) return;
 
-    // build legend/index
-    const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
-    if (indexWrapper) {
-      (chart.groups || []).forEach((group) => {
-        const item = document.createElement("div");
-        item.classList.add("moduledonutindex");
-        item.setAttribute("category", "item");
+    // Ensure the template is hidden but present for cloning
+    template.style.display = "none";
 
-        const icon = document.createElement("div");
-        icon.classList.add("moduleindexcategorywrapper");
-        icon.setAttribute("category", "icon");
+    charts.forEach((chart, cIdx) => {
+      const clone = template.cloneNode(true);
+      clone.style.display = "";
+      clone.removeAttribute("id"); // avoid duplicate IDs
 
-        const colorBox = document.createElement("div");
-        colorBox.classList.add("chart-color");
-        colorBox.style.backgroundColor = hexToRgb(group.color);
+      // Unique chart id per wrapper + chart index
+      const chartId = `chart_${String(chart.id ?? cIdx)}__w${wIdx}`;
+      const chartEl = clone.querySelector(".moduledonutchart");
+      if (chartEl) {
+        chartEl.id = chartId;
+        // apply optional size
+        if (data.chartSize) chartEl.classList.add(data.chartSize);
+      }
 
-        const label = document.createElement("div");
-        label.classList.add("componentsmalllabel");
-        label.setAttribute("category", "name");
-        label.textContent = group.label;
+      // Text bits
+      const labelEl = clone.querySelector('[category="label"]');
+      const descEl  = clone.querySelector('[category="description"]');
+      const discEl  = clone.querySelector('[category="disclaimer"]');
+      const totalEl = clone.querySelector('[category="totalValue"]');
 
-        icon.appendChild(colorBox);
-        icon.appendChild(label);
+      if (labelEl) labelEl.textContent = chart.label ?? "";
+      if (descEl)  descEl.textContent  = chart.description ?? "";
+      if (discEl)  discEl.textContent  = chart.disclaimer ?? "";
+      if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
 
-        const value = document.createElement("div");
-        value.classList.add("moduledonutindexvalue");
-        value.setAttribute("category", "value");
-        value.textContent = `${group.value}%`;
+      // Legend/index
+      const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
+      if (indexWrapper) {
+        indexWrapper.innerHTML = "";
+        (chart.groups || []).forEach((group) => {
+          const item = document.createElement("div");
+          item.classList.add("moduledonutindex");
+          item.setAttribute("category", "item");
 
-        item.appendChild(icon);
-        item.appendChild(value);
-        indexWrapper.appendChild(item);
+          const icon = document.createElement("div");
+          icon.classList.add("moduleindexcategorywrapper");
+          icon.setAttribute("category", "icon");
+
+          const colorBox = document.createElement("div");
+          colorBox.classList.add("chart-color");
+          colorBox.style.backgroundColor = hexToRgb(group.color);
+
+          const label = document.createElement("div");
+          label.classList.add("componentsmalllabel");
+          label.setAttribute("category", "name");
+          label.textContent = group.label;
+
+          icon.appendChild(colorBox);
+          icon.appendChild(label);
+
+          const value = document.createElement("div");
+          value.classList.add("moduledonutindexvalue");
+          value.setAttribute("category", "value");
+          value.textContent = `${group.value}%`;
+
+          item.appendChild(icon);
+          item.appendChild(value);
+          indexWrapper.appendChild(item);
+        });
+      }
+
+      // Append into the current, visible wrapper
+      wrapper.appendChild(clone);
+
+      // Paint conic gradient for this instance
+      renderDonutChart({
+        chartId,
+        categoryGroup: chart.groups,
+        containerSelector: `#${chartId} + .moduledonutindexwrapper`,
       });
-    }
-
-    // append to wrapper
-    moduleWrapper.appendChild(clone);
-
-    // paint conic gradient
-    renderDonutChart({
-      chartId,
-      categoryGroup: chart.groups,
-      containerSelector: `#${chartId} + .moduledonutindexwrapper`,
     });
   });
-
-    donutTemplate.remove();
-  }
+}
 
   function benefitsList() {
     const listContainer = document.querySelector('[benefit="list"]');
@@ -1009,7 +1040,6 @@ async function renderAll(data) {
   // Layout application (with optional reload)
   const applyLayout = (val, { reload = true } = {}) => {
     if (getCurrentDesign() === "2") return; // blocked in design 2
-
     const isTwo = val === "2";
     $$('[layout="dynamic"]').forEach((el) => {
       if (isTwo) el.classList.add("layout2");
