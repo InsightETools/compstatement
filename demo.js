@@ -1114,6 +1114,7 @@ document.addEventListener("DOMContentLoaded", () => {
         el.style.color = elementColor.secondaryColor;
       });
 
+      /*
       //Check Overflow
       document.querySelectorAll('[item="page"]').forEach((page) => {
         const lineElements = page.querySelectorAll(
@@ -1173,6 +1174,7 @@ document.addEventListener("DOMContentLoaded", () => {
           applyStyles();
         }
       });
+      */
 
       // Apply JSON button status (disables + inert behavior)
       applyButtonStatus();
