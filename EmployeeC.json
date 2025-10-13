@@ -1,5 +1,21 @@
 {
+  "explorerLogo": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/6809171f634ed03b8d799918_Insight%20e-Tools_Full%20Color.png",
+  "explorerUrl": "https://www.google.com",
+  "buttonStatus": {
+    "design1": true,
+    "design2": true,
+    "header1": true,
+    "header2": true,
+    "layout1": true,
+    "layout2": true,
+    "noCover": true,
+    "cover1": true,
+    "cover2": true,
+    "benefitsPage": false,
+    "companyPage": false
+  },
   "companyName": "Demo Company",
+  "companyURL": "https://www.google.com",
   "coverSheet": true,
   "companyLogoCover": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
   "companyLogoCoverHeight": 50,
@@ -7,7 +23,7 @@
   "companyLogoHeight": 55,
   "companyWelcome": "Hi",
   "companyMessage": "Demo Company is committed to offering a highly competitive compensation and benefits package that allows our company to recruit and retain the best employees. Your total compensation and benefit package helps to protect you and your family today and to support your long-term financial goals.<br><br>To help each of our employees gain a thorough understanding of the total value of their compensation and benefits, Demo Company has prepared this personalized Compensation Statement specifically for you. The information contained in this statement is designed to show you the combined value of your annual pay and the employee benefits you elected.<br><br>Please take the time to carefully review each benefit to ensure that all your personal information is accurate. If you find anything that does not correctly describe the coverage you have elected, or if you have any questions, please contact Human Resources.<br><br>Sincerely,",
-  "companyRepName": "Stuart Little",
+  "companyRepName": "Benny Bonkers",
   "companyRepTitle": "Chief Comp Officer",
   "companySignature": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792cff6b7dfcbdb518c6b5_DemoSignature.png",
   "companySignatureText": "",
@@ -17,10 +33,10 @@
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "Sally Smith",
-  "employeeFirstName": "Sally",
-  "employeeTitle": "Marketing Specialist",
-  "employeeSalary": "75000",
+  "employeeName": "Benny Bonkers",
+  "employeeFirstName": "John",
+  "employeeTitle": "Graphic Designer",
+  "employeeSalary": "80000",
   "employeeWage": "35",
   "employeeAddress": "1110 N Center Parkway",
   "employeeUnit": "Suite B",
@@ -40,6 +56,26 @@
   "secondaryColor": "#00406c",
   "tableColor": "#00406c",
   "chartSize": "small",
+  "coverContent": [
+    "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
+    "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
+    "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
+    "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png"
+  ],
+  "listModule": [
+    {
+      "id": "module13",
+      "label": "Additional Benies",
+      "details": "The following perks are provided in addition to the compensation and benefits above",
+      "values": [
+        "100% tuition reimbursement up to <span>$5,000</span>",
+        "Short-term Disability coverage at no cost",
+        "Fit & Fun Dollas",
+        "Service Award Program",
+        "Professional development training"
+      ]
+    }
+  ],
   "charts": [
     {
       "id": "chart1",
@@ -47,7 +83,7 @@
       "type": "donut",
       "isDecimal": false,
       "label": "Total Compensation",
-      "description": "Employer contributions to your total compensation package, including benefits and cash",
+      "description": "",
       "disclaimer": "",
       "totalValue": 65000,
       "groups": [
@@ -68,12 +104,6 @@
           "label": "Protection",
           "color": "#466c8a",
           "value": 50
-        },
-        {
-          "relatedGroupId": 2,
-          "label": "Retirement",
-          "color": "#5ee1ff",
-          "value": 50
         }
       ]
     },
@@ -84,7 +114,7 @@
       "isDecimal": false,
       "label": "Total Benefits Costs",
       "description": "",
-      "disclaimer": "Disclaimer goes here",
+      "disclaimer": "",
       "totalValue": 15000,
       "groups": [
         {
@@ -103,23 +133,7 @@
     }
   ],
   "modules": [
-    {
-      "id": "module10",
-      "year": "",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Annual Salary",
-          "type": "currency",
-          "value": "50000",
-          "description": "Description goes here"
-        }
-      ]
-    },
-    {
+   {
       "id": "module11",
       "year": "2024",
       "label": "Time Off Snapshot",
@@ -136,13 +150,38 @@
         {
           "label": "",
           "type": "currency",
-          "value": "",
+          "value": "20000",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "",
+          "value": "30000",
+          "description": "Description goes here"
+        }
+      ]
+    }, {
+      "id": "module12",
+      "year": "2024",
+      "label": "Time Off Snapshot",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": [
+        {
+          "label": "",
+          "type": "currency",
+          "value": "1000",
+          "description": "Description goes here"
+        },{
+          "label": "",
+          "type": "currency",
+          "value": "2500",
+          "description": "Description goes here"
+        },{
+          "label": "",
+          "type": "currency",
+          "value": "3000",
           "description": "Description goes here"
         }
       ]
@@ -243,7 +282,7 @@
       "isDecimal": false,
       "column1Name": "",
       "column2Name": "",
-      "column3Name": "Employer",
+      "column3Name": "Employee",
       "column1Total": 0,
       "column2Total": 0,
       "column3Total": 56000,
