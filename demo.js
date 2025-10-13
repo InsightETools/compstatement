@@ -1233,7 +1233,7 @@ window.applyOverflow();
 
   // Helpers to read current params
   const getCurrentDesign = () => params.get("design") || "1";
-  const getCurrentLayout = () => params.get("layout") || "1";
+  const getCurrentLayout = () => params.get("layout") || "2";
   const getCurrentHeader = () => params.get("header") || "1";
   const getCurrentCover = () => params.get("cover") ?? "0"; // "0" | "1" | "2" | "false"
 
