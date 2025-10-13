@@ -171,19 +171,19 @@
         {
           "label": "",
           "type": "currency",
-          "value": "50000",
+          "value": "1000",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "20000",
+          "value": "2050",
           "description": "Description goes here"
         },
         {
           "label": "",
           "type": "currency",
-          "value": "30000",
+          "value": "5600",
           "description": "Description goes here"
         }
       ]
