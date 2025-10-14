@@ -1321,3 +1321,4 @@ async function renderAll(data) {
 })();
 console.log("DEVELOPMENT");
 console.log("v2025.1");
+console.log(path.parse(fileName).name);
