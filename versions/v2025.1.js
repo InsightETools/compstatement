@@ -1321,11 +1321,10 @@ async function renderAll(data) {
 
 (function() {
   const script = document.currentScript;
-  if (script && script.src) {
-    console.log("Loaded from hosted file:", script.src);
+  if (script && script.src) {    
   } else {
     console.log("DEVELOPMENT");
+    console.log(document.currentScript);
   }
 })();
-
 console.log("Build v2025.1");
