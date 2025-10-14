@@ -1324,7 +1324,7 @@ async function renderAll(data) {
   if (script && script.src) {    
   } else {
     console.log("DEVELOPMENT");
-    console.log(document.currentScript);
+    console.log(script);
   }
 })();
 console.log("Build v2025.1");
