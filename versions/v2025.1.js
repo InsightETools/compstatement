@@ -1318,5 +1318,14 @@ async function renderAll(data) {
     });
   });
 })();
-console.log("DEVELOPMENT");
+
+(function() {
+  const script = document.currentScript;
+  if (script && script.src) {
+    console.log("Loaded from hosted file:", script.src);
+  } else {
+    console.log("DEVELOPMENT");
+  }
+})();
+
 console.log("Build v2025.1");
