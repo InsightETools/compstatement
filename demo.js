@@ -1,14 +1,7 @@
-// ==============================
-// Realtime Param-Driven Renderer
-// ==============================
 
-// Load Status
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-// ---------------------
-// Basic DOM + URL utils
-// ---------------------
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const getParams = () => new URLSearchParams(window.location.search);
@@ -30,9 +23,6 @@ const debounced = (fn, ms = 60) => {
   };
 };
 
-// ------------------------------------------
-// Build fetch URL based on current parameters
-// ------------------------------------------
 let currentFetchController = null;
 
 function buildFetchUrlFromParams() {
@@ -44,11 +34,9 @@ function buildFetchUrlFromParams() {
   const ek     = p.get("ek") || "EmployeeA";
   const layout = p.get("layout");
 
-  // Live endpoint when key present:
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
 
   if (!key) {
-    // Demo/local by employee
     return `https://compstatementdemo.netlify.app/${ek}.json`;
   }
 
@@ -60,9 +48,6 @@ function buildFetchUrlFromParams() {
   return `${baseUrl}?${qp.toString()}`;
 }
 
-// -------------------
-// Overflow controller
-// -------------------
 window.applyOverflow = function () {
   document.querySelectorAll('[item="page"]').forEach((page) => {
     const lineEls = page.querySelectorAll(
@@ -112,18 +97,14 @@ window.applyOverflow = function () {
   });
 };
 
-// -----------------------------
-// Button state fusion (JSON+UI)
-// -----------------------------
-const _jsonDisabled = new Map();    // id -> bool (true means disabled due to JSON)
-const _designDisabled = new Map();  // id -> bool (true means disabled due to design)
-const _allKnownButtons = new Set(); // discovered once
+const _jsonDisabled = new Map();    
+const _designDisabled = new Map();  
+const _allKnownButtons = new Set(); 
 
 function _collectButtons() {
   document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
     _allKnownButtons.add(el.id);
   });
-  // include likely controls even if not button tags
   [
     "design1","design2","layout1","layout2","header1","header2",
     "cover0","cover1","cover2","noCover","benefitsPage","companyPage"
@@ -153,7 +134,6 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
-  // Hard-disabled when design=2
   const forceOffIds = [
     "layout1","layout2",
     "cover0","cover1","cover2","noCover",
@@ -164,15 +144,11 @@ function computeDesignConstraintsAndApply() {
   _applyEffectiveButtonStates();
 }
 
-// ------------------------------
-// Fetch + render (single entrypoint)
-// ------------------------------
 const debouncedReloadFromParams = debounced(() => window.reloadFromParams(), 60);
 
 window.reloadFromParams = async () => {
   $("#loader")?.classList.remove("finished");
 
-  // Abort in-flight fetch
   if (currentFetchController) currentFetchController.abort();
   currentFetchController = new AbortController();
 
@@ -184,7 +160,6 @@ window.reloadFromParams = async () => {
 
     await renderAll(data);
 
-    // Overflow pass after render
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
@@ -200,9 +175,6 @@ window.reloadFromParams = async () => {
   }
 };
 
-// ---------------------
-// Shared helper methods
-// ---------------------
 function hexToRgb(hex) {
   hex = hex.replace(/^#/, "");
   if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
@@ -274,11 +246,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
 
-// =====================
-// R E N D E R   A L L
-// =====================
 async function renderAll(data) {
-  // --- Clean donut clones in every wrapper but keep template(s) ---
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -287,16 +255,15 @@ async function renderAll(data) {
       if (template && child === template) return;
       child.remove();
     });
-    if (template) template.style.display = "none"; // keep template, hidden
+    if (template) template.style.display = "none"; 
   });
 
-  // ---- Local helpers WITH access to "data" ----
   function applyButtonStatus() {
     _jsonDisabled.clear();
     const map = data?.buttonStatus;
     if (map && typeof map === "object") {
       Object.entries(map).forEach(([id, enabled]) => {
-        const disabled = !enabled; // JSON 'false' means disabled
+        const disabled = !enabled; 
         _jsonDisabled.set(id, !!disabled);
       });
     }
@@ -381,7 +348,6 @@ async function renderAll(data) {
       });
     });
 
-    // Logos guarded (prevent src="undefined")
     document.querySelectorAll('[data="companyLogoCover"]').forEach((el) => {
       if (data.companyLogoCover) {
         el.setAttribute("src", data.companyLogoCover);
@@ -425,7 +391,6 @@ async function renderAll(data) {
       });
     }
 
-    // Apply basic color mappings
     Object.entries(elementColor).forEach(([attr, color]) => {
       document.querySelectorAll(`[color="${attr}"]`).forEach((el) => {
         const elementType = el.getAttribute("element");
@@ -435,7 +400,6 @@ async function renderAll(data) {
       });
     });
 
-    // Span overrides + palette
     document.querySelectorAll("span").forEach((span) => {
       span.style.color = elementColor.primaryColor;
       span.style.fontWeight = "bold";
@@ -1011,7 +975,6 @@ async function renderAll(data) {
     setTimeout(() => $("#loader")?.classList.add("finished"), 500);
   }
 
-  // --- Render pipeline calls ---
   staticData();
   standardTables();
   booleanTables();
@@ -1026,14 +989,10 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
 
-  // Button state: design constraints first, then JSON merge
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 }
 
-// =====================================
-// Controls + State sync (params <-> UI)
-// =====================================
 (function controls() {
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
@@ -1055,9 +1014,8 @@ async function renderAll(data) {
   const getCurrentHeader = () => getParams().get("header") || "1";
   const getCurrentCover  = () => getParams().get("cover") ?? "0";
 
-  // Layout application (with optional reload)
   const applyLayout = (val, { reload = true } = {}) => {
-    if (getCurrentDesign() === "2") return; // blocked in design 2
+    if (getCurrentDesign() === "2") return; 
 
     const isTwo = val === "2";
     $$('[layout="dynamic"]').forEach((el) => {
@@ -1070,7 +1028,6 @@ async function renderAll(data) {
 
     setParam("layout", val);
 
-    // Update design constraints (in case state depends on layout)
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
@@ -1080,7 +1037,6 @@ async function renderAll(data) {
     if (reload) debouncedReloadFromParams();
   };
 
-  // Header (UI-only unless your API depends on it)
   const applyHeader = (val) => {
     const headerOneEl = document.getElementById("headerOne");
     const headerTwoEl = document.getElementById("headerTwo");
@@ -1101,11 +1057,8 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-    // If header changes endpoint, uncomment next:
-    // debouncedReloadFromParams();
   };
 
-  // Cover variants
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
 
@@ -1125,11 +1078,9 @@ async function renderAll(data) {
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-    // If cover affects endpoint:
-    // debouncedReloadFromParams();
+
   };
 
-  // Design switch (with optional reload)
   const applyDesignSwitch = (val, { reload = true } = {}) => {
     ["1", "2"].forEach((d) => {
       const show = d === val;
@@ -1139,7 +1090,7 @@ async function renderAll(data) {
     toggleActive("design1", val === "1");
     toggleActive("design2", val === "2");
 
-    if (val === "2") setParam("cover", "false"); // force cover off
+    if (val === "2") setParam("cover", "false"); 
 
     setParam("design", val);
     updateExtras();
@@ -1153,7 +1104,7 @@ async function renderAll(data) {
       $("#layout2")?.classList.remove("active");
     } else {
       if (!getParams().has("layout")) setParam("layout", "1");
-      applyLayout(getCurrentLayout(), { reload: false }); // keep single reload point
+      applyLayout(getCurrentLayout(), { reload: false }); 
     }
 
     computeDesignConstraintsAndApply();
@@ -1204,7 +1155,6 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
   };
 
-  // Apply state from URL to UI (single reload afterwards)
   const applyStateFromParams = () => {
     const design = getCurrentDesign();
     applyDesignSwitch(design, { reload: false });
@@ -1226,18 +1176,13 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // Single reload after state laid out
     debouncedReloadFromParams();
   };
 
-  // ------------------------
-  // DOM Ready: wire up UI/UX
-  // ------------------------
   document.addEventListener("DOMContentLoaded", () => {
     _collectButtons();
     computeDesignConstraintsAndApply();
 
-    // Top design nav (optional)
     const designBtns = document.querySelectorAll('[id^="design-"]');
     if (designBtns.length) {
       designBtns.forEach((btn) => {
@@ -1259,11 +1204,9 @@ async function renderAll(data) {
       }
     }
 
-    // Demo element visibility
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    // Zoom controls
     let scale = 0.7;
     const zoomLevelEl = $("#zoomLevel");
     const updateZoom = () => {
@@ -1275,7 +1218,6 @@ async function renderAll(data) {
     $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
 
-    // Employee selector (IDs start with "Employee")
     const empBtns = $$('[id^="Employee"]');
     const setActiveEmpButton = (id) => {
       empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
@@ -1294,7 +1236,6 @@ async function renderAll(data) {
     }
     setActiveEmpButton(ek);
 
-    // Scroll to sections
     const scrollToComponent = (btnId, key) => {
       $("#" + btnId)?.addEventListener("click", () => {
         const target = $(`[design="${key}"]`);
@@ -1307,7 +1248,6 @@ async function renderAll(data) {
     scrollToComponent("benefitsPage", "benefits");
     scrollToComponent("companyPage", "company");
 
-    // Preview/share helpers
     const getUrlWithPreviewParam = () => {
       const url = new URL(window.location.href);
       if (!url.searchParams.has("preview")) url.searchParams.set("preview", "true");
@@ -1340,7 +1280,6 @@ async function renderAll(data) {
       window.location.href = newUrl;
     });
 
-    // Button handlers
     const safeBindClick = (id, fn) => safeBind($("#" + id), fn);
 
     safeBindClick("design1", () => applyDesignSwitch("1"));
@@ -1357,7 +1296,6 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
-      // debouncedReloadFromParams(); // uncomment if cover affects endpoint
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1369,16 +1307,13 @@ async function renderAll(data) {
     safeBindClick("header1", () => applyHeader("1"));
     safeBindClick("header2", () => applyHeader("2"));
 
-    // Ensure baseline params exist (don’t overwrite if present)
     if (!getParams().has("layout")) setParam("layout", "1");
     if (!getParams().has("header")) setParam("header", "1");
     if (!getParams().has("cover"))  setParam("cover", "0");
     if (!getParams().has("ek"))     setParam("ek", "EmployeeA");
 
-    // Apply UI state, then single debounced fetch
     applyStateFromParams();
 
-    // Sync with back/forward
     window.addEventListener("popstate", () => {
       applyStateFromParams();
     });
