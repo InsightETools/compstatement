@@ -1319,12 +1319,5 @@ async function renderAll(data) {
   });
 })();
 
-(function() {
-  const script = document.currentScript;
-  if (script && script.src) {    
-  } else {
-    console.log("DEVELOPMENT");
-    console.log(script);
-  }
-})();
+console.log("DEVELOPMENT");
 console.log("Build v2025.1");
