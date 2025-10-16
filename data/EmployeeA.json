@@ -178,11 +178,6 @@
           "type": "currency",
           "value": "2500",
           "description": "Description goes here"
-        },{
-          "label": "",
-          "type": "currency",
-          "value": "3000",
-          "description": "Description goes here"
         }
       ]
     },
