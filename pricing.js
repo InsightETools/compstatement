@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
     step: 1,
     range: {
       min: 50,
-      max: 5000,
+      max: 2000,
     },
     start: [1],
     connect: [true, false],
