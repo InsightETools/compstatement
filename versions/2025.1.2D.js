@@ -106,7 +106,7 @@ function _collectButtons() {
   });
   [
     "design1","design2","layout1","layout2","header1","header2",
-    "cover0","cover1","cover2","noCover","benefitsPage","companyPage"
+    "cover0","cover1","cover2","cover3","noCover","benefitsPage","companyPage"
   ].forEach(id => { if (document.getElementById(id)) _allKnownButtons.add(id); });
 }
 
@@ -135,7 +135,7 @@ function computeDesignConstraintsAndApply() {
 
   const forceOffIds = [
     "layout1","layout2",
-    "cover0","cover1","cover2","noCover",
+    "cover0","cover1","cover2","cover3","noCover",
     "header1","header2"
   ];
   forceOffIds.forEach(id => { if (isDesign2) _designDisabled.set(id, true); });
@@ -1062,7 +1062,7 @@ async function renderAll(data) {
     if (getCurrentDesign() === "2") return;
 
     const targetClass = `cover${val}`;
-    const allCoverClasses = ["cover0", "cover1", "cover2"];
+    const allCoverClasses = ["cover0", "cover1", "cover2","cover3"];
 
     $$('[cover="dynamic"]').forEach((el) => {
       allCoverClasses.forEach((c) => el.classList.remove(c));
@@ -1287,11 +1287,12 @@ async function renderAll(data) {
     safeBindClick("cover0", () => applyCover("0"));
     safeBindClick("cover1", () => applyCover("1"));
     safeBindClick("cover2", () => applyCover("2"));
+    safeBindClick("cover3", () => applyCover("3"));
     safeBindClick("noCover", () => {
       setParam("cover", "false");
       ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
       $("#noCover")?.classList.add("active");
-      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
+      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2","cover3"));
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
