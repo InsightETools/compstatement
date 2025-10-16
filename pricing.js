@@ -4,8 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
   noUiSlider.create(slider, {
     step: 1,
     range: {
-      min: 0,
-      max: 21,
+      min: 50,
+      max: 5000,
     },
     start: [1],
     connect: [true, false],
