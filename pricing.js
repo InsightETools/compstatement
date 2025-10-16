@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function () {
     start: [1],
     connect: [true, false],
     padding: [1, 0],
-    pips: { mode: "count", values: 500, density: 500 },
+    pips: { mode: "count", values: 10, density: 10 },
   });
 
   var pips = slider.querySelectorAll(".noUi-value");
