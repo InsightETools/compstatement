@@ -1290,7 +1290,7 @@ async function renderAll(data) {
     safeBindClick("cover3", () => applyCover("3"));
     safeBindClick("noCover", () => {
       setParam("cover", "false");
-      ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
+      ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
       $("#noCover")?.classList.add("active");
       $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2","cover3"));
       updateExtras();
