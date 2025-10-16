@@ -33,7 +33,7 @@
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "Sally Biggy",
+  "employeeName": "Sally Boppers",
   "employeeFirstName": "John",
   "employeeTitle": "Graphic Designer",
   "employeeSalary": "80000",
@@ -177,11 +177,6 @@
           "label": "",
           "type": "currency",
           "value": "2500",
-          "description": "Description goes here"
-        },{
-          "label": "",
-          "type": "currency",
-          "value": "3000",
           "description": "Description goes here"
         }
       ]
