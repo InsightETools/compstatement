@@ -1069,7 +1069,7 @@ async function renderAll(data) {
       el.classList.add(targetClass);
     });
 
-    ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
+    ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
     $("#noCover")?.classList.remove("active");
 
     setParam("cover", val);
