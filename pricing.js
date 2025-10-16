@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pips[i].addEventListener("click", clickOnPip);
   }
 
-  pips[pips.length - 1].innerHTML = "21+";
+  pips[pips.length - 1].innerHTML = "2000+";
 
   const directTotal = document.getElementById("directTotal");
   const providerTotal = document.getElementById("providerTotal");
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const customElements = document.querySelectorAll(".customvalue");
     const signupButton = document.querySelectorAll(".signupbutton");
 
-    if (currentValue === 21) {
+    if (currentValue === 2000) {
       userElements.forEach((el) => (el.style.display = "none"));
       customElements.forEach((el) => (el.style.display = "block"));
       signupButton.forEach((el) => (el.textContent = "Contact Us"));
