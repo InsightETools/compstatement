@@ -36,7 +36,7 @@ function buildFetchUrlFromParams() {
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
 
   if (!key) {
-    return `https://compstatementdemo.netlify.app/${ek}.json`;
+    return `https://compstatementdemo.netlify.app/data/${ek}.json`;
   }
 
   const qp = new URLSearchParams({
