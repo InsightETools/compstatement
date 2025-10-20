@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var slider = document.getElementById("slider");
 
   noUiSlider.create(slider, {
-    step: 1,
+    step: 50,
     range: {
       min: 50,
       max: 2000,
