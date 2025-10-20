@@ -179,3 +179,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+  const radios = document.querySelectorAll('input[name="typeSelect"]');
+  const target = document.querySelector('[details="type"]');
+
+  radios.forEach(radio => {
+    radio.addEventListener('change', () => {
+      if (radio.checked) {
+        target.textContent = radio.value;
+      }
+    });
+  });
