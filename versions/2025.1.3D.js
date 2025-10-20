@@ -196,84 +196,116 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
-/* ===================== PRICING (NEW) ===================== */
-// Default price table (override with JSON: data.pricing)
-const DEFAULT_PRICING = {
-  base: 0,
-  design: { "1": 0, "2": 50 },
-  layout: { "1": 0, "2": 15 },
-  header: { "1": 0, "2": 5 },
-  cover:  { "false": 0, "0": 10, "1": 20, "2": 30, "3": 40 },
-  extras: { benefits: 25, company: 15 }
-};
+/* ========================== PRICING ENGINE (NEW) ========================== */
+window.__currentData = null;
 
-let PRICING = { ...DEFAULT_PRICING };
-
-function getSelectionState() {
+function getSelectionsFromParams() {
   const p = getParams();
-  const design  = p.get("design") || "1";
-  const layout  = p.get("layout") || "1";
-  const header  = p.get("header") || "1";
-  const cover   = p.get("cover")  ?? "0"; // can be "false"
-  const benefits = p.get("benefits") === "true";
-  const company  = p.get("company")  === "true";
-  return { design, layout, header, cover, benefits, company };
+  return {
+    design: p.get("design") || "1",
+    layout: p.get("layout") || "1",
+    header: p.get("header") || "1",
+    cover:  (p.get("cover") ?? "0"),
+    benefits: p.get("benefits") === "true",
+    company:  p.get("company") === "true",
+  };
 }
 
-function computeStatementPrice(state) {
-  const isDesign2 = state.design === "2";
+/**
+ * JSON shape (optional):
+ * {
+ *   "pricing": {
+ *     "base": 0,
+ *     "design": { "1": 0, "2": 150 },
+ *     "layout": { "1": 0, "2": 50 },
+ *     "header": { "1": 0, "2": 25 },
+ *     "cover":  { "false": 0, "0": 0, "1": 20, "2": 40, "3": 60 },
+ *     "toggles": { "benefits": 30, "company": 30 },
+ *     "matrix": [
+ *       { "when": { "design": "2", "layout": "2" }, "add": 40, "label": "Design 2 + Layout 2 combo" }
+ *     ]
+ *   }
+ * }
+ */
+function computeStatementPrice(data, sel) {
+  const pricing = data?.pricing ?? {};
+  const breakdown = [];
 
-  const base     = Number(PRICING.base || 0);
-  const design   = Number((PRICING.design?.[state.design]) ?? 0);
-  const layout   = isDesign2 ? 0 : Number((PRICING.layout?.[state.layout]) ?? 0);
-  const header   = isDesign2 ? 0 : Number((PRICING.header?.[state.header]) ?? 0);
-  const coverKey = isDesign2 ? "false" : (state.cover ?? "0");
-  const cover    = Number((PRICING.cover?.[coverKey]) ?? 0);
-
-  const benefits = state.benefits ? Number(PRICING.extras?.benefits ?? 0) : 0;
-  const company  = state.company  ? Number(PRICING.extras?.company  ?? 0) : 0;
-
-  const breakdown = {
-    base, design, layout, header, cover,
-    extras: { benefits, company }
+  const addPart = (label, amt) => {
+    const n = Number(amt) || 0;
+    if (n !== 0) breakdown.push({ label, amount: n });
+    return n;
   };
 
-  const total = base + design + layout + header + cover + benefits + company;
+  let total = 0;
+
+  total += addPart("Base", pricing.base);
+
+  if (pricing.design && sel.design in pricing.design) {
+    total += addPart(`Design ${sel.design}`, pricing.design[sel.design]);
+  }
+  if (pricing.layout && sel.layout in pricing.layout) {
+    total += addPart(`Layout ${sel.layout}`, pricing.layout[sel.layout]);
+  }
+  if (pricing.header && sel.header in pricing.header) {
+    total += addPart(`Header ${sel.header}`, pricing.header[sel.header]);
+  }
+
+  const coverKey = sel.cover === "false" ? "false" : sel.cover;
+  if (pricing.cover && coverKey in pricing.cover) {
+    total += addPart(coverKey === "false" ? "No Cover" : `Cover ${coverKey}`, pricing.cover[coverKey]);
+  }
+
+  if (pricing.toggles) {
+    if (sel.benefits && "benefits" in pricing.toggles) {
+      total += addPart("Benefits page", pricing.toggles.benefits);
+    }
+    if (sel.company && "company" in pricing.toggles) {
+      total += addPart("Company page", pricing.toggles.company);
+    }
+  }
+
+  if (Array.isArray(pricing.matrix)) {
+    pricing.matrix.forEach((rule) => {
+      const when = rule?.when || {};
+      const matched = Object.entries(when).every(([k, v]) => String(sel[k]) === String(v));
+      if (matched) total += addPart(rule.label || "Rule", rule.add);
+    });
+  }
+
   return { total, breakdown };
 }
 
-function updatePriceUI() {
-  const els = document.querySelectorAll('[details="price"], [detail="price"]'); // support both spellings
-  if (!els.length) return;
+function renderPrice(data) {
+  if (!data) return;
+  const sel = getSelectionsFromParams();
+  const { total, breakdown } = computeStatementPrice(data, sel);
 
-  const state = getSelectionState();
-  const { total, breakdown } = computeStatementPrice(state);
-
-  els.forEach((el) => {
+  document.querySelectorAll('[details="price"]').forEach((el) => {
     el.textContent = formatCurrency(total, el, true, true);
   });
 
-  const bd = document.querySelector('[details="price-breakdown"]');
-  if (bd) {
-    const lines = [
-      `Base: ${formatCurrency(breakdown.base)}`,
-      `Design ${state.design}: ${formatCurrency(breakdown.design)}`,
-      ...(state.design === "2" ? [] : [
-        `Layout ${state.layout}: ${formatCurrency(breakdown.layout)}`,
-        `Header ${state.header}: ${formatCurrency(breakdown.header)}`,
-        `Cover ${state.cover}: ${formatCurrency(breakdown.cover)}`
-      ]),
-      `Benefits page: ${formatCurrency(breakdown.extras.benefits)}`,
-      `Company page: ${formatCurrency(breakdown.extras.company)}`
-    ];
-    bd.textContent = lines.join(" • ");
-  }
-}
+  document.querySelectorAll('[details="priceBreakdown"]').forEach((container) => {
+    container.innerHTML = "";
+    breakdown.forEach((row) => {
+      const item = document.createElement("div");
+      item.setAttribute("price", "row");
+      const label = document.createElement("div");
+      label.setAttribute("price", "label");
+      label.textContent = row.label;
 
-function refreshPrice() {
-  try { updatePriceUI(); } catch {}
+      const val = document.createElement("div");
+      val.setAttribute("price", "value");
+      val.setAttribute("number", "dynamic");
+      val.textContent = formatCurrency(row.amount, val, true, true);
+
+      item.appendChild(label);
+      item.appendChild(val);
+      container.appendChild(item);
+    });
+  });
 }
-/* =================== END PRICING (NEW) =================== */
+/* ======================== END PRICING ENGINE (NEW) ======================== */
 
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
@@ -1022,18 +1054,6 @@ async function renderAll(data) {
     });
   }
 
-  /* ---------- PRICING MERGE FROM DATA (NEW) ---------- */
-  PRICING = {
-    ...DEFAULT_PRICING,
-    ...(data?.pricing || {}),
-    design: { ...DEFAULT_PRICING.design, ...(data?.pricing?.design || {}) },
-    layout: { ...DEFAULT_PRICING.layout, ...(data?.pricing?.layout || {}) },
-    header: { ...DEFAULT_PRICING.header, ...(data?.pricing?.header || {}) },
-    cover:  { ...DEFAULT_PRICING.cover,  ...(data?.pricing?.cover  || {}) },
-    extras: { ...DEFAULT_PRICING.extras, ...(data?.pricing?.extras || {}) },
-  };
-  /* -------- END PRICING MERGE FROM DATA (NEW) -------- */
-
   function loadDisplay() {
     const renderParam = getParams().get("render");
     if (renderParam === "true") {
@@ -1082,8 +1102,9 @@ async function renderAll(data) {
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
-  // Update price after everything paints
-  refreshPrice();
+  // === NEW: cache data & render price ===
+  window.__currentData = data;
+  renderPrice(window.__currentData);
 }
 
 (function controls() {
@@ -1127,10 +1148,10 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     try { donutCharts(); } catch {}
 
-    if (reload) debouncedReloadFromParams();
+    // NEW: refresh price
+    renderPrice(window.__currentData);
 
-    // NEW: update price after layout changes
-    refreshPrice();
+    if (reload) debouncedReloadFromParams();
   };
 
   const applyHeader = (val) => {
@@ -1154,8 +1175,8 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: update price after header changes
-    refreshPrice();
+    // NEW: refresh price
+    renderPrice(window.__currentData);
   };
 
   const applyCover = (val) => {
@@ -1178,8 +1199,8 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: update price after cover changes
-    refreshPrice();
+    // NEW: refresh price
+    renderPrice(window.__currentData);
   };
 
   const applyDesignSwitch = (val, { reload = true } = {}) => {
@@ -1211,10 +1232,10 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    if (reload) debouncedReloadFromParams();
+    // NEW: refresh price
+    renderPrice(window.__currentData);
 
-    // NEW: update price after design switch
-    refreshPrice();
+    if (reload) debouncedReloadFromParams();
   };
 
   const updateExtras = () => {
@@ -1258,8 +1279,8 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: update price after extras toggle
-    refreshPrice();
+    // NEW: refresh price
+    renderPrice(window.__currentData);
   };
 
   const applyStateFromParams = () => {
@@ -1285,8 +1306,8 @@ async function renderAll(data) {
 
     debouncedReloadFromParams();
 
-    // NEW: update price after state applied
-    refreshPrice();
+    // NEW: ensure price reflects current state immediately
+    renderPrice(window.__currentData);
   };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1407,8 +1428,8 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
-      // NEW: update price when 'no cover'
-      refreshPrice();
+      // NEW: refresh price
+      renderPrice(window.__currentData);
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1429,8 +1450,10 @@ async function renderAll(data) {
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
+      // NEW: refresh price after history changes
+      renderPrice(window.__currentData);
     });
   });
 })();
 console.log("DEVELOPMENT");
-console.log("Build v2025.1.3D");
+console.log("Build v2025.1.2D");
