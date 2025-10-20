@@ -96,9 +96,9 @@ window.applyOverflow = function () {
   });
 };
 
-const _jsonDisabled = new Map();    
-const _designDisabled = new Map();  
-const _allKnownButtons = new Set(); 
+const _jsonDisabled = new Map();
+const _designDisabled = new Map();
+const _allKnownButtons = new Set();
 
 function _collectButtons() {
   document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
@@ -196,7 +196,7 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
-/* ========================== PRICING ENGINE (NEW) ========================== */
+/* ========================== PRICING (ONLY TOTAL) ========================== */
 window.__currentData = null;
 
 function getSelectionsFromParams() {
@@ -220,92 +220,42 @@ function getSelectionsFromParams() {
  *     "layout": { "1": 0, "2": 50 },
  *     "header": { "1": 0, "2": 25 },
  *     "cover":  { "false": 0, "0": 0, "1": 20, "2": 40, "3": 60 },
- *     "toggles": { "benefits": 30, "company": 30 },
- *     "matrix": [
- *       { "when": { "design": "2", "layout": "2" }, "add": 40, "label": "Design 2 + Layout 2 combo" }
- *     ]
+ *     "toggles": { "benefits": 30, "company": 30 }
  *   }
  * }
  */
-function computeStatementPrice(data, sel) {
+function computeStatementTotal(data, sel) {
   const pricing = data?.pricing ?? {};
-  const breakdown = [];
-
-  const addPart = (label, amt) => {
-    const n = Number(amt) || 0;
-    if (n !== 0) breakdown.push({ label, amount: n });
-    return n;
-  };
-
   let total = 0;
 
-  total += addPart("Base", pricing.base);
+  const add = (val) => total += (Number(val) || 0);
 
-  if (pricing.design && sel.design in pricing.design) {
-    total += addPart(`Design ${sel.design}`, pricing.design[sel.design]);
-  }
-  if (pricing.layout && sel.layout in pricing.layout) {
-    total += addPart(`Layout ${sel.layout}`, pricing.layout[sel.layout]);
-  }
-  if (pricing.header && sel.header in pricing.header) {
-    total += addPart(`Header ${sel.header}`, pricing.header[sel.header]);
-  }
+  add(pricing.base);
+
+  if (pricing.design && sel.design in pricing.design) add(pricing.design[sel.design]);
+  if (pricing.layout && sel.layout in pricing.layout) add(pricing.layout[sel.layout]);
+  if (pricing.header && sel.header in pricing.header) add(pricing.header[sel.header]);
 
   const coverKey = sel.cover === "false" ? "false" : sel.cover;
-  if (pricing.cover && coverKey in pricing.cover) {
-    total += addPart(coverKey === "false" ? "No Cover" : `Cover ${coverKey}`, pricing.cover[coverKey]);
-  }
+  if (pricing.cover && coverKey in pricing.cover) add(pricing.cover[coverKey]);
 
   if (pricing.toggles) {
-    if (sel.benefits && "benefits" in pricing.toggles) {
-      total += addPart("Benefits page", pricing.toggles.benefits);
-    }
-    if (sel.company && "company" in pricing.toggles) {
-      total += addPart("Company page", pricing.toggles.company);
-    }
+    if (sel.benefits && "benefits" in pricing.toggles) add(pricing.toggles.benefits);
+    if (sel.company && "company" in pricing.toggles) add(pricing.toggles.company);
   }
 
-  if (Array.isArray(pricing.matrix)) {
-    pricing.matrix.forEach((rule) => {
-      const when = rule?.when || {};
-      const matched = Object.entries(when).every(([k, v]) => String(sel[k]) === String(v));
-      if (matched) total += addPart(rule.label || "Rule", rule.add);
-    });
-  }
-
-  return { total, breakdown };
+  return total;
 }
 
 function renderPrice(data) {
   if (!data) return;
   const sel = getSelectionsFromParams();
-  const { total, breakdown } = computeStatementPrice(data, sel);
-
+  const total = computeStatementTotal(data, sel);
   document.querySelectorAll('[details="price"]').forEach((el) => {
     el.textContent = formatCurrency(total, el, true, true);
   });
-
-  document.querySelectorAll('[details="priceBreakdown"]').forEach((container) => {
-    container.innerHTML = "";
-    breakdown.forEach((row) => {
-      const item = document.createElement("div");
-      item.setAttribute("price", "row");
-      const label = document.createElement("div");
-      label.setAttribute("price", "label");
-      label.textContent = row.label;
-
-      const val = document.createElement("div");
-      val.setAttribute("price", "value");
-      val.setAttribute("number", "dynamic");
-      val.textContent = formatCurrency(row.amount, val, true, true);
-
-      item.appendChild(label);
-      item.appendChild(val);
-      container.appendChild(item);
-    });
-  });
 }
-/* ======================== END PRICING ENGINE (NEW) ======================== */
+/* ======================== END PRICING (ONLY TOTAL) ======================== */
 
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
@@ -365,7 +315,7 @@ async function renderAll(data) {
       if (template && child === template) return;
       child.remove();
     });
-    if (template) template.style.display = "none"; 
+    if (template) template.style.display = "none";
   });
 
   function applyButtonStatus() {
@@ -373,7 +323,7 @@ async function renderAll(data) {
     const map = data?.buttonStatus;
     if (map && typeof map === "object") {
       Object.entries(map).forEach(([id, enabled]) => {
-        const disabled = !enabled; 
+        const disabled = !enabled;
         _jsonDisabled.set(id, !!disabled);
       });
     }
@@ -1102,7 +1052,7 @@ async function renderAll(data) {
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
-  // === NEW: cache data & render price ===
+  // Cache data & render just the total price
   window.__currentData = data;
   renderPrice(window.__currentData);
 }
@@ -1129,7 +1079,7 @@ async function renderAll(data) {
   const getCurrentCover  = () => getParams().get("cover") ?? "0";
 
   const applyLayout = (val, { reload = true } = {}) => {
-    if (getCurrentDesign() === "2") return; 
+    if (getCurrentDesign() === "2") return;
 
     const isTwo = val === "2";
     $$('[layout="dynamic"]').forEach((el) => {
@@ -1148,7 +1098,6 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     try { donutCharts(); } catch {}
 
-    // NEW: refresh price
     renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
@@ -1175,7 +1124,6 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: refresh price
     renderPrice(window.__currentData);
   };
 
@@ -1199,7 +1147,6 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: refresh price
     renderPrice(window.__currentData);
   };
 
@@ -1212,7 +1159,7 @@ async function renderAll(data) {
     toggleActive("design1", val === "1");
     toggleActive("design2", val === "2");
 
-    if (val === "2") setParam("cover", "false"); 
+    if (val === "2") setParam("cover", "false");
 
     setParam("design", val);
     updateExtras();
@@ -1226,13 +1173,12 @@ async function renderAll(data) {
       $("#layout2")?.classList.remove("active");
     } else {
       if (!getParams().has("layout")) setParam("layout", "1");
-      applyLayout(getCurrentLayout(), { reload: false }); 
+      applyLayout(getCurrentLayout(), { reload: false });
     }
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: refresh price
     renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
@@ -1279,7 +1225,6 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    // NEW: refresh price
     renderPrice(window.__currentData);
   };
 
@@ -1306,7 +1251,6 @@ async function renderAll(data) {
 
     debouncedReloadFromParams();
 
-    // NEW: ensure price reflects current state immediately
     renderPrice(window.__currentData);
   };
 
@@ -1428,7 +1372,6 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
-      // NEW: refresh price
       renderPrice(window.__currentData);
     });
 
@@ -1450,7 +1393,6 @@ async function renderAll(data) {
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
-      // NEW: refresh price after history changes
       renderPrice(window.__currentData);
     });
   });
