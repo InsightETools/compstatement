@@ -1,4 +1,3 @@
-
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -196,6 +195,85 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   });
   return isCurrency ? `$${formatted}` : formatted;
 }
+
+/* ===================== PRICING (NEW) ===================== */
+// Default price table (override with JSON: data.pricing)
+const DEFAULT_PRICING = {
+  base: 0,
+  design: { "1": 0, "2": 50 },
+  layout: { "1": 0, "2": 15 },
+  header: { "1": 0, "2": 5 },
+  cover:  { "false": 0, "0": 10, "1": 20, "2": 30, "3": 40 },
+  extras: { benefits: 25, company: 15 }
+};
+
+let PRICING = { ...DEFAULT_PRICING };
+
+function getSelectionState() {
+  const p = getParams();
+  const design  = p.get("design") || "1";
+  const layout  = p.get("layout") || "1";
+  const header  = p.get("header") || "1";
+  const cover   = p.get("cover")  ?? "0"; // can be "false"
+  const benefits = p.get("benefits") === "true";
+  const company  = p.get("company")  === "true";
+  return { design, layout, header, cover, benefits, company };
+}
+
+function computeStatementPrice(state) {
+  const isDesign2 = state.design === "2";
+
+  const base     = Number(PRICING.base || 0);
+  const design   = Number((PRICING.design?.[state.design]) ?? 0);
+  const layout   = isDesign2 ? 0 : Number((PRICING.layout?.[state.layout]) ?? 0);
+  const header   = isDesign2 ? 0 : Number((PRICING.header?.[state.header]) ?? 0);
+  const coverKey = isDesign2 ? "false" : (state.cover ?? "0");
+  const cover    = Number((PRICING.cover?.[coverKey]) ?? 0);
+
+  const benefits = state.benefits ? Number(PRICING.extras?.benefits ?? 0) : 0;
+  const company  = state.company  ? Number(PRICING.extras?.company  ?? 0) : 0;
+
+  const breakdown = {
+    base, design, layout, header, cover,
+    extras: { benefits, company }
+  };
+
+  const total = base + design + layout + header + cover + benefits + company;
+  return { total, breakdown };
+}
+
+function updatePriceUI() {
+  const els = document.querySelectorAll('[details="price"], [detail="price"]'); // support both spellings
+  if (!els.length) return;
+
+  const state = getSelectionState();
+  const { total, breakdown } = computeStatementPrice(state);
+
+  els.forEach((el) => {
+    el.textContent = formatCurrency(total, el, true, true);
+  });
+
+  const bd = document.querySelector('[details="price-breakdown"]');
+  if (bd) {
+    const lines = [
+      `Base: ${formatCurrency(breakdown.base)}`,
+      `Design ${state.design}: ${formatCurrency(breakdown.design)}`,
+      ...(state.design === "2" ? [] : [
+        `Layout ${state.layout}: ${formatCurrency(breakdown.layout)}`,
+        `Header ${state.header}: ${formatCurrency(breakdown.header)}`,
+        `Cover ${state.cover}: ${formatCurrency(breakdown.cover)}`
+      ]),
+      `Benefits page: ${formatCurrency(breakdown.extras.benefits)}`,
+      `Company page: ${formatCurrency(breakdown.extras.company)}`
+    ];
+    bd.textContent = lines.join(" • ");
+  }
+}
+
+function refreshPrice() {
+  try { updatePriceUI(); } catch {}
+}
+/* =================== END PRICING (NEW) =================== */
 
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
@@ -944,6 +1022,18 @@ async function renderAll(data) {
     });
   }
 
+  /* ---------- PRICING MERGE FROM DATA (NEW) ---------- */
+  PRICING = {
+    ...DEFAULT_PRICING,
+    ...(data?.pricing || {}),
+    design: { ...DEFAULT_PRICING.design, ...(data?.pricing?.design || {}) },
+    layout: { ...DEFAULT_PRICING.layout, ...(data?.pricing?.layout || {}) },
+    header: { ...DEFAULT_PRICING.header, ...(data?.pricing?.header || {}) },
+    cover:  { ...DEFAULT_PRICING.cover,  ...(data?.pricing?.cover  || {}) },
+    extras: { ...DEFAULT_PRICING.extras, ...(data?.pricing?.extras || {}) },
+  };
+  /* -------- END PRICING MERGE FROM DATA (NEW) -------- */
+
   function loadDisplay() {
     const renderParam = getParams().get("render");
     if (renderParam === "true") {
@@ -991,6 +1081,9 @@ async function renderAll(data) {
 
   computeDesignConstraintsAndApply();
   applyButtonStatus();
+
+  // Update price after everything paints
+  refreshPrice();
 }
 
 (function controls() {
@@ -1035,6 +1128,9 @@ async function renderAll(data) {
     try { donutCharts(); } catch {}
 
     if (reload) debouncedReloadFromParams();
+
+    // NEW: update price after layout changes
+    refreshPrice();
   };
 
   const applyHeader = (val) => {
@@ -1057,6 +1153,9 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    // NEW: update price after header changes
+    refreshPrice();
   };
 
   const applyCover = (val) => {
@@ -1079,6 +1178,8 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
+    // NEW: update price after cover changes
+    refreshPrice();
   };
 
   const applyDesignSwitch = (val, { reload = true } = {}) => {
@@ -1111,6 +1212,9 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
 
     if (reload) debouncedReloadFromParams();
+
+    // NEW: update price after design switch
+    refreshPrice();
   };
 
   const updateExtras = () => {
@@ -1153,6 +1257,9 @@ async function renderAll(data) {
     updateExtras();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    // NEW: update price after extras toggle
+    refreshPrice();
   };
 
   const applyStateFromParams = () => {
@@ -1177,6 +1284,9 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
 
     debouncedReloadFromParams();
+
+    // NEW: update price after state applied
+    refreshPrice();
   };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1297,6 +1407,8 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
+      // NEW: update price when 'no cover'
+      refreshPrice();
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1321,4 +1433,4 @@ async function renderAll(data) {
   });
 })();
 console.log("DEVELOPMENT");
-console.log("Build v2025.1.2D");
+console.log("Build v2025.1.3D");
