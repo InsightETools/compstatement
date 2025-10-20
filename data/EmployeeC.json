@@ -12,7 +12,7 @@
     "cover1": true,
     "cover2": true,
     "benefitsPage": false,
-    "companyPage": false
+    "companyPage": true
   },
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
