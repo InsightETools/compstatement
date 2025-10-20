@@ -11,8 +11,8 @@
     "noCover": true,
     "cover1": true,
     "cover2": true,
-    "benefitsPage": false,
-    "companyPage": false
+    "benefitsPage": true,
+    "companyPage": true
   },
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
