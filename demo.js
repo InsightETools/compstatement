@@ -156,7 +156,7 @@ window.reloadFromParams = async () => {
   const fetchUrl = buildFetchUrlFromParams();
 
   try {
-    const res = await fetch(baseUrl);
+    const res = await fetch(fetchUrl, { signal: currentFetchController.signal});
     const data = await res.json();
 
     await renderAll(data);
