@@ -46,8 +46,8 @@ function buildFetchUrlFromParams() {
   });
 
   // Auto-hide editor panel in preview or shared view
-    const hasKey = qp.has("key");
-    const isPreview = qp.has("preview");
+    const hasKey = p.has("key");
+    const isPreview = p.has("preview");
 
 /*
     if (hasKey || isPreview) {
