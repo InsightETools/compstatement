@@ -45,6 +45,25 @@ function buildFetchUrlFromParams() {
     key, cpid, yr, ck, ek, layout,
   });
 
+  // Auto-hide editor panel in preview or shared view
+    const hasKey = qp.has("key");
+    const isPreview = qp.has("preview");
+
+/*
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+*/
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+
   return `${baseUrl}?${qp.toString()}`;
 }
 
@@ -1484,24 +1503,5 @@ function renderListModules(data, elementColor) {
     });
   });
 })();
-
-// Auto-hide editor panel in preview or shared view
-    const hasKey = p.has("key");
-    const isPreview = p.has("preview");
-
-/*
-    if (hasKey || isPreview) {
-      qs("#editorPanel")?.classList.add("hidden");
-      qs("#fullScreen")?.classList.add("hidden");
-      qs("#pagesWrapper")?.classList.add("centered");
-    }
-*/
-    if (!hasKey && !isPreview) {
-      qs("#editButton")?.classList.add("hidden");
-    }
-
-    if (!hasKey) {
-      qs("#preparedFor")?.classList.add("hidden");
-    }
 
 console.log("Build v2025.1.4");
