@@ -38,6 +38,7 @@ function buildFetchUrlFromParams() {
 
   if (!key) {
     return `https://compstatementdemo.netlify.app/data/${ek}.json`;
+    console.log("Test Data");
   }
 
   const qp = new URLSearchParams({
