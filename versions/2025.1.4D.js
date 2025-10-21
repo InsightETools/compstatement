@@ -1005,10 +1005,37 @@ async function renderAll(data) {
     });
   }
 
-  // --- FIXED: render list modules (cards) ---
+// remove any previously rendered list-module cards everywhere
+function wipeListModules() {
+  // only remove our injected cards, not the container divs
+  document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => {
+    const parent = el.parentElement;
+    el.remove();
+    // if parent ended up empty, leave the container but you could also hide it:
+    // if (parent && parent.children.length === 0) parent.style.display = "none";
+  });
+}
+
+// render list modules from JSON, replacing anything that existed before
 function renderListModule(data, elementColor) {
+  // always clear previous list-module cards first
+  wipeListModules();
+
   const items = Array.isArray(data?.listModule) ? data.listModule : [];
-  if (!items.length) return;
+
+  // if no listModule data, also blank known mounts so old content doesn't linger
+  if (!items.length) {
+    // Optionally hide/clear common mounts you use for list modules
+    ["module10", "module11", "module12", "module13"].forEach((id) => {
+      const mount = document.getElementById(id);
+      if (mount) {
+        // remove only our cards, not other module content
+        mount.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+        // mount.style.display = "none"; // uncomment if you want to hide empty mounts
+      }
+    });
+    return;
+  }
 
   const make = (tag, attrs = {}, text = null) => {
     const n = document.createElement(tag);
@@ -1022,27 +1049,28 @@ function renderListModule(data, elementColor) {
 
   items.forEach((item) => {
     const target = document.getElementById(String(item.id));
-    if (!target) return; // no mount point in this layout
+    if (!target) return;
 
-    // wipe previous
-    target.innerHTML = "";
+    // remove only our prior cards in this mount
+    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+    // target.style.display = ""; // ensure mount is visible if you hide empties elsewhere
 
     // header
     const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
     const header   = make("div", { module: "header", class: "listmoduleheader" });
     header.appendChild(heading);
-    if (elementColor?.tableColor) header.style.backgroundColor = elementColor.tableColor;
+    const headerColor = item.color || elementColor?.tableColor;
+    if (headerColor) header.style.backgroundColor = headerColor;
 
     // details
     const detailsEl = make("div", { "data": "details", class: "listdescription" });
     if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
 
-    // bullet list
+    // bullets
     const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
     (item.values || ["[Bullet Point]"]).forEach((val) => {
       const li = make("li", { "data": "value", class: "listitemtext" });
-      // allow simple markup in values
-      li.innerHTML = val;
+      li.innerHTML = val; // allow simple markup
       ul.appendChild(li);
     });
 
@@ -1054,7 +1082,7 @@ function renderListModule(data, elementColor) {
     listWrapper.appendChild(detailsEl);
     listWrapper.appendChild(listItems);
 
-    const card = make("div", { module: "template", class: "listmoduletemplate" });
+    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
     if (item.height && !isNaN(item.height)) card.style.minHeight = `${item.height}px`;
     card.appendChild(header);
     card.appendChild(listWrapper);
