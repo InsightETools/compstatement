@@ -64,19 +64,6 @@
   ],
   "listModules": [
     {
-      "id": "listModule3",
-      "label": "List Module 2",
-      "details": "The following perks are provided in addition to the compensation and benefits above",
-      "height": 150,
-      "align": "center",
-          "values": [
-        "100% tuition reimbursement up to <span>$5,000</span>",
-        "Short-term Disability coverage at no cost",
-        "Fit & Fun Dollas",
-        "Service Award Program",
-        "Professional development training"
-      ]
-    },{
       "id": "listModule1",
       "label": "List Module 1",
       "details": "The following perks are provided in addition to the compensation and benefits above",
