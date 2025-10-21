@@ -45,25 +45,6 @@ function buildFetchUrlFromParams() {
     key, cpid, yr, ck, ek, layout,
   });
 
-  // Auto-hide editor panel in preview or shared view
-    const hasKey = p.has("key");
-    const isPreview = p.has("preview");
-
-/*
-    if (hasKey || isPreview) {
-      qs("#editorPanel")?.classList.add("hidden");
-      qs("#fullScreen")?.classList.add("hidden");
-      qs("#pagesWrapper")?.classList.add("centered");
-    }
-*/
-    if (!hasKey && !isPreview) {
-      qs("#editButton")?.classList.add("hidden");
-    }
-
-    if (!hasKey) {
-      qs("#preparedFor")?.classList.add("hidden");
-    }
-
   return `${baseUrl}?${qp.toString()}`;
 }
 
@@ -152,6 +133,25 @@ function computeDesignConstraintsAndApply() {
   const params = getParams();
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
+
+  // Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+/*
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+*/
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
 
   const forceOffIds = [
     "layout1","layout2",
