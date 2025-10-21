@@ -1051,7 +1051,7 @@ function wipeListModules() {
 function renderListModule(data, elementColor) {
   wipeListModules();
 
-  const items = Array.isArray(data?.listModule) ? data.listModule : [];
+  const items = Array.isArray(data?.listModules) ? data.listModules : [];
   if (!items.length) return;
 
   const make = (tag, attrs = {}, text = null) => {
@@ -1145,7 +1145,7 @@ function renderListModule(data, elementColor) {
   holidaysList();
   contactsLists(data.companyContacts, '[contacts="company"]');
   contactsLists(data.benefitContacts, '[contacts="providers"]');
-  renderListModule(data, elementColor);
+  renderListModules(data, elementColor);
   applyCompanyURL();
   applyExplorerURL();
   applyCoverContent();
