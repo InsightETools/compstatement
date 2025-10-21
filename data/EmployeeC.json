@@ -68,7 +68,7 @@
       "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "height": 200,
-      "align": "center",
+      "align": "right",
           "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
@@ -81,6 +81,7 @@
       "label": "List Module 1",
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "height": 200,
+      "align": "left",
       "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
