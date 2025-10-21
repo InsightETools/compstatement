@@ -1075,6 +1075,7 @@ async function renderAll(data) {
   holidaysList();
   contactsLists(data.companyContacts, '[contacts="company"]');
   contactsLists(data.benefitContacts, '[contacts="providers"]');
+  listModule();
   applyCompanyURL();
   applyExplorerURL();
   applyCoverContent();
