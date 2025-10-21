@@ -1008,21 +1008,48 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
-  // clear previous alignment first
+  // clear previous alignment
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
 
-  if (!align) return;
+  const v = String(align || "").toLowerCase().trim();
 
-  const v = String(align).toLowerCase().trim();
-  // card text alignment
+  // text alignment
   if (["left", "center", "right", "justify"].includes(v)) {
     card.style.textAlign = v;
   }
 
-    if (v === "center") header.style.justifyContent = "center";
+  // header alignment
+  if (v === "center") header.style.justifyContent = "center";
   else if (v === "right") header.style.justifyContent = "flex-end";
   else header.style.justifyContent = "flex-start";
+
+  // ----- bullets toggle -----
+  // find the UL(s) that hold the values inside this card
+  const uls = card.querySelectorAll('ul[data="values"], ul.listitemline');
+  const removeBullets = v && v !== "left";
+
+  uls.forEach((ul) => {
+    if (removeBullets) {
+      // inline reset (works even if there’s external CSS)
+      ul.style.listStyleType = "none";
+      ul.style.listStyleImage = "none";
+      ul.style.paddingLeft = "0";
+      // In case bullets are added via ::marker in some global CSS,
+      // remove default marker spacing by zeroing margin on LIs.
+      ul.querySelectorAll("li").forEach((li) => {
+        li.style.marginLeft = "0";
+      });
+    } else {
+      // restore defaults
+      ul.style.removeProperty("list-style-type");
+      ul.style.removeProperty("list-style-image");
+      ul.style.removeProperty("padding-left");
+      ul.querySelectorAll("li").forEach((li) => {
+        li.style.removeProperty("margin-left");
+      });
+    }
+  });
 }
   
 function applyCardHeight(el, h) {
