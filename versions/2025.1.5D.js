@@ -1119,7 +1119,8 @@ function renderListModules(data, elementColor) {
     listItems.appendChild(ul);
 
     const orientation = item.orientation || "vertical";
-    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+    const alignment = item.align || "left";
+    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation} ${alignment}` });
     listWrapper.appendChild(detailsEl);
     listWrapper.appendChild(listItems);
 
