@@ -212,19 +212,6 @@ function getSelectionsFromParams() {
   };
 }
 
-/**
- * JSON shape (optional):
- * {
- *   "pricing": {
- *     "base": 0,
- *     "design": { "1": 0, "2": 150 },
- *     "layout": { "1": 0, "2": 50 },
- *     "header": { "1": 0, "2": 25 },
- *     "cover":  { "false": 0, "0": 0, "1": 20, "2": 40, "3": 60 },
- *     "toggles": { "benefits": 30, "company": 30 }
- *   }
- * }
- */
 function computeStatementTotal(data, sel) {
   const pricing = data?.pricing ?? {};
   let total = 0;
@@ -256,7 +243,6 @@ function renderPrice(data) {
     el.textContent = formatCurrency(total, el, true, true);
   });
 }
-/* ======================== END PRICING (ONLY TOTAL) ======================== */
 
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
