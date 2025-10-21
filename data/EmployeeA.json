@@ -67,7 +67,8 @@
       "id": "listModule2",
       "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
-      "values": [
+      "height": 500,
+          "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
         "Fit & Fun Dollas",
@@ -78,6 +79,7 @@
       "id": "listModule1",
       "label": "List Module 1",
       "details": "The following perks are provided in addition to the compensation and benefits above",
+      "height": 500,
       "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
