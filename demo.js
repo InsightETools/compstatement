@@ -98,6 +98,26 @@ window.applyOverflow = function () {
   });
 };
 
+// Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+/*
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+*/
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+  });
+
 const _jsonDisabled = new Map();
 const _designDisabled = new Map();
 const _allKnownButtons = new Set();
