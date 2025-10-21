@@ -67,7 +67,7 @@
       "id": "listModule3",
       "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
-      "height": 500,
+      "height": 150,
       "align": "center",
           "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
