@@ -48,6 +48,26 @@ function buildFetchUrlFromParams() {
   return `${baseUrl}?${qp.toString()}`;
 }
 
+// Auto-hide editor panel in preview or shared view
+    const hasKey = params.has("key");
+    const isPreview = params.has("preview");
+
+/*
+    if (hasKey || isPreview) {
+      qs("#editorPanel")?.classList.add("hidden");
+      qs("#fullScreen")?.classList.add("hidden");
+      qs("#pagesWrapper")?.classList.add("centered");
+    }
+*/
+    if (!hasKey && !isPreview) {
+      qs("#editButton")?.classList.add("hidden");
+    }
+
+    if (!hasKey) {
+      qs("#preparedFor")?.classList.add("hidden");
+    }
+  });
+
 window.applyOverflow = function () {
   document.querySelectorAll('[item="page"]').forEach((page) => {
     const lineEls = page.querySelectorAll(
@@ -197,7 +217,6 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
-/* ========================== PRICING (ONLY TOTAL) ========================== */
 window.__currentData = null;
 
 function getSelectionsFromParams() {
