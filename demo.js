@@ -38,7 +38,6 @@ function buildFetchUrlFromParams() {
 
   if (!key) {
     return `https://compstatementdemo.netlify.app/data/${ek}.json`;
-    console.log("Test Data");
   }
 
   const qp = new URLSearchParams({
@@ -98,26 +97,6 @@ window.applyOverflow = function () {
   });
 };
 
-// Auto-hide editor panel in preview or shared view
-    const hasKey = params.has("key");
-    const isPreview = params.has("preview");
-
-/*
-    if (hasKey || isPreview) {
-      qs("#editorPanel")?.classList.add("hidden");
-      qs("#fullScreen")?.classList.add("hidden");
-      qs("#pagesWrapper")?.classList.add("centered");
-    }
-*/
-    if (!hasKey && !isPreview) {
-      qs("#editButton")?.classList.add("hidden");
-    }
-
-    if (!hasKey) {
-      qs("#preparedFor")?.classList.add("hidden");
-    }
-  });
-
 const _jsonDisabled = new Map();
 const _designDisabled = new Map();
 const _allKnownButtons = new Set();
@@ -176,7 +155,7 @@ window.reloadFromParams = async () => {
   const fetchUrl = buildFetchUrlFromParams();
 
   try {
-    const res = await fetch(fetchUrl, { signal: currentFetchController.signal});
+    const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
     const data = await res.json();
 
     await renderAll(data);
@@ -218,6 +197,7 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
+/* ========================== PRICING (ONLY TOTAL) ========================== */
 window.__currentData = null;
 
 function getSelectionsFromParams() {
@@ -232,6 +212,19 @@ function getSelectionsFromParams() {
   };
 }
 
+/**
+ * JSON shape (optional):
+ * {
+ *   "pricing": {
+ *     "base": 0,
+ *     "design": { "1": 0, "2": 150 },
+ *     "layout": { "1": 0, "2": 50 },
+ *     "header": { "1": 0, "2": 25 },
+ *     "cover":  { "false": 0, "0": 0, "1": 20, "2": 40, "3": 60 },
+ *     "toggles": { "benefits": 30, "company": 30 }
+ *   }
+ * }
+ */
 function computeStatementTotal(data, sel) {
   const pricing = data?.pricing ?? {};
   let total = 0;
@@ -263,6 +256,7 @@ function renderPrice(data) {
     el.textContent = formatCurrency(total, el, true, true);
   });
 }
+/* ======================== END PRICING (ONLY TOTAL) ======================== */
 
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
@@ -1012,12 +1006,14 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
+  // clear previous alignment first
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
 
   if (!align) return;
 
   const v = String(align).toLowerCase().trim();
+  // card text alignment
   if (["left", "center", "right", "justify"].includes(v)) {
     card.style.textAlign = v;
   }
@@ -1103,6 +1099,8 @@ function renderListModule(data, elementColor) {
     card.appendChild(listWrapper);
 
     applyCardHeight(card, item.height);
+    //applyCardAlignment(card, header, item.align);
+
     target.appendChild(card);
   });
 }
@@ -1156,6 +1154,7 @@ function renderListModule(data, elementColor) {
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
+  // Cache data & render just the total price
   window.__currentData = data;
   renderPrice(window.__currentData);
 }
