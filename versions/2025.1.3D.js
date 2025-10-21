@@ -1004,37 +1004,6 @@ async function renderAll(data) {
     });
   }
 
-  function listModule(data, elementColor) {
-  function buildListCard({
-    label = "Additional Benefits",
-    details = "",
-    values = ["[Bullet Point]"],
-    orientation = "vertical",
-    color = elementColor?.tableColor,
-    height = null,
-  } = {}) {
-    const heading = el("div", { data: "label", class: "listmoduleheading" }, label);
-    const header  = el("div", { module: "header", class: "listmoduleheader" }, heading);
-    if (color) header.style.backgroundColor = color;
-
-    const detailsEl = el("div", { data: "details", class: "listdescription" });
-    if (details) detailsEl.textContent = details; else detailsEl.style.display = "none";
-
-    const ul = el("ul", { data: "values", role: "list", class: "listitemline" });
-    (values || []).forEach((v) => {
-      const li = el("li", { data: "value", class: "listitemtext" });
-      li.innerHTML = v;
-      ul.appendChild(li);
-    });
-
-    const listItems   = el("div", { module: "listItems", class: "listitemitems w-richtext" }, ul);
-    const listWrapper = el("div", { module: "list", class: `listmodulelist ${orientation}` }, [detailsEl, listItems]);
-
-    const card = el("div", { module: "template", class: "listmoduletemplate" }, [header, listWrapper]);
-    if (height && !isNaN(height)) card.style.minHeight = `${height}px`;
-    return card;
-  }  
-
   function loadDisplay() {
     const renderParam = getParams().get("render");
     if (renderParam === "true") {
@@ -1075,7 +1044,6 @@ async function renderAll(data) {
   holidaysList();
   contactsLists(data.companyContacts, '[contacts="company"]');
   contactsLists(data.benefitContacts, '[contacts="providers"]');
-  listModule();
   applyCompanyURL();
   applyExplorerURL();
   applyCoverContent();
