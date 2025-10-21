@@ -1005,6 +1005,27 @@ async function renderAll(data) {
     });
   }
 
+  function applyCardAlignment(card, header, align) {
+  // clear previous alignment first
+  card.style.removeProperty("text-align");
+  header.style.removeProperty("justify-content");
+
+  if (!align) return;
+
+  const v = String(align).toLowerCase().trim();
+  // card text alignment
+  if (["left", "center", "right", "justify"].includes(v)) {
+    card.style.textAlign = v;
+  }
+
+  // header row nudge (keeps the colored band's label visually aligned)
+  // we assume .listmoduleheader is a block; justify-content works if it’s flex,
+  // but setting it is harmless otherwise.
+  if (v === "center") header.style.justifyContent = "center";
+  else if (v === "right") header.style.justifyContent = "flex-end";
+  else header.style.justifyContent = "flex-start";
+}
+  
 // --- NEW helper: normalize & apply height -----------------------------------
 function applyCardHeight(el, h) {
   // clear any previous height first
@@ -1092,6 +1113,7 @@ function renderListModule(data, elementColor) {
 
     // --- NEW: apply height from JSON (number -> px, string -> use as-is) ----
     applyCardHeight(card, item.height);
+    applyCardAlignment(card, header, item.align);
     // ------------------------------------------------------------------------
 
     target.appendChild(card);
