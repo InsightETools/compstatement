@@ -1,3 +1,4 @@
+
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -36,7 +37,7 @@ function buildFetchUrlFromParams() {
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
 
   if (!key) {
-    return `https://compstatementdemo.netlify.app/${ek}.json`;
+    return `https://compstatementdemo.netlify.app/data/${ek}.json`;
   }
 
   const qp = new URLSearchParams({
@@ -96,9 +97,9 @@ window.applyOverflow = function () {
   });
 };
 
-const _jsonDisabled = new Map();    
-const _designDisabled = new Map();  
-const _allKnownButtons = new Set(); 
+const _jsonDisabled = new Map();
+const _designDisabled = new Map();
+const _allKnownButtons = new Set();
 
 function _collectButtons() {
   document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
@@ -106,7 +107,7 @@ function _collectButtons() {
   });
   [
     "design1","design2","layout1","layout2","header1","header2",
-    "cover0","cover1","cover2","noCover","benefitsPage","companyPage"
+    "cover0","cover1","cover2","cover3","noCover","benefitsPage","companyPage"
   ].forEach(id => { if (document.getElementById(id)) _allKnownButtons.add(id); });
 }
 
@@ -135,7 +136,7 @@ function computeDesignConstraintsAndApply() {
 
   const forceOffIds = [
     "layout1","layout2",
-    "cover0","cover1","cover2","noCover",
+    "cover0","cover1","cover2","cover3","noCover",
     "header1","header2"
   ];
   forceOffIds.forEach(id => { if (isDesign2) _designDisabled.set(id, true); });
@@ -196,6 +197,67 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
+/* ========================== PRICING (ONLY TOTAL) ========================== */
+window.__currentData = null;
+
+function getSelectionsFromParams() {
+  const p = getParams();
+  return {
+    design: p.get("design") || "1",
+    layout: p.get("layout") || "1",
+    header: p.get("header") || "1",
+    cover:  (p.get("cover") ?? "0"),
+    benefits: p.get("benefits") === "true",
+    company:  p.get("company") === "true",
+  };
+}
+
+/**
+ * JSON shape (optional):
+ * {
+ *   "pricing": {
+ *     "base": 0,
+ *     "design": { "1": 0, "2": 150 },
+ *     "layout": { "1": 0, "2": 50 },
+ *     "header": { "1": 0, "2": 25 },
+ *     "cover":  { "false": 0, "0": 0, "1": 20, "2": 40, "3": 60 },
+ *     "toggles": { "benefits": 30, "company": 30 }
+ *   }
+ * }
+ */
+function computeStatementTotal(data, sel) {
+  const pricing = data?.pricing ?? {};
+  let total = 0;
+
+  const add = (val) => total += (Number(val) || 0);
+
+  add(pricing.base);
+
+  if (pricing.design && sel.design in pricing.design) add(pricing.design[sel.design]);
+  if (pricing.layout && sel.layout in pricing.layout) add(pricing.layout[sel.layout]);
+  if (pricing.header && sel.header in pricing.header) add(pricing.header[sel.header]);
+
+  const coverKey = sel.cover === "false" ? "false" : sel.cover;
+  if (pricing.cover && coverKey in pricing.cover) add(pricing.cover[coverKey]);
+
+  if (pricing.toggles) {
+    if (sel.benefits && "benefits" in pricing.toggles) add(pricing.toggles.benefits);
+    if (sel.company && "company" in pricing.toggles) add(pricing.toggles.company);
+  }
+
+  return total;
+}
+
+function renderPrice(data) {
+  if (!data) return;
+  const sel = getSelectionsFromParams();
+  const total = computeStatementTotal(data, sel);
+  document.querySelectorAll('[details="price"]').forEach((el) => {
+    el.textContent = formatCurrency(total, el, true, true);
+  });
+}
+/* ======================== END PRICING (ONLY TOTAL) ======================== */
+
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
@@ -254,7 +316,7 @@ async function renderAll(data) {
       if (template && child === template) return;
       child.remove();
     });
-    if (template) template.style.display = "none"; 
+    if (template) template.style.display = "none";
   });
 
   function applyButtonStatus() {
@@ -262,7 +324,7 @@ async function renderAll(data) {
     const map = data?.buttonStatus;
     if (map && typeof map === "object") {
       Object.entries(map).forEach(([id, enabled]) => {
-        const disabled = !enabled; 
+        const disabled = !enabled;
         _jsonDisabled.set(id, !!disabled);
       });
     }
@@ -943,6 +1005,106 @@ async function renderAll(data) {
     });
   }
 
+  function applyCardAlignment(card, header, align) {
+  // clear previous alignment first
+  card.style.removeProperty("text-align");
+  header.style.removeProperty("justify-content");
+
+  if (!align) return;
+
+  const v = String(align).toLowerCase().trim();
+  // card text alignment
+  if (["left", "center", "right", "justify"].includes(v)) {
+    card.style.textAlign = v;
+  }
+
+    if (v === "center") header.style.justifyContent = "center";
+  else if (v === "right") header.style.justifyContent = "flex-end";
+  else header.style.justifyContent = "flex-start";
+}
+  
+function applyCardHeight(el, h) {
+  el.style.removeProperty("height");
+  el.style.removeProperty("min-height");
+
+  if (h == null || h === "" || h === false) return; 
+
+  if (typeof h === "number" && !Number.isNaN(h)) {
+    el.style.height = `${h}px`;
+    return;
+  }
+  if (typeof h === "string") {
+    const trimmed = h.trim().toLowerCase();
+    if (trimmed === "auto" || trimmed === "unset") return; 
+    if (/^\d+(\.\d+)?$/.test(trimmed)) {
+      el.style.height = `${trimmed}px`;
+    } else {
+      el.style.height = h;
+    }
+  }
+}
+
+function wipeListModules() {
+  document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
+}
+
+function renderListModule(data, elementColor) {
+  wipeListModules();
+
+  const items = Array.isArray(data?.listModule) ? data.listModule : [];
+  if (!items.length) return;
+
+  const make = (tag, attrs = {}, text = null) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v;
+      else n.setAttribute(k, v);
+    }
+    if (text != null) n.textContent = text;
+    return n;
+  };
+
+  items.forEach((item) => {
+    const target = document.getElementById(String(item.id));
+    if (!target) return;
+
+    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+
+    const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
+    const header   = make("div", { module: "header", class: "listmoduleheader" });
+    header.appendChild(heading);
+    const headerColor = item.color || elementColor?.tableColor;
+    if (headerColor) header.style.backgroundColor = headerColor;
+
+    const detailsEl = make("div", { "data": "details", class: "listdescription" });
+    if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+    const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+    (item.values || ["[Bullet Point]"]).forEach((val) => {
+      const li = make("li", { "data": "value", class: "listitemtext" });
+      li.innerHTML = val;
+      ul.appendChild(li);
+    });
+
+    const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+    listItems.appendChild(ul);
+
+    const orientation = item.orientation || "vertical";
+    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+    listWrapper.appendChild(detailsEl);
+    listWrapper.appendChild(listItems);
+
+    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+    card.appendChild(header);
+    card.appendChild(listWrapper);
+
+    applyCardHeight(card, item.height);
+    //applyCardAlignment(card, header, item.align);
+
+    target.appendChild(card);
+  });
+}
+
   function loadDisplay() {
     const renderParam = getParams().get("render");
     if (renderParam === "true") {
@@ -983,6 +1145,7 @@ async function renderAll(data) {
   holidaysList();
   contactsLists(data.companyContacts, '[contacts="company"]');
   contactsLists(data.benefitContacts, '[contacts="providers"]');
+  renderListModule(data, elementColor);
   applyCompanyURL();
   applyExplorerURL();
   applyCoverContent();
@@ -990,6 +1153,10 @@ async function renderAll(data) {
 
   computeDesignConstraintsAndApply();
   applyButtonStatus();
+
+  // Cache data & render just the total price
+  window.__currentData = data;
+  renderPrice(window.__currentData);
 }
 
 (function controls() {
@@ -1014,7 +1181,7 @@ async function renderAll(data) {
   const getCurrentCover  = () => getParams().get("cover") ?? "0";
 
   const applyLayout = (val, { reload = true } = {}) => {
-    if (getCurrentDesign() === "2") return; 
+    if (getCurrentDesign() === "2") return;
 
     const isTwo = val === "2";
     $$('[layout="dynamic"]').forEach((el) => {
@@ -1032,6 +1199,8 @@ async function renderAll(data) {
 
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     try { donutCharts(); } catch {}
+
+    renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
   };
@@ -1056,20 +1225,22 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
   };
 
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
 
     const targetClass = `cover${val}`;
-    const allCoverClasses = ["cover0", "cover1", "cover2"];
+    const allCoverClasses = ["cover0", "cover1", "cover2","cover3"];
 
     $$('[cover="dynamic"]').forEach((el) => {
       allCoverClasses.forEach((c) => el.classList.remove(c));
       el.classList.add(targetClass);
     });
 
-    ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
+    ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
     $("#noCover")?.classList.remove("active");
 
     setParam("cover", val);
@@ -1078,6 +1249,7 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
+    renderPrice(window.__currentData);
   };
 
   const applyDesignSwitch = (val, { reload = true } = {}) => {
@@ -1089,7 +1261,7 @@ async function renderAll(data) {
     toggleActive("design1", val === "1");
     toggleActive("design2", val === "2");
 
-    if (val === "2") setParam("cover", "false"); 
+    if (val === "2") setParam("cover", "false");
 
     setParam("design", val);
     updateExtras();
@@ -1103,11 +1275,13 @@ async function renderAll(data) {
       $("#layout2")?.classList.remove("active");
     } else {
       if (!getParams().has("layout")) setParam("layout", "1");
-      applyLayout(getCurrentLayout(), { reload: false }); 
+      applyLayout(getCurrentLayout(), { reload: false });
     }
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
   };
@@ -1152,6 +1326,8 @@ async function renderAll(data) {
     updateExtras();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
   };
 
   const applyStateFromParams = () => {
@@ -1176,6 +1352,8 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
 
     debouncedReloadFromParams();
+
+    renderPrice(window.__currentData);
   };
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -1287,14 +1465,16 @@ async function renderAll(data) {
     safeBindClick("cover0", () => applyCover("0"));
     safeBindClick("cover1", () => applyCover("1"));
     safeBindClick("cover2", () => applyCover("2"));
+    safeBindClick("cover3", () => applyCover("3"));
     safeBindClick("noCover", () => {
       setParam("cover", "false");
-      ["0", "1", "2"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
+      ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
       $("#noCover")?.classList.add("active");
-      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2"));
+      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2","cover3"));
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
+      renderPrice(window.__currentData);
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1315,9 +1495,9 @@ async function renderAll(data) {
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
+      renderPrice(window.__currentData);
     });
   });
 })();
-
 console.log("DEVELOPMENT");
-console.log("Build v2025.1");
+console.log("Build v2025.1.4D");
