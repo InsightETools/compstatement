@@ -1048,7 +1048,7 @@ function wipeListModules() {
   document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
 }
 
-function renderListModule(data, elementColor) {
+function renderListModules(data, elementColor) {
   wipeListModules();
 
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
