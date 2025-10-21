@@ -66,7 +66,6 @@ function buildFetchUrlFromParams() {
     if (!hasKey) {
       qs("#preparedFor")?.classList.add("hidden");
     }
-  });
 
 window.applyOverflow = function () {
   document.querySelectorAll('[item="page"]').forEach((page) => {
