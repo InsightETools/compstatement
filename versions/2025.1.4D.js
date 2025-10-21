@@ -1018,40 +1018,31 @@ async function renderAll(data) {
     card.style.textAlign = v;
   }
 
-  // header row nudge (keeps the colored band's label visually aligned)
-  // we assume .listmoduleheader is a block; justify-content works if it’s flex,
-  // but setting it is harmless otherwise.
-  if (v === "center") header.style.justifyContent = "center";
+    if (v === "center") header.style.justifyContent = "center";
   else if (v === "right") header.style.justifyContent = "flex-end";
   else header.style.justifyContent = "flex-start";
 }
   
-// --- NEW helper: normalize & apply height -----------------------------------
 function applyCardHeight(el, h) {
-  // clear any previous height first
   el.style.removeProperty("height");
   el.style.removeProperty("min-height");
 
-  if (h == null || h === "" || h === false) return; // nothing to set
+  if (h == null || h === "" || h === false) return; 
 
-  // allow numbers (treated as px) or strings with units like "320px", "24rem", "50vh"
   if (typeof h === "number" && !Number.isNaN(h)) {
     el.style.height = `${h}px`;
     return;
   }
   if (typeof h === "string") {
     const trimmed = h.trim().toLowerCase();
-    if (trimmed === "auto" || trimmed === "unset") return; // explicit "no height"
-    // if it's a bare number in a string, treat as px
+    if (trimmed === "auto" || trimmed === "unset") return; 
     if (/^\d+(\.\d+)?$/.test(trimmed)) {
       el.style.height = `${trimmed}px`;
     } else {
-      // assume user provided a valid CSS length with units
       el.style.height = h;
     }
   }
 }
-// ----------------------------------------------------------------------------
 
 function wipeListModules() {
   document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
@@ -1077,21 +1068,17 @@ function renderListModule(data, elementColor) {
     const target = document.getElementById(String(item.id));
     if (!target) return;
 
-    // remove any previous cards rendered by us in this mount
     target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
 
-    // header
     const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
     const header   = make("div", { module: "header", class: "listmoduleheader" });
     header.appendChild(heading);
     const headerColor = item.color || elementColor?.tableColor;
     if (headerColor) header.style.backgroundColor = headerColor;
 
-    // details
     const detailsEl = make("div", { "data": "details", class: "listdescription" });
     if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
 
-    // bullets
     const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
     (item.values || ["[Bullet Point]"]).forEach((val) => {
       const li = make("li", { "data": "value", class: "listitemtext" });
@@ -1111,10 +1098,8 @@ function renderListModule(data, elementColor) {
     card.appendChild(header);
     card.appendChild(listWrapper);
 
-    // --- NEW: apply height from JSON (number -> px, string -> use as-is) ----
     applyCardHeight(card, item.height);
-    applyCardAlignment(card, header, item.align);
-    // ------------------------------------------------------------------------
+    //applyCardAlignment(card, header, item.align);
 
     target.appendChild(card);
   });
