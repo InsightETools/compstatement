@@ -1005,37 +1005,42 @@ async function renderAll(data) {
     });
   }
 
-// remove any previously rendered list-module cards everywhere
+// --- NEW helper: normalize & apply height -----------------------------------
+function applyCardHeight(el, h) {
+  // clear any previous height first
+  el.style.removeProperty("height");
+  el.style.removeProperty("min-height");
+
+  if (h == null || h === "" || h === false) return; // nothing to set
+
+  // allow numbers (treated as px) or strings with units like "320px", "24rem", "50vh"
+  if (typeof h === "number" && !Number.isNaN(h)) {
+    el.style.height = `${h}px`;
+    return;
+  }
+  if (typeof h === "string") {
+    const trimmed = h.trim().toLowerCase();
+    if (trimmed === "auto" || trimmed === "unset") return; // explicit "no height"
+    // if it's a bare number in a string, treat as px
+    if (/^\d+(\.\d+)?$/.test(trimmed)) {
+      el.style.height = `${trimmed}px`;
+    } else {
+      // assume user provided a valid CSS length with units
+      el.style.height = h;
+    }
+  }
+}
+// ----------------------------------------------------------------------------
+
 function wipeListModules() {
-  // only remove our injected cards, not the container divs
-  document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => {
-    const parent = el.parentElement;
-    el.remove();
-    // if parent ended up empty, leave the container but you could also hide it:
-    // if (parent && parent.children.length === 0) parent.style.display = "none";
-  });
+  document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
 }
 
-// render list modules from JSON, replacing anything that existed before
 function renderListModule(data, elementColor) {
-  // always clear previous list-module cards first
   wipeListModules();
 
   const items = Array.isArray(data?.listModule) ? data.listModule : [];
-
-  // if no listModule data, also blank known mounts so old content doesn't linger
-  if (!items.length) {
-    // Optionally hide/clear common mounts you use for list modules
-    ["module10", "module11", "module12", "module13"].forEach((id) => {
-      const mount = document.getElementById(id);
-      if (mount) {
-        // remove only our cards, not other module content
-        mount.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-        // mount.style.display = "none"; // uncomment if you want to hide empty mounts
-      }
-    });
-    return;
-  }
+  if (!items.length) return;
 
   const make = (tag, attrs = {}, text = null) => {
     const n = document.createElement(tag);
@@ -1051,9 +1056,8 @@ function renderListModule(data, elementColor) {
     const target = document.getElementById(String(item.id));
     if (!target) return;
 
-    // remove only our prior cards in this mount
+    // remove any previous cards rendered by us in this mount
     target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-    // target.style.display = ""; // ensure mount is visible if you hide empties elsewhere
 
     // header
     const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
@@ -1070,7 +1074,7 @@ function renderListModule(data, elementColor) {
     const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
     (item.values || ["[Bullet Point]"]).forEach((val) => {
       const li = make("li", { "data": "value", class: "listitemtext" });
-      li.innerHTML = val; // allow simple markup
+      li.innerHTML = val;
       ul.appendChild(li);
     });
 
@@ -1083,9 +1087,12 @@ function renderListModule(data, elementColor) {
     listWrapper.appendChild(listItems);
 
     const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
-    if (item.height && !isNaN(item.height)) card.style.minHeight = `${item.height}px`;
     card.appendChild(header);
     card.appendChild(listWrapper);
+
+    // --- NEW: apply height from JSON (number -> px, string -> use as-is) ----
+    applyCardHeight(card, item.height);
+    // ------------------------------------------------------------------------
 
     target.appendChild(card);
   });
