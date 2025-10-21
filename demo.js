@@ -156,7 +156,7 @@ window.reloadFromParams = async () => {
   const fetchUrl = buildFetchUrlFromParams();
 
   try {
-    const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
+    const res = await fetch(baseUrl);
     const data = await res.json();
 
     await renderAll(data);
@@ -198,7 +198,6 @@ function formatCurrency(value, element = null, decimalFlag = null, isCurrency = 
   return isCurrency ? `$${formatted}` : formatted;
 }
 
-/* ========================== PRICING (ONLY TOTAL) ========================== */
 window.__currentData = null;
 
 function getSelectionsFromParams() {
