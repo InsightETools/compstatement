@@ -62,17 +62,33 @@
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png"
   ],
-  "listModule": [
+  "listModules": [
     {
-      "id": "module13",
-      "label": "Additional Benies",
+      "id": "listModule3",
+      "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
-      "values": [
+      "height": 350,
+      "align": "center",
+          "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
         "Fit & Fun Dollas",
         "Service Award Program",
         "Professional development training"
+      ]
+    },{
+      "id": "listModule1",
+      "label": "List Module 1",
+      "details": "The following perks are provided in addition to the compensation and benefits above",
+      "height": 350,
+      "values": [
+        "100% tuition reimbursement up to <span>$5,000</span>",
+        "Short-term Disability coverage at no cost",
+        "Fit & Fun Dollas",
+        "Service Award Program",
+        "Professional development training",
+        "Test Line #1",
+        "Test Line#2"
       ]
     }
   ],
