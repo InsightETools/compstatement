@@ -64,7 +64,7 @@
   ],
   "listModules": [
     {
-      "id": "listModule3",
+      "id": "listModule2",
       "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "height": 150,
@@ -148,143 +148,7 @@
       ]
     }
   ],
-  "modules": [
-   {
-      "id": "module11",
-      "year": "2024",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "",
-          "type": "currency",
-          "value": "50000",
-          "description": "Description goes here"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "20000",
-          "description": "Description goes here"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "30000",
-          "description": "Description goes here"
-        }
-      ]
-    }, {
-      "id": "module12",
-      "year": "2024",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "",
-          "type": "currency",
-          "value": "1000",
-          "description": "Description goes here"
-        },{
-          "label": "",
-          "type": "currency",
-          "value": "2500",
-          "description": "Description goes here"
-        }
-      ]
-    },
-    {
-      "id": "module13",
-      "year": "2024",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Paid Time Off",
-          "type": "currency",
-          "value": "50000",
-          "description": ""
-        },
-        {
-          "label": "Paid Holidays",
-          "type": "currency",
-          "value": "15000",
-          "description": ""
-        },
-        {
-          "label": "Sick Days",
-          "type": "currency",
-          "value": "10000",
-          "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module14",
-      "year": "2025",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Annual Salary",
-          "type": "currency",
-          "value": "65000",
-          "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module15",
-      "year": "2025",
-      "label": "",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Total Compensation",
-          "type": "currency",
-          "value": "75000",
-          "description": ""
-        }
-      ]
-    },
-    {
-      "id": "module16",
-      "year": "2025",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "Paid Time Off",
-          "type": "currency",
-          "value": "50000",
-          "description": "25 hours at your daily rate"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "",
-          "description": "12 paid & 1 floating"
-        },
-        {
-          "label": "",
-          "type": "currency",
-          "value": "",
-          "description": "20 hours at your daily rate"
-        }
-      ]
-    }
+  "modules": [   
   ],
   "standardTables": [
     {
