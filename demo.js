@@ -1486,8 +1486,8 @@ function renderListModules(data, elementColor) {
 })();
 
 // Auto-hide editor panel in preview or shared view
-    const hasKey = params.has("key");
-    const isPreview = params.has("preview");
+    const hasKey = p.has("key");
+    const isPreview = p.has("preview");
 
 /*
     if (hasKey || isPreview) {
