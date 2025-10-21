@@ -140,17 +140,17 @@ function computeDesignConstraintsAndApply() {
 
 /*
     if (hasKey || isPreview) {
-      qs("#editorPanel")?.classList.add("hidden");
-      qs("#fullScreen")?.classList.add("hidden");
-      qs("#pagesWrapper")?.classList.add("centered");
+      $("#editorPanel")?.classList.add("hidden");
+      $("#fullScreen")?.classList.add("hidden");
+      $("#pagesWrapper")?.classList.add("centered");
     }
 */
     if (!hasKey && !isPreview) {
-      qs("#editButton")?.classList.add("hidden");
+      $("#editButton")?.classList.add("hidden");
     }
 
     if (!hasKey) {
-      qs("#preparedFor")?.classList.add("hidden");
+      $("#preparedFor")?.classList.add("hidden");
     }
 
   const forceOffIds = [
