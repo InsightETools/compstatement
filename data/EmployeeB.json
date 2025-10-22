@@ -321,7 +321,7 @@
               "col3_value": null
             },
             {
-              "label": "Life and AD&D",
+              "label": "Life and AD&DD",
               "col1_value": null,
               "col2_value": 0,
               "col3_value": null
@@ -344,40 +344,12 @@
           "col3_subtotal": null
         },
         {
-          "label": "Elective Benefits",
+          "label": "Elective Bennies",
           "shortLabel": "Elective",
           "color": "#b89237",
           "items": [
             {
               "label": "401(k) Match",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Additional Benefits",
-          "shortLabel": "Additional",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Holiday Bonus",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Education & Other Cash Rewards",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Retirement Plan Deposit (Deferred)",
               "col1_value": null,
               "col2_value": 0,
               "col3_value": null
