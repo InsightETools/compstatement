@@ -1424,6 +1424,24 @@ function renderListModules(data, elementColor) {
     renderPrice(window.__currentData);
   };
 
+  async function selectEmployee(ekId) {
+  setParam("ek", ekId);
+
+  const empBtns = $$('[id^="Employee"]');
+  empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ekId));
+
+  await window.reloadFromParams();
+
+  computeDesignConstraintsAndApply();
+  _applyEffectiveButtonStates();
+
+  renderPrice(window.__currentData);
+  if (typeof window.applyOverflow === "function") window.applyOverflow();
+
+  try { donutCharts(); } catch {}
+}
+
+
   document.addEventListener("DOMContentLoaded", () => {
     _collectButtons();
     computeDesignConstraintsAndApply();
@@ -1464,22 +1482,22 @@ function renderListModules(data, elementColor) {
     updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
-    const setActiveEmpButton = (id) => {
-      empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === id));
-    };
-    empBtns.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        setParam("ek", btn.id);
-        setActiveEmpButton(btn.id);
-        debouncedReloadFromParams();
-      });
-    });
-    let ek = getParams().get("ek");
-    if (!ek || !document.getElementById(ek)) {
-      ek = "EmployeeA";
-      setParam("ek", ek);
-    }
-    setActiveEmpButton(ek);
+
+// Initial active state
+let ek = getParams().get("ek");
+if (!ek || !document.getElementById(ek)) {
+  ek = "EmployeeA";
+  setParam("ek", ek);
+}
+empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
+
+// Click → full re-render
+empBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("active")) return; // no-op if already active
+    selectEmployee(btn.id);
+  });
+});
 
     const scrollToComponent = (btnId, key) => {
       $("#" + btnId)?.addEventListener("click", () => {
