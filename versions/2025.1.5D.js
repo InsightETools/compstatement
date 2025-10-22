@@ -134,16 +134,16 @@ function computeDesignConstraintsAndApply() {
   const isDesign2 = design === "2";
 
   // Auto-hide editor panel in preview or shared view
-    const hasKey = params.has("key");
-    const isPreview = params.has("preview");
+  const hasKey = params.has("key");
+  const isPreview = params.has("preview");
 
-    if (!hasKey && !isPreview) {
-      $("#editButton")?.classList.add("hidden");
-    }
+  if (!hasKey && !isPreview) {
+    $("#editButton")?.classList.add("hidden");
+  }
 
-    if (!hasKey) {
-      $("#preparedFor")?.classList.add("hidden");
-    }
+  if (!hasKey) {
+    $("#preparedFor")?.classList.add("hidden");
+  }
 
   const forceOffIds = [
     "layout1","layout2",
@@ -304,6 +304,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 }
 
 async function renderAll(data) {
+  // clear per-wrapper donut children (keep template)
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -427,7 +428,7 @@ async function renderAll(data) {
       }
     });
 
-     document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
+    document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
       if (data.companyLogoMail) {
         el.setAttribute("src", data.companyLogoMail);
         if (data.companyLogoMailHeight) el.style.height = data.companyLogoMailHeight + "px";
@@ -438,7 +439,7 @@ async function renderAll(data) {
       }
     });
 
-     document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
+    document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
       if (data.companyLogoSideBar) {
         el.setAttribute("src", data.companyLogoSideBar);
         if (data.companyLogoSideBarHeight) el.style.height = data.companyLogoSideBarHeight + "px";
@@ -1024,116 +1025,115 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
-  card.style.removeProperty("text-align");
-  header.style.removeProperty("justify-content");
+    card.style.removeProperty("text-align");
+    header.style.removeProperty("justify-content");
 
-  if (!align) return;
+    if (!align) return;
 
-  const v = String(align).toLowerCase().trim();
-  if (["left", "center", "right", "justify"].includes(v)) {
-    card.style.textAlign = v;
-  }
+    const v = String(align).toLowerCase().trim();
+    if (["left", "center", "right", "justify"].includes(v)) {
+      card.style.textAlign = v;
+    }
 
     if (v === "center") header.style.justifyContent = "center";
-  else if (v === "right") header.style.justifyContent = "flex-end";
-  else header.style.justifyContent = "flex-start";
-}
-  
-function applyCardHeight(el, h) {
-  el.style.removeProperty("height");
-  el.style.removeProperty("min-height");
-
-  if (h == null || h === "" || h === false) return; 
-
-  if (typeof h === "number" && !Number.isNaN(h)) {
-    el.style.minHeight = `${h}px`;
-    return;
+    else if (v === "right") header.style.justifyContent = "flex-end";
+    else header.style.justifyContent = "flex-start";
   }
-  if (typeof h === "string") {
-    const trimmed = h.trim().toLowerCase();
-    if (trimmed === "auto" || trimmed === "unset") return; 
-    if (/^\d+(\.\d+)?$/.test(trimmed)) {
-      el.style.minHeight = `${trimmed}px`;
-    } else {
-      el.style.minHeight = h;
+
+  function applyCardHeight(el, h) {
+    el.style.removeProperty("height");
+    el.style.removeProperty("min-height");
+
+    if (h == null || h === "" || h === false) return;
+
+    if (typeof h === "number" && !Number.isNaN(h)) {
+      el.style.minHeight = `${h}px`;
+      return;
+    }
+    if (typeof h === "string") {
+      const trimmed = h.trim().toLowerCase();
+      if (trimmed === "auto" || trimmed === "unset") return;
+      if (/^\d+(\.\d+)?$/.test(trimmed)) {
+        el.style.minHeight = `${trimmed}px`;
+      } else {
+        el.style.minHeight = h;
+      }
     }
   }
-}
 
-function wipeListModules() {
-  document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
-}
-    
-function renderListModules(data, elementColor) {
-  wipeListModules();
+  function wipeListModules() {
+    document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
+  }
 
-  const items = Array.isArray(data?.listModules) ? data.listModules : [];
-  const validIds = new Set(items.map((i) => String(i.id)));
+  function renderListModules(data, elementColor) {
+    wipeListModules();
 
-  document.querySelectorAll("#listModule1").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule2").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule3").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule4").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
+    const items = Array.isArray(data?.listModules) ? data.listModules : [];
+    const validIds = new Set(items.map((i) => String(i.id)));
 
-  if (!items.length) return;
-
-  const make = (tag, attrs = {}, text = null) => {
-    const n = document.createElement(tag);
-    for (const [k, v] of Object.entries(attrs)) {
-      if (k === "class") n.className = v;
-      else n.setAttribute(k, v);
-    }
-    if (text != null) n.textContent = text;
-    return n;
-  };
-
-  items.forEach((item) => {
-    const target = document.getElementById(String(item.id));
-    if (!target) return;
-
-    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-
-    const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
-    const header   = make("div", { module: "header", class: "listmoduleheader" });
-    header.appendChild(heading);
-    const headerColor = item.color || elementColor?.tableColor;
-    if (headerColor) header.style.backgroundColor = headerColor;
-
-    const detailsEl = make("div", { "data": "details", class: "listdescription" });
-    if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
-
-    const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
-    (item.values || ["[Bullet Point]"]).forEach((val) => {
-      const li = make("li", { "data": "value", class: "listitemtext" });
-      li.innerHTML = val;
-      ul.appendChild(li);
+    document.querySelectorAll("#listModule1").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule2").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule3").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule4").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
     });
 
-    const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
-    listItems.appendChild(ul);
+    if (!items.length) return;
 
-    const orientation = item.orientation || "vertical";
-    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
-    listWrapper.appendChild(detailsEl);
-    listWrapper.appendChild(listItems);
+    const make = (tag, attrs = {}, text = null) => {
+      const n = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (k === "class") n.className = v;
+        else n.setAttribute(k, v);
+      }
+      if (text != null) n.textContent = text;
+      return n;
+    };
 
-    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
-    card.appendChild(header);
-    card.appendChild(listWrapper);
+    items.forEach((item) => {
+      const target = document.getElementById(String(item.id));
+      if (!target) return;
 
-    applyCardHeight(card, item.height);
-    target.appendChild(card);
-  });
-}
+      target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
 
+      const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
+      const header   = make("div", { module: "header", class: "listmoduleheader" });
+      header.appendChild(heading);
+      const headerColor = item.color || elementColor?.tableColor;
+      if (headerColor) header.style.backgroundColor = headerColor;
+
+      const detailsEl = make("div", { "data": "details", class: "listdescription" });
+      if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+      const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+      (item.values || ["[Bullet Point]"]).forEach((val) => {
+        const li = make("li", { "data": "value", class: "listitemtext" });
+        li.innerHTML = val;
+        ul.appendChild(li);
+      });
+
+      const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+      listItems.appendChild(ul);
+
+      const orientation = item.orientation || "vertical";
+      const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+      listWrapper.appendChild(detailsEl);
+      listWrapper.appendChild(listItems);
+
+      const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+      card.appendChild(header);
+      card.appendChild(listWrapper);
+
+      applyCardHeight(card, item.height);
+      target.appendChild(card);
+    });
+  }
 
   function loadDisplay() {
     const renderParam = getParams().get("render");
@@ -1167,44 +1167,45 @@ function renderListModules(data, elementColor) {
   }
 
   function applyFontsFromData(data) {
-  if (!data) return;
+    if (!data) return;
 
-  const map = {
-    primary:  data.primaryFont  || "",
-    secondary:data.secondaryFont|| "",
-    body:     data.bodyFont     || ""
-  };
+    const map = {
+      primary:  data.primaryFont  || "",
+      secondary:data.secondaryFont|| "",
+      body:     data.bodyFont     || ""
+    };
 
-  const loadOnce = (family) => {
-    if (!family) return;
-    const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
-    if (document.getElementById(id)) return;
+    const loadOnce = (family) => {
+      if (!family) return;
+      const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
+      if (document.getElementById(id)) return;
 
-    const link = document.createElement("link");
-    link.id = id;
-    link.rel = "stylesheet";
-    link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
-    document.head.appendChild(link);
-  };
+      const link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
+      document.head.appendChild(link);
+    };
 
-  Object.values(map).forEach(loadOnce);
+    Object.values(map).forEach(loadOnce);
 
-  const applyFamilies = () => {
-    for (const [key, family] of Object.entries(map)) {
-      if (!family) continue;
-      document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
-        el.style.fontFamily = `"${family}", sans-serif`;        
-      });
+    const applyFamilies = () => {
+      for (const [key, family] of Object.entries(map)) {
+        if (!family) continue;
+        document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
+          el.style.fontFamily = `"${family}", sans-serif`;
+        });
+      }
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(applyFamilies).catch(applyFamilies);
+    } else {
+      setTimeout(applyFamilies, 200);
     }
-  };
-
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(applyFamilies).catch(applyFamilies);
-  } else {
-    setTimeout(applyFamilies, 200);
   }
-}
 
+  // ---- Render Pipeline ----
   staticData();
   standardTables();
   booleanTables();
@@ -1227,6 +1228,7 @@ function renderListModules(data, elementColor) {
   renderPrice(window.__currentData);
 }
 
+// ===================== Controls / UI =====================
 (function controls() {
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
@@ -1424,38 +1426,11 @@ function renderListModules(data, elementColor) {
     renderPrice(window.__currentData);
   };
 
-function selectEmployee(ekId) {
-  setParam("ek", ekId);
-
-  window.location.reload();
-}
-
-const empBtns = $$('[id^="Employee"]');
-
-let ek = getParams().get("ek");
-if (!ek || !document.getElementById(ek)) {
-  ek = "EmployeeA";
-  setParam("ek", ek);
-}
-
-empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
-
-empBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.classList.contains("active")) return; 
-    selectEmployee(btn.id);
-  });
-});
-
-  computeDesignConstraintsAndApply();
-  _applyEffectiveButtonStates();
-
-  renderPrice(window.__currentData);
-  if (typeof window.applyOverflow === "function") window.applyOverflow();
-
-  try { donutCharts(); } catch {}
-}
-
+  // --- Employee switcher (full page reload) ---
+  function selectEmployee(ekId) {
+    setParam("ek", ekId);
+    window.location.reload();
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     _collectButtons();
@@ -1496,22 +1471,20 @@ empBtns.forEach((btn) => {
     $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
 
+    // Employee buttons
     const empBtns = $$('[id^="Employee"]');
-
-let ek = getParams().get("ek");
-if (!ek || !document.getElementById(ek)) {
-  ek = "EmployeeA";
-  setParam("ek", ek);
-}
-empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
-
-empBtns.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    if (btn.classList.contains("active")) return; 
-    selectEmployee(btn.id);
-  });
-});
-
+    let ek = getParams().get("ek");
+    if (!ek || !document.getElementById(ek)) {
+      ek = "EmployeeA";
+      setParam("ek", ek);
+    }
+    empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.classList.contains("active")) return;
+        selectEmployee(btn.id);
+      });
+    });
 
     const scrollToComponent = (btnId, key) => {
       $("#" + btnId)?.addEventListener("click", () => {
@@ -1598,5 +1571,5 @@ empBtns.forEach((btn) => {
       renderPrice(window.__currentData);
     });
   });
-  })();
+})();
 console.log("Build v2025.1.5D1");
