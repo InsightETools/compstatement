@@ -1,3 +1,4 @@
+
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -133,6 +134,7 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
+  // Auto-hide editor panel in preview or shared view
     const hasKey = params.has("key");
     const isPreview = params.has("preview");
 
@@ -1008,50 +1010,23 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
-  // clear previous alignment
+  // clear previous alignment first
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
 
-  const v = String(align || "").toLowerCase().trim();
+  if (!align) return;
 
-  // text alignment
+  const v = String(align).toLowerCase().trim();
+  // card text alignment
   if (["left", "center", "right", "justify"].includes(v)) {
     card.style.textAlign = v;
   }
 
-  // header alignment
-  if (v === "center") header.style.justifyContent = "center";
+    if (v === "center") header.style.justifyContent = "center";
   else if (v === "right") header.style.justifyContent = "flex-end";
   else header.style.justifyContent = "flex-start";
-
-  // ----- bullets toggle -----
-  // find the UL(s) that hold the values inside this card
-  const uls = card.querySelectorAll('ul[data="values"], ul.listitemline');
-  const removeBullets = v && v !== "left";
-
-  uls.forEach((ul) => {
-    if (removeBullets) {
-      // inline reset (works even if there’s external CSS)
-      ul.style.listStyleType = "none";
-      ul.style.listStyleImage = "none";
-      ul.style.paddingLeft = "0";
-      // In case bullets are added via ::marker in some global CSS,
-      // remove default marker spacing by zeroing margin on LIs.
-      ul.querySelectorAll("li").forEach((li) => {
-        li.style.marginLeft = "0";
-      });
-    } else {
-      // restore defaults
-      ul.style.removeProperty("list-style-type");
-      ul.style.removeProperty("list-style-image");
-      ul.style.removeProperty("padding-left");
-      ul.querySelectorAll("li").forEach((li) => {
-        li.style.removeProperty("margin-left");
-      });
-    }
-  });
 }
-
+  
 function applyCardHeight(el, h) {
   el.style.removeProperty("height");
   el.style.removeProperty("min-height");
@@ -1120,8 +1095,6 @@ function renderListModules(data, elementColor) {
 
     const orientation = item.orientation || "vertical";
     const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
-    const alignment = item.align || "left";
-    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation} ${alignment}` });
     listWrapper.appendChild(detailsEl);
     listWrapper.appendChild(listItems);
 
@@ -1130,7 +1103,7 @@ function renderListModules(data, elementColor) {
     card.appendChild(listWrapper);
 
     applyCardHeight(card, item.height);
-    applyCardAlignment(card, header, item.align);
+    //applyCardAlignment(card, header, item.align);
 
     target.appendChild(card);
   });
@@ -1185,6 +1158,7 @@ function renderListModules(data, elementColor) {
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
+  // Cache data & render just the total price
   window.__currentData = data;
   renderPrice(window.__currentData);
 }
