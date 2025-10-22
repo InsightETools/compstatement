@@ -1424,16 +1424,28 @@ function renderListModules(data, elementColor) {
     renderPrice(window.__currentData);
   };
 
-  function selectEmployee(ekId) {
+function selectEmployee(ekId) {
   setParam("ek", ekId);
+
   window.location.reload();
 }
 
+const empBtns = $$('[id^="Employee"]');
 
-  const empBtns = $$('[id^="Employee"]');
-  empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ekId));
+let ek = getParams().get("ek");
+if (!ek || !document.getElementById(ek)) {
+  ek = "EmployeeA";
+  setParam("ek", ek);
+}
 
-  await window.reloadFromParams();
+empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
+
+empBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (btn.classList.contains("active")) return; 
+    selectEmployee(btn.id);
+  });
+});
 
   computeDesignConstraintsAndApply();
   _applyEffectiveButtonStates();
