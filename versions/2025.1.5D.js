@@ -1566,7 +1566,7 @@ function renderListModules(data, elementColor) {
   });
 })();
 
-console.log("Build v2025.1.5D");
+console.log("Build v2025.1.5D1");
 document.querySelectorAll(".listModule3").forEach((el) => {
     console.log("test");
   });
