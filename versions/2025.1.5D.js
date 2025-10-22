@@ -1166,6 +1166,40 @@ function renderListModules(data, elementColor) {
     setTimeout(() => $("#loader")?.classList.add("finished"), 500);
   }
 
+  function applyGoogleFonts(fontConfig = {}) {
+  // fontConfig example:
+  // {
+  //   primary: "Poppins",
+  //   secondary: "Roboto Slab",
+  //   body: "Open Sans"
+  // }
+
+  // Helper: load font from Google Fonts
+  function loadGoogleFont(family) {
+    if (!family) return;
+    const formatted = family.replace(/ /g, "+");
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${formatted}:wght@400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+  }
+
+  // Load all fonts listed in config
+  Object.values(fontConfig).forEach(loadGoogleFont);
+
+  // Wait a short moment to ensure fonts are loaded
+  setTimeout(() => {
+    for (const [key, family] of Object.entries(fontConfig)) {
+      if (!family) continue;
+      // Select elements by their font attribute (e.g., font="primary")
+      document.querySelectorAll(`[font="${key}"]`).forEach((el) => {
+        el.style.fontFamily = `"${family}", sans-serif`;
+      });
+    }
+  }, 300);
+}
+
+  
   staticData();
   standardTables();
   booleanTables();
@@ -1183,6 +1217,12 @@ function renderListModules(data, elementColor) {
 
   computeDesignConstraintsAndApply();
   applyButtonStatus();
+
+  applyGoogleFonts({
+  primary: data.primary,
+  secondary: data.secondary,
+  body: data.body
+});
 
   window.__currentData = data;
   renderPrice(window.__currentData);
