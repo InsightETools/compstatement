@@ -1166,14 +1166,6 @@ function renderListModules(data, elementColor) {
     setTimeout(() => $("#loader")?.classList.add("finished"), 500);
   }
 
-  function applyGoogleFonts(fontConfig = {}) {
-  // fontConfig example:
-  // {
-  //   primary: "Poppins",
-  //   secondary: "Roboto Slab",
-  //   body: "Open Sans"
-  // }
-
   // Helper: load font from Google Fonts
   function loadGoogleFont(family) {
     if (!family) return;
@@ -1219,9 +1211,9 @@ function renderListModules(data, elementColor) {
   applyButtonStatus();
 
   applyGoogleFonts({
-  primary: data.primary,
-  secondary: data.secondary,
-  body: data.body
+  primary: data.primaryFont,
+  secondary: data.secondaryFont,
+  body: data.bodyFont
 });
 
   window.__currentData = data;
