@@ -1071,16 +1071,17 @@ function applyCardHeight(el, h) {
 function wipeListModules() {
   document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
 }
-  
-document.querySelectorAll(".listModule3").forEach((el) => {
-    console.log("test");
-  });
-  
+    
 function renderListModules(data, elementColor) {
   wipeListModules();
 
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
-  const validIds = new Set(items.map((i) => String(i.id)));
+  const validIds = new Set(items.map((i) => String(i.id))); // ✅ added line
+
+  // hide modules not in JSON
+  document.querySelectorAll("#listmodulecontainer[id]").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none"; // ✅ added line
+  });
 
   if (!items.length) return;
 
@@ -1132,6 +1133,7 @@ function renderListModules(data, elementColor) {
     target.appendChild(card);
   });
 }
+
 
   function loadDisplay() {
     const renderParam = getParams().get("render");
@@ -1567,6 +1569,3 @@ function renderListModules(data, elementColor) {
 })();
 
 console.log("Build v2025.1.5D1");
-document.querySelectorAll(".listModule3").forEach((el) => {
-    console.log("test");
-  });
