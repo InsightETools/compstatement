@@ -14,6 +14,9 @@
     "benefitsPage": true,
     "companyPage": true
   },
+  "primaryFont": "Zilla Slab",
+  "secondaryFont": "Source Sans Pro",
+  "bodyFont": "Source Sans Pro",
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
