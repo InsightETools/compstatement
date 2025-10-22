@@ -175,7 +175,10 @@ window.reloadFromParams = async () => {
 
     isLoaded = true;
     console.log("Finished");
-    $("#loader")?.classList.add("finished");
+    setTimeout(() => {
+      $("#loader")?.classList.add("finished");
+    }, 3000);
+    
   } catch (err) {
     if (err.name !== "AbortError") {
       const errorCheck = err.message?.includes?.("Unexpected token");
@@ -1198,7 +1201,6 @@ async function renderAll(data) {
     }
   }
 
-  // ---- Render Pipeline ----
   staticData();
   standardTables();
   booleanTables();
@@ -1228,7 +1230,6 @@ async function renderAll(data) {
 });
 }
 
-// ===================== Controls / UI =====================
 (function controls() {
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
