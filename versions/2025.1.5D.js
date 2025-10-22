@@ -1076,6 +1076,13 @@ function renderListModules(data, elementColor) {
   wipeListModules();
 
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
+  const validIds = new Set(items.map((i) => String(i.id))); // ✅ added line
+
+  // hide modules not in JSON
+  document.querySelectorAll(".listmodulecontainer[id]").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none"; // ✅ added line
+  });
+
   if (!items.length) return;
 
   const make = (tag, attrs = {}, text = null) => {
@@ -1123,7 +1130,6 @@ function renderListModules(data, elementColor) {
     card.appendChild(listWrapper);
 
     applyCardHeight(card, item.height);
-
     target.appendChild(card);
   });
 }
