@@ -1161,6 +1161,46 @@ function renderListModules(data, elementColor) {
   // Cache data & render just the total price
   window.__currentData = data;
   renderPrice(window.__currentData);
+
+function applyGoogleFonts(fontConfig = {}) {
+  // fontConfig example:
+  // {
+  //   primary: "Poppins",
+  //   secondary: "Roboto Slab",
+  //   body: "Open Sans"
+  // }
+
+  // Helper: load font from Google Fonts
+  function loadGoogleFont(family) {
+    if (!family) return;
+    const formatted = family.replace(/ /g, "+");
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${formatted}:wght@400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+  }
+
+  // Load all fonts listed in config
+  Object.values(fontConfig).forEach(loadGoogleFont);
+
+  // Wait a short moment to ensure fonts are loaded
+  setTimeout(() => {
+    for (const [key, family] of Object.entries(fontConfig)) {
+      if (!family) continue;
+      // Select elements by their font attribute (e.g., font="primary")
+      document.querySelectorAll(`[font="${key}"]`).forEach((el) => {
+        el.style.fontFamily = `"${family}", sans-serif`;
+      });
+    }
+  }, 300);
+}
+
+// Example usage:
+applyGoogleFonts({
+  primary: data.primaryFont,
+  secondary: data.secondaryFont,
+  body: data.bodyFont
+});
 }
 
 (function controls() {
