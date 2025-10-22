@@ -1071,17 +1071,15 @@ function applyCardHeight(el, h) {
 function wipeListModules() {
   document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
 }
-
+document.querySelectorAll(".listModule3").forEach((el) => {
+    console.log("test");
+  });
+  
 function renderListModules(data, elementColor) {
   wipeListModules();
 
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
   const validIds = new Set(items.map((i) => String(i.id)));
-
-  document.querySelectorAll(".listModule3").forEach((el) => {
-    console.log("test");
-    el.style.display = validIds.has(el.id) ? "" : "none";e
-  });
 
   if (!items.length) return;
 
