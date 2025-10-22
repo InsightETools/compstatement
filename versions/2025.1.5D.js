@@ -435,6 +435,28 @@ async function renderAll(data) {
       }
     });
 
+    document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
+      if (data.companyLogo) {
+        el.setAttribute("src", data.companyLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
+      if (data.companyLogo) {
+        el.setAttribute("src", data.companyLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
     document.querySelectorAll('[data="explorerLogo"]').forEach((el) => {
       if (data.explorerLogo) {
         el.setAttribute("src", data.explorerLogo);
