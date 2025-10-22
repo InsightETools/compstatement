@@ -1186,7 +1186,6 @@ function renderListModules(data, elementColor) {
   
   window.__currentData = data;
   renderPrice(window.__currentData);
-}
 
 (function controls() {
   const isDisabledBtn = (el) =>
