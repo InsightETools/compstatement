@@ -1,0 +1,71 @@
+<div id="tableTemplate" class="standardtabletemplate">
+  <div class="standardtablewrapper">
+    <div class="standardtablewrap">
+      <div element="block" color="tableColor" class="standardtableheader">
+        <div table="name" class="standardtablename">[Name]</div>
+        <div class="standardtablelabels">
+          <div table="summaryHeaderCol1" class="standardtablelabel">
+            [Label]
+          </div>
+          <div table="summaryHeaderCol2" class="standardtablelabel">
+            [Label]
+          </div>
+          <div table="summaryHeaderCol3" class="standardtablelabel">
+            [Label]
+          </div>
+        </div>
+      </div>
+    </div>
+    <div table="list" class="standardtablelist"></div>
+  </div>
+  <div id="categoryEntry" category="list" class="standardtablecategories">
+    <div class="standardtablecategory">
+      <div class="standardtablecategoryname">
+        <div category="icon" chartcomp="color" class="standardtableicon"></div>
+        <div category="name" class="lineitemlabel category">[Category]</div>
+      </div>
+    </div>
+    <div id="categoryList" line="list" class="standardtablelinewrapper">
+      <div category="line" class="standardtablelineitem">
+        <div line="item" class="standardtablelinelabel">[Line Item]</div>
+        <div class="standardtablelabels">
+          <div number="dynamic" line="col1" class="standardtablevalue">
+            $0.00
+          </div>
+          <div number="dynamic" line="col2" class="standardtablevalue">
+            $0.00
+          </div>
+          <div number="dynamic" line="col3" class="standardtablevalue">
+            $0.00
+          </div>
+        </div>
+      </div>
+    </div>
+    <div category="subtotal" class="standardtablesubtotalwrapper">
+      <div class="standardtablesubtotallabel">Subtotal</div>
+      <div class="standardtablelabels">
+        <div
+          number="dynamic"
+          subtotal="col1"
+          class="standardtablesubtotalvalue"
+        >
+          $0.00
+        </div>
+        <div
+          number="dynamic"
+          subtotal="col2"
+          class="standardtablesubtotalvalue"
+        >
+          $0.00
+        </div>
+        <div
+          number="dynamic"
+          subtotal="col3"
+          class="standardtablesubtotalvalue"
+        >
+          $0.00
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
