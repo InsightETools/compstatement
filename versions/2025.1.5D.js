@@ -1071,6 +1071,7 @@ function applyCardHeight(el, h) {
 function wipeListModules() {
   document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
 }
+  
 document.querySelectorAll(".listModule3").forEach((el) => {
     console.log("test");
   });
@@ -1566,3 +1567,6 @@ function renderListModules(data, elementColor) {
 })();
 
 console.log("Build v2025.1.5D");
+document.querySelectorAll(".listModule3").forEach((el) => {
+    console.log("test");
+  });
