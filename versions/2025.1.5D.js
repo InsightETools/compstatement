@@ -1078,8 +1078,16 @@ function renderListModules(data, elementColor) {
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
   const validIds = new Set(items.map((i) => String(i.id)));
 
+  document.querySelectorAll("#listModule1").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule2").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
   document.querySelectorAll("#listModule3").forEach((el) => {
-    console.log("Test");
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule4").forEach((el) => {
     el.style.display = validIds.has(el.id) ? "" : "none";
   });
 
