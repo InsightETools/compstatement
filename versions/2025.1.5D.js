@@ -1149,6 +1149,8 @@ function renderListModules(data, elementColor) {
     body:     data.bodyFont     || ""
   };
 
+    console.log(map);
+
   // Load each Google Font once
   const loadOnce = (family) => {
     if (!family) return;
@@ -1168,8 +1170,7 @@ function renderListModules(data, elementColor) {
     for (const [key, family] of Object.entries(map)) {
       if (!family) continue;
       document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
-        el.style.fontFamily = `"${family}", sans-serif`;
-        console.log(fontFamily);
+        el.style.fontFamily = `"${family}", sans-serif`;        
       });
     }
   };
