@@ -1078,8 +1078,7 @@ function renderListModules(data, elementColor) {
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
   const validIds = new Set(items.map((i) => String(i.id)));
 
-  // hide modules not in JSON
-  document.querySelectorAll(".listModule[id]").forEach((el) => {
+  document.querySelectorAll(".listModule3").forEach((el) => {
     console.log(el);
     el.style.display = validIds.has(el.id) ? "" : "none";e
   });
