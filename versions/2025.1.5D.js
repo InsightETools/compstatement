@@ -758,97 +758,116 @@ async function renderAll(data) {
   }
 
   function modules() {
-    if (!Array.isArray(data.modules) || data.modules.length === 0) {
-      document.querySelectorAll(".moduletemplate").forEach((el) => (el.style.display = "none"));
+  if (!Array.isArray(data.modules) || data.modules.length === 0) {
+    document.querySelectorAll(".moduletemplate").forEach((el) => (el.style.display = "none"));
+    return;
+  }
+
+  const moduleData = data.modules || [];
+  const validIds = new Set(moduleData.map((mod) => mod.id));
+
+  document.querySelectorAll(".moduletemplate").forEach((el) => {
+    const id = el.id?.trim();
+    if (!validIds.has(id)) el.style.display = "none";
+  });
+
+  moduleData.forEach((module) => {
+    // 🧩 If the module object or its ID is missing, hide the template
+    if (!module || !module.id) return;
+    if (
+      (!module.label && !module.description && !module.disclaimer) &&
+      (!Array.isArray(module.components) || module.components.length === 0)
+    ) {
+      const el = document.getElementById(module.id);
+      if (el) el.style.display = "none";
       return;
     }
 
-    const moduleData = data.modules || [];
-    const validIds = new Set(moduleData.map((mod) => mod.id));
+    const containers = document.querySelectorAll(`#${module.id}`);
+    if (!containers.length) return;
 
-    document.querySelectorAll(".moduletemplate").forEach((el) => {
-      const id = el.id?.trim();
-      if (!validIds.has(id)) el.style.display = "none";
-    });
+    containers.forEach((moduleContainer) => {
+      moduleContainer.style.display = "";
 
-    moduleData.forEach((module) => {
-      const containers = document.querySelectorAll(`#${module.id}`);
-      if (!containers.length) return;
+      const labelEl = moduleContainer.querySelector('[module="label"]');
+      if (labelEl) {
+        const value = module.label || "";
+        labelEl.textContent = value;
+        labelEl.style.display = value.trim() ? "" : "none";
+      }
 
-      containers.forEach((moduleContainer) => {
-        moduleContainer.style.display = "";
+      const descEl = moduleContainer.querySelector('[module="description"]');
+      if (descEl) {
+        const value = module.description || "";
+        descEl.textContent = value;
+        descEl.style.display = value.trim() ? "" : "none";
+      }
 
-        const labelEl = moduleContainer.querySelector('[module="label"]');
-        if (labelEl) {
-          const value = module.label || "";
-          labelEl.textContent = value;
-          labelEl.style.display = value.trim() ? "" : "none";
-        }
+      const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
+      if (disclaimerEl) {
+        const value = module.disclaimer || "";
+        disclaimerEl.textContent = value;
+        disclaimerEl.style.display = value.trim() ? "" : "none";
+      }
 
-        const descEl = moduleContainer.querySelector('[module="description"]');
-        if (descEl) {
-          const value = module.description || "";
-          descEl.textContent = value;
-          descEl.style.display = value.trim() ? "" : "none";
-        }
+      const listEl = moduleContainer.querySelector('[module="list"]');
+      const template = listEl?.querySelector('[module="component"]');
+      if (!listEl || !template) return;
 
-        const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
-        if (disclaimerEl) {
-          const value = module.disclaimer || "";
-          disclaimerEl.textContent = value;
-          disclaimerEl.style.display = value.trim() ? "" : "none";
-        }
-
-        const listEl = moduleContainer.querySelector('[module="list"]');
-        const template = listEl?.querySelector('[module="component"]');
-        if (!listEl || !template) return;
-
-        listEl.querySelectorAll('[module="component"]').forEach((el) => {
-          if (el !== template) el.remove();
-        });
-
-        let hasValidComponent = false;
-
-        module.components.forEach((component) => {
-          const value = component.value;
-          const isEmpty = value === null || value === undefined || value === "";
-          if (isEmpty) return;
-
-          const componentClone = template.cloneNode(true);
-          componentClone.style.display = "";
-          componentClone.removeAttribute("id");
-
-          const labelComponentEl = componentClone.querySelector('[category="label"]');
-          if (labelComponentEl) {
-            labelComponentEl.textContent = component.label || "";
-            labelComponentEl.style.display = component.label?.trim() ? "" : "none";
-          }
-
-          const valueEl = componentClone.querySelector('[category="value"]');
-          if (valueEl) {
-            const isCurrency = component.type === "currency";
-            const needsFormatting = ["currency", "number"].includes(component.type);
-            const formattedValue = needsFormatting
-              ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
-              : value;
-            valueEl.textContent = formattedValue;
-          }
-
-          const unitEl = componentClone.querySelector('[category="unit"]');
-          if (unitEl) {
-            unitEl.textContent = component.description || "";
-            unitEl.style.display = component.description?.trim() ? "" : "none";
-          }
-
-          listEl.appendChild(componentClone);
-          hasValidComponent = true;
-        });
-
-        template.style.display = "none";
-        if (!hasValidComponent) moduleContainer.style.display = "none";
+      listEl.querySelectorAll('[module="component"]').forEach((el) => {
+        if (el !== template) el.remove();
       });
+
+      let hasValidComponent = false;
+
+      (module.components || []).forEach((component) => {
+        const value = component?.value;
+        const isEmpty = value === null || value === undefined || value === "";
+        if (isEmpty) return;
+
+        const componentClone = template.cloneNode(true);
+        componentClone.style.display = "";
+        componentClone.removeAttribute("id");
+
+        const labelComponentEl = componentClone.querySelector('[category="label"]');
+        if (labelComponentEl) {
+          labelComponentEl.textContent = component.label || "";
+          labelComponentEl.style.display = component.label?.trim() ? "" : "none";
+        }
+
+        const valueEl = componentClone.querySelector('[category="value"]');
+        if (valueEl) {
+          const isCurrency = component.type === "currency";
+          const needsFormatting = ["currency", "number"].includes(component.type);
+          const formattedValue = needsFormatting
+            ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
+            : value;
+          valueEl.textContent = formattedValue;
+        }
+
+        const unitEl = componentClone.querySelector('[category="unit"]');
+        if (unitEl) {
+          unitEl.textContent = component.description || "";
+          unitEl.style.display = component.description?.trim() ? "" : "none";
+        }
+
+        listEl.appendChild(componentClone);
+        hasValidComponent = true;
+      });
+
+      template.style.display = "none";
+
+      // 👇 Hide the module container if no valid components OR all fields empty
+      const hasTextContent =
+        (module.label && module.label.trim()) ||
+        (module.description && module.description.trim()) ||
+        (module.disclaimer && module.disclaimer.trim());
+      if (!hasValidComponent && !hasTextContent) {
+        moduleContainer.style.display = "none";
+      }
     });
-  }
+  });
+}
 
   function donutCharts() {
     const isVisible = (el) => {
