@@ -1038,7 +1038,7 @@ async function renderAll(data) {
     });
   }
 
-  function applyCardAlignment(card, header, "center") {
+  function applyCardAlignment(card, header, align) {
     card.style.removeProperty("text-align");
     header.style.removeProperty("justify-content");
 
@@ -1145,7 +1145,7 @@ async function renderAll(data) {
       card.appendChild(listWrapper);
 
       applyCardHeight(card, item.height);
-      applyCardAlignment(card, header, align);
+      applyCardAlignment(card, header, item.align);
       target.appendChild(card);
     });
   }
