@@ -1169,6 +1169,7 @@ function renderListModules(data, elementColor) {
       if (!family) continue;
       document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
         el.style.fontFamily = `"${family}", sans-serif`;
+        console.log(fontFamily);
       });
     }
   };
@@ -1196,8 +1197,6 @@ function renderListModules(data, elementColor) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
-
-
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
