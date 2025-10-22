@@ -1572,4 +1572,4 @@ async function renderAll(data) {
     });
   });
 })();
-console.log("Build v2025.1.5D1");
+console.log("Build v2025.1.5D");
