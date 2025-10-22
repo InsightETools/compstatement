@@ -1054,16 +1054,16 @@ function applyCardHeight(el, h) {
   if (h == null || h === "" || h === false) return; 
 
   if (typeof h === "number" && !Number.isNaN(h)) {
-    el.style.min-height = `${h}px`;
+    el.style.minHeight = `${h}px`;
     return;
   }
   if (typeof h === "string") {
     const trimmed = h.trim().toLowerCase();
     if (trimmed === "auto" || trimmed === "unset") return; 
     if (/^\d+(\.\d+)?$/.test(trimmed)) {
-      el.style.min-height = `${trimmed}px`;
+      el.style.minHeight = `${trimmed}px`;
     } else {
-      el.style.min-height = h;
+      el.style.minHeight = h;
     }
   }
 }
