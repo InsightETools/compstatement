@@ -1,4 +1,3 @@
-
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -157,4 +156,7 @@ window.reloadFromParams = async () => {
   try {
     const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
     const data = await res.json();
-));
+
+//Rest of code goes here based on data
+    
+})();
