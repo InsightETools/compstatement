@@ -11,19 +11,26 @@
     "noCover": true,
     "cover1": true,
     "cover2": true,
-    "benefitsPage": false,
-    "companyPage": false
+    "benefitsPage": true,
+    "companyPage": true
   },
+  "primaryFont": "Zilla Slab",
+  "secondaryFont": "Source Sans Pro",
+  "bodyFont": "Source Sans Pro",
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
   "companyLogoCover": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
   "companyLogoCoverHeight": 50,
+  "companyLogoMail": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/682678566f8a2bb00b01f5a8_Award2.png",
+  "companyLogoMailHeight": 150,
+  "companyLogoSideBar": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68267855cb943176f7b51740_Award9.png",
+  "companyLogoSideBarHeight": 100,
   "companyLogo": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
   "companyLogoHeight": 55,
   "companyWelcome": "Hi",
   "companyMessage": "Demo Company is committed to offering a highly competitive compensation and benefits package that allows our company to recruit and retain the best employees. Your total compensation and benefit package helps to protect you and your family today and to support your long-term financial goals.<br><br>To help each of our employees gain a thorough understanding of the total value of their compensation and benefits, Demo Company has prepared this personalized Compensation Statement specifically for you. The information contained in this statement is designed to show you the combined value of your annual pay and the employee benefits you elected.<br><br>Please take the time to carefully review each benefit to ensure that all your personal information is accurate. If you find anything that does not correctly describe the coverage you have elected, or if you have any questions, please contact Human Resources.<br><br>Sincerely,",
-  "companyRepName": "Sally Smith",
+  "companyRepName": "Stuart Little",
   "companyRepTitle": "Chief Comp Officer",
   "companySignature": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792cff6b7dfcbdb518c6b5_DemoSignature.png",
   "companySignatureText": "",
@@ -33,7 +40,7 @@
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "Sally Smith",
+  "employeeName": "John Doe",
   "employeeFirstName": "John",
   "employeeTitle": "Graphic Designer",
   "employeeSalary": "80000",
@@ -64,19 +71,17 @@
   ],
   "listModules": [
     {
-      "id": "listModule1",
-      "label": "List Module 1",
+      "id": "listModule3",
+      "label": "List Module 2",
       "details": "The following perks are provided in addition to the compensation and benefits above",
-      "height": 150,
-      "align": "left",
-      "values": [
+      "height": 50,
+      "align": "center",
+          "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
         "Fit & Fun Dollas",
         "Service Award Program",
-        "Professional development training",
-        "Test Line #1",
-        "Test Line#2"
+        "Professional development training"
       ]
     }
   ],
@@ -164,28 +169,7 @@
           "description": "Description goes here"
         }
       ]
-    }, {
-      "id": "module12",
-      "year": "2024",
-      "label": "Time Off Snapshot",
-      "description": "",
-      "isDecimal": false,
-      "disclaimer": "",
-      "components": [
-        {
-          "label": "",
-          "type": "currency",
-          "value": "1000",
-          "description": "Description goes here"
-        },{
-          "label": "",
-          "type": "currency",
-          "value": "2500",
-          "description": "Description goes here"
-        }
-      ]
-    },
-    {
+    },{
       "id": "module13",
       "year": "2024",
       "label": "Time Off Snapshot",
@@ -321,7 +305,7 @@
               "col3_value": null
             },
             {
-              "label": "Life and AD&DD",
+              "label": "Life and AD&D",
               "col1_value": null,
               "col2_value": 0,
               "col3_value": null
@@ -344,12 +328,154 @@
           "col3_subtotal": null
         },
         {
-          "label": "Elective Bennies",
+          "label": "Elective Benefits",
           "shortLabel": "Elective",
           "color": "#b89237",
           "items": [
             {
               "label": "401(k) Match",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            }
+          ],
+          "col1_subtotal": null,
+          "col2_subtotal": 0,
+          "col3_subtotal": null
+        },
+        {
+          "label": "Additional Benefits",
+          "shortLabel": "Additional",
+          "color": "#b89237",
+          "items": [
+            {
+              "label": "Holiday Bonus",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Education & Other Cash Rewards",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Retirement Plan Deposit (Deferred)",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            }
+          ],
+          "col1_subtotal": null,
+          "col2_subtotal": 0,
+          "col3_subtotal": null
+        }
+      ]
+    },
+    {
+      "id": "table2",
+      "name": "2024 Employee Contributions",
+      "isDecimal": false,
+      "column1Name": "",
+      "column2Name": "",
+      "column3Name": "Employee",
+      "column1Total": 0,
+      "column2Total": 0,
+      "column3Total": 56000,
+      "totalLineName": "Total",
+      "categories": [
+        {
+          "label": "Cash Compensation",
+          "shortLabel": "Cash",
+          "color": "#b89237",
+          "items": [
+            {
+              "label": "Salary",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Overtime",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            }
+          ],
+          "col1_subtotal": null,
+          "col2_subtotal": 0,
+          "col3_subtotal": null
+        },
+        {
+          "label": "Core Benefits",
+          "shortLabel": "Benefits",
+          "color": "#b89237",
+          "items": [
+            {
+              "label": "Medical",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Life and AD&D",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Long Term Disability",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Employee Assistance Program",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            }
+          ],
+          "col1_subtotal": null,
+          "col2_subtotal": 0,
+          "col3_subtotal": null
+        },
+        {
+          "label": "Elective Benefits",
+          "shortLabel": "Elective",
+          "color": "#b89237",
+          "items": [
+            {
+              "label": "401(k) Match",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            }
+          ],
+          "col1_subtotal": null,
+          "col2_subtotal": 0,
+          "col3_subtotal": null
+        },
+        {
+          "label": "Additional Benefits",
+          "shortLabel": "Additional",
+          "color": "#b89237",
+          "items": [
+            {
+              "label": "Holiday Bonus",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Education & Other Cash Rewards",
+              "col1_value": null,
+              "col2_value": 0,
+              "col3_value": null
+            },
+            {
+              "label": "Retirement Plan Deposit (Deferred)",
               "col1_value": null,
               "col2_value": 0,
               "col3_value": null
