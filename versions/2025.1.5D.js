@@ -1079,7 +1079,7 @@ function renderListModules(data, elementColor) {
   const validIds = new Set(items.map((i) => String(i.id))); // ✅ added line
 
   // hide modules not in JSON
-  document.querySelectorAll(".listmodulecontainer[id]").forEach((el) => {
+  document.querySelectorAll(".listModule[id]").forEach((el) => {
     el.style.display = validIds.has(el.id) ? "" : "none"; // ✅ added line
   });
 
