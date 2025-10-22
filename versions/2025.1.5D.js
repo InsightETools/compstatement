@@ -435,9 +435,9 @@ async function renderAll(data) {
       }
     });
 
-    document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
-      if (data.companyLogo) {
-        el.setAttribute("src", data.companyLogo);
+    document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
+      if (data.companyLogoSideBar) {
+        el.setAttribute("src", data.companyLogoSideBar);
         el.style.display = "flex";
         el.style.justifyContent = "flex-end";
       } else {
@@ -446,9 +446,9 @@ async function renderAll(data) {
       }
     });
 
-    document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
-      if (data.companyLogo) {
-        el.setAttribute("src", data.companyLogo);
+    document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
+      if (data.companyLogoMail) {
+        el.setAttribute("src", data.companyLogoMail);
         el.style.display = "flex";
         el.style.justifyContent = "flex-end";
       } else {
