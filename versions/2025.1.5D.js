@@ -1010,14 +1010,12 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
-  // clear previous alignment first
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
 
   if (!align) return;
 
   const v = String(align).toLowerCase().trim();
-  // card text alignment
   if (["left", "center", "right", "justify"].includes(v)) {
     card.style.textAlign = v;
   }
@@ -1103,7 +1101,6 @@ function renderListModules(data, elementColor) {
     card.appendChild(listWrapper);
 
     applyCardHeight(card, item.height);
-    //applyCardAlignment(card, header, item.align);
 
     target.appendChild(card);
   });
@@ -1149,9 +1146,6 @@ function renderListModules(data, elementColor) {
     body:     data.bodyFont     || ""
   };
 
-    console.log(map);
-
-  // Load each Google Font once
   const loadOnce = (family) => {
     if (!family) return;
     const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
@@ -1175,7 +1169,6 @@ function renderListModules(data, elementColor) {
     }
   };
 
-  // Prefer reliable font readiness if available
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(applyFamilies).catch(applyFamilies);
   } else {
@@ -1201,7 +1194,6 @@ function renderListModules(data, elementColor) {
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
-  // Cache data & render just the total price
   window.__currentData = data;
   renderPrice(window.__currentData);
 }
