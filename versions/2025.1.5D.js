@@ -158,7 +158,6 @@ function computeDesignConstraintsAndApply() {
 const debouncedReloadFromParams = debounced(() => window.reloadFromParams(), 60);
 
 window.reloadFromParams = async () => {
-  $("#loader")?.classList.remove("finished");
 
   if (currentFetchController) currentFetchController.abort();
   currentFetchController = new AbortController();
