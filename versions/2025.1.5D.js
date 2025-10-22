@@ -857,7 +857,6 @@ async function renderAll(data) {
 
       template.style.display = "none";
 
-      // 👇 Hide the module container if no valid components OR all fields empty
       const hasTextContent =
         (module.label && module.label.trim()) ||
         (module.description && module.description.trim()) ||
@@ -1039,20 +1038,35 @@ async function renderAll(data) {
   }
 
   function applyCardAlignment(card, header, align) {
-    card.style.removeProperty("text-align");
-    header.style.removeProperty("justify-content");
+  card.style.removeProperty("text-align");
+  header.style.removeProperty("justify-content");
 
-    if (!align) return;
+  if (!align) return;
 
-    const v = String(align).toLowerCase().trim();
-    if (["left", "center", "right", "justify"].includes(v)) {
-      card.style.textAlign = v;
-    }
+  const v = String(align).toLowerCase().trim();
 
-    if (v === "center") header.style.justifyContent = "center";
-    else if (v === "right") header.style.justifyContent = "flex-end";
-    else header.style.justifyContent = "flex-start";
+  if (["left", "center", "right", "justify"].includes(v)) {
+    card.style.textAlign = v;
   }
+
+  if (v === "center") header.style.justifyContent = "center";
+  else if (v === "right") header.style.justifyContent = "flex-end";
+  else header.style.justifyContent = "flex-start";
+
+  const listItems = card.querySelectorAll("ul, ol");
+  listItems.forEach((list) => {
+    if (v === "center" || v === "right") {
+      list.style.listStyleType = "none";
+      list.style.paddingLeft = "0";
+      list.style.marginLeft = "0";
+    } else {
+      list.style.removeProperty("list-style-type");
+      list.style.removeProperty("padding-left");
+      list.style.removeProperty("margin-left");
+    }
+  });
+}
+
 
   function applyCardHeight(el, h) {
     el.style.removeProperty("height");
