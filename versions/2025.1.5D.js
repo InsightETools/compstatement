@@ -1079,7 +1079,7 @@ function renderListModules(data, elementColor) {
   const validIds = new Set(items.map((i) => String(i.id)));
 
   document.querySelectorAll(".listModule3").forEach((el) => {
-    console.log(el);
+    console.log("test");
     el.style.display = validIds.has(el.id) ? "" : "none";e
   });
 
