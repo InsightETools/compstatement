@@ -1051,7 +1051,7 @@ async function renderAll(data) {
     }
   });
 }
-  
+
 function applyCardHeight(el, h) {
   el.style.removeProperty("height");
   el.style.removeProperty("min-height");
@@ -1119,6 +1119,7 @@ function renderListModules(data, elementColor) {
     listItems.appendChild(ul);
 
     const orientation = item.orientation || "vertical";
+    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
     const alignment = item.align || "left";
     const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation} ${alignment}` });
     listWrapper.appendChild(detailsEl);
@@ -1165,7 +1166,7 @@ function renderListModules(data, elementColor) {
 
     setTimeout(() => $("#loader")?.classList.add("finished"), 500);
   }
-  
+
   staticData();
   standardTables();
   booleanTables();
@@ -1183,9 +1184,10 @@ function renderListModules(data, elementColor) {
 
   computeDesignConstraintsAndApply();
   applyButtonStatus();
-  
+
   window.__currentData = data;
   renderPrice(window.__currentData);
+}
 
 (function controls() {
   const isDisabledBtn = (el) =>
