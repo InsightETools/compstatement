@@ -1076,11 +1076,12 @@ function renderListModules(data, elementColor) {
   wipeListModules();
 
   const items = Array.isArray(data?.listModules) ? data.listModules : [];
-  const validIds = new Set(items.map((i) => String(i.id))); // ✅ added line
+  const validIds = new Set(items.map((i) => String(i.id)));
 
   // hide modules not in JSON
   document.querySelectorAll(".listModule[id]").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none"; // ✅ added line
+    console.log(el);
+    el.style.display = validIds.has(el.id) ? "" : "none";e
   });
 
   if (!items.length) return;
