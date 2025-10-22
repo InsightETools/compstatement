@@ -480,12 +480,28 @@ async function renderAll(data) {
       });
     });
 
-    document.querySelectorAll("span").forEach((span) => {
-      span.style.color = elementColor.primaryColor;
-      span.style.fontWeight = "bold";
-      const dataKey = span.getAttribute("data");
-      if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
-    });
+document.querySelectorAll('span[data]').forEach((span) => {
+  const dataKey = span.getAttribute('data');
+
+  if (dataKey && data[dataKey] != null) {
+    const fmt = span.getAttribute('format'); 
+    if (fmt === 'currency' || fmt === 'number') {
+      const isCurrency = fmt === 'currency';
+      span.textContent = formatCurrency(data[dataKey], span, null, isCurrency);
+    } else {
+      span.textContent = data[dataKey];
+    }
+  }
+
+  if (!span.hasAttribute('color') && elementColor.primaryColor) {
+    span.style.color = elementColor.primaryColor;
+  }
+
+  if (!span.hasAttribute('nobold')) {
+    span.style.fontWeight = 'bold';
+  }
+});
+
 
     document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
       el.style.color = elementColor.primaryColor;
