@@ -446,10 +446,10 @@ async function renderAll(data) {
       }
     });
 
-     document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
-      if (data.companyLogoMail) {
-        el.setAttribute("src", data.companyLogoMail);
-        if (data.companyLogoMailHeight) el.style.height = data.companyLogoMailHeight + "px";
+     document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
+      if (data.companyLogoSideBar) {
+        el.setAttribute("src", data.companyLogoSideBar);
+        if (data.companyLogoSideBarHeight) el.style.height = data.companyLogoSideBarHeight + "px";
         el.style.display = "";
       } else {
         el.removeAttribute("src");
