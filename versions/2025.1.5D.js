@@ -1424,8 +1424,11 @@ function renderListModules(data, elementColor) {
     renderPrice(window.__currentData);
   };
 
-  async function selectEmployee(ekId) {
+  function selectEmployee(ekId) {
   setParam("ek", ekId);
+  window.location.reload();
+}
+
 
   const empBtns = $$('[id^="Employee"]');
   empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ekId));
@@ -1483,7 +1486,6 @@ function renderListModules(data, elementColor) {
 
     const empBtns = $$('[id^="Employee"]');
 
-// Initial active state
 let ek = getParams().get("ek");
 if (!ek || !document.getElementById(ek)) {
   ek = "EmployeeA";
@@ -1491,13 +1493,13 @@ if (!ek || !document.getElementById(ek)) {
 }
 empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
 
-// Click → full re-render
 empBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
-    if (btn.classList.contains("active")) return; // no-op if already active
+    if (btn.classList.contains("active")) return; 
     selectEmployee(btn.id);
   });
 });
+
 
     const scrollToComponent = (btnId, key) => {
       $("#" + btnId)?.addEventListener("click", () => {
