@@ -435,22 +435,22 @@ async function renderAll(data) {
       }
     });
 
-    document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
-      if (data.companyLogoSideBar) {
-        el.setAttribute("src", data.companyLogoSideBar);
-        el.style.display = "flex";
-        el.style.justifyContent = "flex-end";
+     document.querySelectorAll('[data="ompanyLogoMail"]').forEach((el) => {
+      if (data.ompanyLogoMail) {
+        el.setAttribute("src", data.ompanyLogoMail);
+        if (data.ompanyLogoMailHeight) el.style.height = data.companyLogoMailHeight + "px";
+        el.style.display = "";
       } else {
         el.removeAttribute("src");
         el.style.display = "none";
       }
     });
 
-    document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
+     document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
       if (data.companyLogoMail) {
         el.setAttribute("src", data.companyLogoMail);
-        el.style.display = "flex";
-        el.style.justifyContent = "flex-end";
+        if (data.companyLogoMailHeight) el.style.height = data.companyLogoMailHeight + "px";
+        el.style.display = "";
       } else {
         el.removeAttribute("src");
         el.style.display = "none";
