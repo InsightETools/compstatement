@@ -489,8 +489,8 @@ async function renderAll(data) {
     });
   }
 
-  function applyHeaderEmployeeNameSize(data) {
-   if (!data) return;
+  function applyHeaderEmployeeNameSize(size) {
+   /*if (!data) return;
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
     if (raw == null) return;
     let sizeStr = "";
@@ -501,9 +501,9 @@ async function renderAll(data) {
     sizeStr = /^\d+(\.\d+)?$/.test(v) ? `${v}px` : v;
     } else {
       return;
-    } 
+    } */
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
-      el.style.fontSize = data.headerEmployeeNameSize;
+      el.style.fontSize = size;
     });
   }
 
@@ -1273,9 +1273,12 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
-  applyHeaderEmployeeNameSize(data);
+  applyHeaderEmployeeNameSize(data.headerEmployeeNameSize);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
+
+  console.log(data);
+  console.log(data.headerEmployeeNameSize);
 
   window.__currentData = data;
   renderPrice(window.__currentData);
