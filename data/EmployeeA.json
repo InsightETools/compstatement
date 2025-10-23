@@ -15,7 +15,7 @@
     "companyPage": true
   },
   "primaryFont": "Zilla Slab",
-  "headerEmployeeNameSize": 35,
+  "headerEmployeeSize": 35,
   "secondaryFont": "Source Sans Pro",
   "bodyFont": "Source Sans Pro",
   "bodyFontSize": 11,
