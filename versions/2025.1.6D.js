@@ -510,7 +510,6 @@ async function renderAll(data) {
     });
   }
 
-
   function standardTables() {
     const categoryEntryTemplate = document.querySelector("#categoryEntry");
     const baseTableTemplate = document.querySelector("#tableTemplate");
@@ -1277,7 +1276,7 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
-  applyHeaderEmployeeNameSize(data);
+  applyHeaderEmployeeNameSize();
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
