@@ -1278,19 +1278,23 @@ async function renderAll(data) {
     console.log(data);
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
+      el.style.lineHeight = data.headerEmployeeNameSize + "px";
     });
     document.querySelectorAll('[px="welcomeFontSize"]').forEach((el) => {
       el.style.fontSize = data.welcomeFontSize + "px";
-      console.log(data.welcomeFontSize);
+      el.style.lineHeight = data.welcomeFontSize + "px";
     });
     document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
       el.style.fontSize = data.headerYearSize + "px";
+      el.style.lineHeight = data.headerYearSize + "px";
     });
     document.querySelectorAll('[px="headerNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerNameSize + "px";
+      el.style.lineHeight = data.headerNameSize + "px";
     });
     document.querySelectorAll('[px="headerEmployeeSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeSize + "px";
+      el.style.lineHeight = data.headerEmployeeSize + "px";
     });
     document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
       el.style.color = elementColor.primaryColor;
