@@ -7,10 +7,13 @@ const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
   const p = getParams();
+  const keepEdit = p.get("edit") === "true";
   if (value === null || value === undefined) p.delete(key);
   else p.set(key, value);
+  if (keepEdit && key !== "edit") p.set("edit", "true");
   history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
+
 
 const toggleActive = (id, isActive) => $("#" + id)?.classList.toggle("active", !!isActive);
 
