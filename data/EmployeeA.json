@@ -21,7 +21,6 @@
   "bodyFontSize": 11,
   "headerYearSize": 25,
   "headerNameSize": 25,
-  "headerEmployeeSize": 25,
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
