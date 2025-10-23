@@ -502,6 +502,8 @@ async function renderAll(data) {
     } else {
       return;
     } */
+    console.log(data.headerEmployeeNameSize);
+    console.log(size);
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
       el.style.fontSize = size;
     });
@@ -1276,9 +1278,6 @@ async function renderAll(data) {
   applyHeaderEmployeeNameSize(data.headerEmployeeNameSize);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
-
-  console.log(data);
-  console.log(data.headerEmployeeNameSize);
 
   window.__currentData = data;
   renderPrice(window.__currentData);
