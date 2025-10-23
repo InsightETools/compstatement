@@ -1279,9 +1279,9 @@ async function renderAll(data) {
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
     });
-    document.querySelectorAll('[px="bodyFontSize"]').forEach((el) => {
-      el.style.fontSize = data.bodyFontSize + "px";
-      console.log(data.bodyFontSize);
+    document.querySelectorAll('[px="welcomeFontSize"]').forEach((el) => {
+      el.style.fontSize = data.welcomeFontSize + "px";
+      console.log(data.welcomeFontSize);
     });
     document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
       el.style.fontSize = data.headerYearSize + "px";
