@@ -1239,6 +1239,7 @@ async function renderAll(data) {
     });
     document.querySelectorAll('[px="bodyFontSize"]').forEach((el) => {
       el.style.fontSize = data.bodyFontSize + "px";
+      console.log(data.bodyFontSize);
     });
     document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
       el.style.fontSize = data.headerYearSize + "px";
