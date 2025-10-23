@@ -490,7 +490,7 @@ async function renderAll(data) {
     });
   }
 
-  function apply(data = window.__currentData) {
+  function applyHeaderEmployeeNameSize(data = window.__currentData) {
    /* if (!data) return;
 
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
