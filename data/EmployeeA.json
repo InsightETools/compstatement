@@ -15,6 +15,7 @@
     "companyPage": true
   },
   "primaryFont": "Zilla Slab",
+  "HeaderEmployeeNameSize": 35;
   "secondaryFont": "Source Sans Pro",
   "bodyFont": "Source Sans Pro",
   "companyName": "Demo Company",
