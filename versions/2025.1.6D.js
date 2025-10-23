@@ -506,7 +506,7 @@ async function renderAll(data) {
       return;
     }
 
-  document.querySelectorAll(".HeaderEmployeeName").forEach((el) => {
+  document.querySelectorAll(".headeremployeename").forEach((el) => {
     el.style.fontSize = sizeStr;
   });
 }
