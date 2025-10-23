@@ -133,7 +133,6 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
-  // Auto-hide editor panel in preview or shared view
   const hasKey = params.has("key");
   const isPreview = params.has("preview");
 
@@ -274,7 +273,6 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 }
 
 async function renderAll(data) {
-  // clear per-wrapper donut children (keep template)
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -740,7 +738,6 @@ async function renderAll(data) {
   });
 
   moduleData.forEach((module) => {
-    // 🧩 If the module object or its ID is missing, hide the template
     if (!module || !module.id) return;
     if (
       (!module.label && !module.description && !module.disclaimer) &&
@@ -1301,7 +1298,7 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-  }; // <-- ADDED closing brace
+  }; 
 
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
@@ -1396,7 +1393,7 @@ async function renderAll(data) {
     updateExtras();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-  }; // <-- ADDED closing brace
+  };
 
   const applyStateFromParams = () => {
     const design = getCurrentDesign();
@@ -1466,7 +1463,6 @@ async function renderAll(data) {
     $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
 
-    // Employee buttons
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
     if (!ek || !document.getElementById(ek)) {
