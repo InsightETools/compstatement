@@ -1561,13 +1561,12 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    let scale = 0.7;
+    let scale = 1.0;
     const zoomLevelEl = $("#zoomLevel");
     const updateZoom = () => {
       $$('[item="page"]').forEach((el) => (el.style.zoom = scale));
       if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
     };
-    $("#fullScreen")?.addEventListener("click", () => $("#editorPanel")?.classList.toggle("hidden"));
     $("#zoomOut")?.addEventListener("click", () => { scale = Math.max(0.1, scale - 0.1); updateZoom(); });
     $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
@@ -1604,33 +1603,7 @@ async function renderAll(data) {
       if (!url.searchParams.has("preview")) url.searchParams.set("preview", "true");
       return url.toString();
     };
-    $("#shareEmail")?.addEventListener("click", () => {
-      const subject = `Design #${getParams().get("design") || "1"} Preview`;
-      const body = `Here is a preview of Compensation Statement Design #${getParams().get("design") || "1"}:\n\n${getUrlWithPreviewParam()}`;
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-    $("#copyButton")?.addEventListener("click", () => {
-      const url = getUrlWithPreviewParam();
-      navigator.clipboard.writeText(url).then(() => {
-        const icon = $("#copyIcon");
-        const alert = $("#copyAlert");
-        if (icon && alert) {
-          icon.style.display = "none";
-          alert.style.display = "block";
-          setTimeout(() => {
-            icon.style.display = "flex";
-            alert.style.display = "none";
-          }, 5000);
-        }
-      });
-    });
-    $("#editButton")?.addEventListener("click", () => {
-      const p = getParams();
-      p.delete("preview"); p.delete("key");
-      const newUrl = `${location.origin}${location.pathname}?${p}${location.hash}`;
-      window.location.href = newUrl;
-    });
-
+    
     const safeBindClick = (id, fn) => safeBind($("#" + id), fn);
 
     safeBindClick("design1", () => applyDesignSwitch("1"));
