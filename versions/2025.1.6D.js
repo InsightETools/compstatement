@@ -7,12 +7,13 @@ const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
   const p = getParams();
-  const keepEdit = p.get("edit") === "true";
+  const hadEdit = p.get("edit") === "true" || sessionStorage.getItem("edit") === "true";
   if (value === null || value === undefined) p.delete(key);
   else p.set(key, value);
-  if (keepEdit && key !== "edit") p.set("edit", "true");
+  if (hadEdit && key !== "edit") p.set("edit", "true");
   history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
+
 
 
 const toggleActive = (id, isActive) => $("#" + id)?.classList.toggle("active", !!isActive);
@@ -1220,12 +1221,14 @@ async function renderAll(data) {
   if (coverEl) coverEl.style.display = showCover ? "" : "none";
 
   const isEdit = params.get("edit") === "true";
+  if (isEdit) sessionStorage.setItem("edit", "true");
+  else sessionStorage.removeItem("edit");
   const editorEl = document.getElementById("editorPanel");
   const pagesWrapper = document.getElementById("pagesWrapper");
   if (editorEl) editorEl.style.display = isEdit ? "" : "none";
   if (pagesWrapper) {
     if (isEdit) pagesWrapper.classList.remove("centered");
-    else pagesWrapper.classList.add("centered"); // keep subclass applied
+    else pagesWrapper.classList.add("centered");
   }
 
   setTimeout(() => $("#loader")?.classList.add("finished"), 500);
