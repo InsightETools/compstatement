@@ -1116,75 +1116,78 @@ async function renderAll(data) {
   }
 
   function renderListModules(data, elementColor) {
-    wipeListModules();
+  wipeListModules();
 
-    const items = Array.isArray(data?.listModules) ? data.listModules : [];
-    const validIds = new Set(items.map((i) => String(i.id)));
+  const items = Array.isArray(data?.listModules) ? data.listModules : [];
+  const validIds = new Set(items.map((i) => String(i.id)));
 
-    document.querySelectorAll("#listModule1").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
+  document.querySelectorAll("#listModule1").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule2").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule3").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule4").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+
+  if (!items.length) return;
+
+  const make = (tag, attrs = {}, text = null) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v;
+      else n.setAttribute(k, v);
+    }
+    if (text != null) n.textContent = text;
+    return n;
+  };
+
+  items.forEach((item) => {
+    const target = document.getElementById(String(item.id));
+    if (!target) return;
+
+    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+
+    // ⬇️ add element="text" font="bodyFont"
+    const heading  = make("div", { "data": "label", class: "listmoduleheading", element: "text", font: "bodyFont" }, item.label || "Additional Benefits");
+    const header   = make("div", { module: "header", class: "listmoduleheader" });
+    header.appendChild(heading);
+    const headerColor = item.color || elementColor?.tableColor;
+    if (headerColor) header.style.backgroundColor = headerColor;
+
+    // ⬇️ add element="text" font="bodyFont"
+    const detailsEl = make("div", { "data": "details", class: "listdescription", element: "text", font: "bodyFont" });
+    if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+    const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+    (item.values || ["[Bullet Point]"]).forEach((val) => {
+      // ⬇️ add element="text" font="bodyFont"
+      const li = make("li", { "data": "value", class: "listitemtext", element: "text", font: "bodyFont" });
+      li.innerHTML = val;
+      ul.appendChild(li);
     });
-    document.querySelectorAll("#listModule2").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
-    document.querySelectorAll("#listModule3").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
-    document.querySelectorAll("#listModule4").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
 
-    if (!items.length) return;
+    const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+    listItems.appendChild(ul);
 
-    const make = (tag, attrs = {}, text = null) => {
-      const n = document.createElement(tag);
-      for (const [k, v] of Object.entries(attrs)) {
-        if (k === "class") n.className = v;
-        else n.setAttribute(k, v);
-      }
-      if (text != null) n.textContent = text;
-      return n;
-    };
+    const orientation = item.orientation || "vertical";
+    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+    listWrapper.appendChild(detailsEl);
+    listWrapper.appendChild(listItems);
 
-    items.forEach((item) => {
-      const target = document.getElementById(String(item.id));
-      if (!target) return;
+    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+    card.appendChild(header);
+    card.appendChild(listWrapper);
 
-      target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-
-      const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
-      const header   = make("div", { module: "header", class: "listmoduleheader" });
-      header.appendChild(heading);
-      const headerColor = item.color || elementColor?.tableColor;
-      if (headerColor) header.style.backgroundColor = headerColor;
-
-      const detailsEl = make("div", { "data": "details", class: "listdescription" });
-      if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
-
-      const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
-      (item.values || ["[Bullet Point]"]).forEach((val) => {
-        const li = make("li", { "data": "value", class: "listitemtext" });
-        li.innerHTML = val;
-        ul.appendChild(li);
-      });
-
-      const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
-      listItems.appendChild(ul);
-
-      const orientation = item.orientation || "vertical";
-      const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
-      listWrapper.appendChild(detailsEl);
-      listWrapper.appendChild(listItems);
-
-      const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
-      card.appendChild(header);
-      card.appendChild(listWrapper);
-
-      applyCardHeight(card, item.height);
-      applyCardAlignment(card, header, item.align);
-      target.appendChild(card);
-    });
-  }
+    applyCardHeight(card, item.height);
+    applyCardAlignment(card, header, item.align);
+    target.appendChild(card);
+  });
+}
 
   function loadDisplay() {
     const renderParam = getParams().get("render");
