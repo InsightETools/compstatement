@@ -490,6 +490,28 @@ async function renderAll(data) {
     });
   }
 
+  function applyHeaderEmployeeNameSize(data = window.__currentData) {
+    if (!data) return;
+
+    let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
+    if (raw == null) return;
+
+    let sizeStr = "";
+    if (typeof raw === "number" && !Number.isNaN(raw)) {
+      sizeStr = `${raw}px`;
+    } else if (typeof raw === "string") {
+      const v = raw.trim();
+    sizeStr = /^\d+(\.\d+)?$/.test(v) ? `${v}px` : v;
+    } else {
+      return;
+    }
+
+  document.querySelectorAll(".HeaderEmployeeName").forEach((el) => {
+    el.style.fontSize = sizeStr;
+  });
+}
+
+
   function standardTables() {
     const categoryEntryTemplate = document.querySelector("#categoryEntry");
     const baseTableTemplate = document.querySelector("#tableTemplate");
