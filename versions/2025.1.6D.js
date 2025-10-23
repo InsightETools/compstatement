@@ -1232,7 +1232,8 @@ async function renderAll(data) {
     }
   }
 
-  function applyCustomFonts(data) {    
+  function applyCustomFonts(data) { 
+    console.log(data);
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
       console.log(data.headerEmployeeNameSize);
