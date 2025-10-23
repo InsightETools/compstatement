@@ -133,7 +133,6 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
-  // Auto-hide editor panel in preview or shared view
   const hasKey = params.has("key");
   const isPreview = params.has("preview");
 
@@ -1190,35 +1189,44 @@ async function renderAll(data) {
 }
 
   function loadDisplay() {
-    const renderParam = getParams().get("render");
-    if (renderParam === "true") {
-      const body = document.body;
-      body.classList.remove("design");
-      body.classList.add("render");
+  const renderParam = getParams().get("render");
+  if (renderParam === "true") {
+    const body = document.body;
+    body.classList.remove("design");
+    body.classList.add("render");
 
-      const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
-      pageElements.forEach((el) => body.appendChild(el));
+    const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
+    pageElements.forEach((el) => body.appendChild(el));
 
-      Array.from(body.children).forEach((child) => {
-        if (!pageElements.includes(child)) body.removeChild(child);
-      });
+    Array.from(body.children).forEach((child) => {
+      if (!pageElements.includes(child)) body.removeChild(child);
+    });
 
-      Array.from(body.childNodes).forEach((node) => {
-        if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
-      });
-    }
-
-    const params = getParams();
-    const getCurrentDesign = () => params.get("design") || "1";
-    const coverParam = params.get("cover") ?? "0";
-    const isDesign2 = getCurrentDesign() === "2";
-    const showCover = coverParam !== "false" && !isDesign2;
-
-    const coverEl = document.querySelector("#pageCover");
-    if (coverEl) coverEl.style.display = showCover ? "" : "none";
-
-    setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+    Array.from(body.childNodes).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
+    });
   }
+
+  const params = getParams();
+  const getCurrentDesign = () => params.get("design") || "1";
+  const coverParam = params.get("cover") ?? "0";
+  const isDesign2 = getCurrentDesign() === "2";
+  const showCover = coverParam !== "false" && !isDesign2;
+
+  const coverEl = document.querySelector("#pageCover");
+  if (coverEl) coverEl.style.display = showCover ? "" : "none";
+
+  const isEdit = params.get("edit") === "true";
+  const editorEl = document.getElementById("editorPanel");
+  const pagesWrapper = document.getElementById("pagesWrapper");
+  if (editorEl) editorEl.style.display = isEdit ? "" : "none";
+  if (pagesWrapper) {
+    if (isEdit) pagesWrapper.classList.remove("centered");
+    else pagesWrapper.classList.add("centered"); // keep subclass applied
+  }
+
+  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+}
 
   function applyFontsFromData(data) {
   if (!data) return;
