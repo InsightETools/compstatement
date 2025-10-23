@@ -1277,6 +1277,7 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
+  applyHeaderEmployeeNameSize(data);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
