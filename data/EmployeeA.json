@@ -14,9 +14,9 @@
     "benefitsPage": true,
     "companyPage": true
   },
-  "primaryFont": "Balsamiq Sans",
+  "primaryFont": "BBH Sans Hegarty",
   "headerEmployeeSize": 35,
-  "secondaryFont": "BBH Sans Hegarty",
+  "secondaryFont": "Balsamiq Sans",
   "bodyFont": "Sofia Sans Extra Condensed",
   "bodyFontSize": 55,
   "headerYearSize": 25,
