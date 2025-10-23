@@ -247,15 +247,6 @@ function computeStatementTotal(data, sel) {
   return total;
 }
 
-function renderPrice(data) {
-  if (!data) return;
-  const sel = getSelectionsFromParams();
-  const total = computeStatementTotal(data, sel);
-  document.querySelectorAll('[details="price"]').forEach((el) => {
-    el.textContent = formatCurrency(total, el, true, true);
-  });
-}
-
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
@@ -1260,7 +1251,6 @@ async function renderAll(data) {
   applyButtonStatus();
 
   window.__currentData = data;
-  renderPrice(window.__currentData);
 
   document.querySelectorAll("span").forEach((span) => {
   span.style.color = elementColor.primaryColor;
@@ -1311,8 +1301,6 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     try { donutCharts(); } catch {}
 
-    renderPrice(window.__currentData);
-
     if (reload) debouncedReloadFromParams();
   };
 
@@ -1337,9 +1325,6 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    renderPrice(window.__currentData);
-  };
-
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
 
@@ -1359,8 +1344,6 @@ async function renderAll(data) {
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-
-    renderPrice(window.__currentData);
   };
 
   const applyDesignSwitch = (val, { reload = true } = {}) => {
@@ -1391,8 +1374,6 @@ async function renderAll(data) {
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-
-    renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
   };
@@ -1438,9 +1419,6 @@ async function renderAll(data) {
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
 
-    renderPrice(window.__currentData);
-  };
-
   const applyStateFromParams = () => {
     const design = getCurrentDesign();
     applyDesignSwitch(design, { reload: false });
@@ -1463,11 +1441,8 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
 
     debouncedReloadFromParams();
-
-    renderPrice(window.__currentData);
   };
 
-  // --- Employee switcher (full page reload) ---
   function selectEmployee(ekId) {
     setParam("ek", ekId);
     window.location.reload();
@@ -1588,7 +1563,6 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
-      renderPrice(window.__currentData);
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1609,7 +1583,6 @@ async function renderAll(data) {
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
-      renderPrice(window.__currentData);
     });
   });
 })();
