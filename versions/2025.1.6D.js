@@ -1235,24 +1235,31 @@ async function renderAll(data) {
   function applyCustomFonts(data) {    
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
+      console.log(data.headerEmployeeNameSize);
     });
     document.querySelectorAll('[px="bodyFontSize"]').forEach((el) => {
       el.style.fontSize = data.bodyFontSize + "px";
+      console.log(data.bodyFontSize);
     });
     document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
       el.style.fontSize = data.headerYearSize + "px";
+      console.log(data.headerYearSize);
     });
     document.querySelectorAll('[px="headerNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerNameSize + "px";
+      console.log(data.headerNameSize);
     });
     document.querySelectorAll('[px="headerEmployeeSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeSize + "px";
+      console.log(data.headerEmployeeSize);
     });
     document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
       el.style.color = elementColor.primaryColor;
+      console.log(elementColor.primaryColor);
     });
     document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
       el.style.color = elementColor.secondaryColor;
+      console.log(elementColor.secondaryColor);
     });
   }
 
