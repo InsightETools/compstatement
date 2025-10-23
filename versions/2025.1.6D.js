@@ -490,23 +490,10 @@ async function renderAll(data) {
   }
 
   function applyHeaderEmployeeNameSize(size) {
-   /*if (!data) return;
-    let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
-    if (raw == null) return;
-    let sizeStr = "";
-    if (typeof raw === "number" && !Number.isNaN(raw)) {
-      sizeStr = `${raw}px`;
-    } else if (typeof raw === "string") {
-      const v = raw.trim();
-    sizeStr = /^\d+(\.\d+)?$/.test(v) ? `${v}px` : v;
-    } else {
-      return;
-    } */
     console.log(data.headerEmployeeNameSize);
 
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
-      console.log(size);
-      el.style.fontSize = size;
+      el.style.fontSize = size + "px";
     });
   }
 
