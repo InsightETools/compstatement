@@ -1561,17 +1561,31 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    let scale = 1.0;
+    const params = getParams();
+    const isPreview = params.get("pr") === "true";
+
+    let scale = isPreview ? 1.0 : 0.7;
+
     const zoomLevelEl = $("#zoomLevel");
     const updateZoom = () => {
       $$('[item="page"]').forEach((el) => (el.style.zoom = scale));
       if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
     };
-    $("#zoomOut")?.addEventListener("click", () => { scale = Math.max(0.1, scale - 0.1); updateZoom(); });
-    $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
-    updateZoom();
 
-    // Employee buttons
+    $("#fullScreen")?.addEventListener("click", () =>
+    $("#editorPanel")?.classList.toggle("hidden")
+    );
+    $("#zoomOut")?.addEventListener("click", () => {
+      scale = Math.max(0.1, scale - 0.1);
+      updateZoom();
+    });
+    $("#zoomIn")?.addEventListener("click", () => {
+      scale = Math.min(2, scale + 0.1);
+      updateZoom();
+    });
+
+updateZoom();
+
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
     if (!ek || !document.getElementById(ek)) {
