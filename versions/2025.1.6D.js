@@ -1197,9 +1197,9 @@ async function renderAll(data) {
   if (!data) return;
 
   const map = {
-    primary:   data.primaryFont   || "",
-    secondary: data.secondaryFont || "",
-    body:      data.bodyFont      || ""
+    primaryFont:   data.primaryFont   || "",
+    secondaryFont: data.secondaryFont || "",
+    bodyFont:      data.bodyFont      || ""
   };
 
   const loadOnce = (family) => {
