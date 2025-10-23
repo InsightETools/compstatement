@@ -503,8 +503,9 @@ async function renderAll(data) {
       return;
     } */
     console.log(data.headerEmployeeNameSize);
-    console.log(size);
+
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
+      console.log(size);
       el.style.fontSize = size;
     });
   }
