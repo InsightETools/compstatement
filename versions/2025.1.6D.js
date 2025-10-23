@@ -480,19 +480,6 @@ async function renderAll(data) {
         else if (elementType === "stroke") el.style.borderColor = elementColor.primaryColor;
       });
     });
-
-    document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
-      el.style.color = elementColor.primaryColor;
-    });
-    document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
-      el.style.color = elementColor.secondaryColor;
-    });
-  }
-
-  function applyHeaderEmployeeNameSize(size) {
-    document.querySelectorAll("#headerEmployeeName").forEach((el) => {
-      el.style.fontSize = size + "px";
-    });
   }
 
   function standardTables() {
@@ -777,7 +764,6 @@ async function renderAll(data) {
   });
 
   moduleData.forEach((module) => {
-    // 🧩 If the module object or its ID is missing, hide the template
     if (!module || !module.id) return;
     if (
       (!module.label && !module.description && !module.disclaimer) &&
@@ -1211,9 +1197,9 @@ async function renderAll(data) {
     if (!data) return;
 
     const map = {
-      primary:  data.primaryFont  || "",
-      secondary:data.secondaryFont|| "",
-      body:     data.bodyFont     || ""
+      primaryFont:  data.primaryFont  || "",
+      secondaryFont:data.secondaryFont|| "",
+      bodyFont:     data.bodyFont     || ""
     };
 
     const loadOnce = (family) => {
@@ -1246,6 +1232,30 @@ async function renderAll(data) {
     }
   }
 
+  function applyCustomFonts(data) {    
+    document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
+      el.style.fontSize = data.headerEmployeeNameSize + "px";
+    });
+    document.querySelectorAll('[px="bodyFontSize"]').forEach((el) => {
+      el.style.fontSize = data.bodyFontSize + "px";
+    });
+    document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
+      el.style.fontSize = data.headerYearSize + "px";
+    });
+    document.querySelectorAll('[px="headerNameSize"]').forEach((el) => {
+      el.style.fontSize = data.headerNameSize + "px";
+    });
+    document.querySelectorAll('[px="headerEmployeeSize"]').forEach((el) => {
+      el.style.fontSize = data.headerEmployeeSize + "px";
+    });
+    document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
+      el.style.color = elementColor.primaryColor;
+    });
+    document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
+      el.style.color = elementColor.secondaryColor;
+    });
+  }
+
   staticData();
   standardTables();
   booleanTables();
@@ -1261,7 +1271,7 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
-  applyHeaderEmployeeNameSize(data.headerEmployeeNameSize);
+  applyHeaderEmployeeNameSize(data);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
