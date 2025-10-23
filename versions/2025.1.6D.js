@@ -133,6 +133,7 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
+  // Auto-hide editor panel in preview or shared view
   const hasKey = params.has("key");
   const isPreview = params.has("preview");
 
@@ -223,6 +224,38 @@ function getSelectionsFromParams() {
   };
 }
 
+function computeStatementTotal(data, sel) {
+  const pricing = data?.pricing ?? {};
+  let total = 0;
+
+  const add = (val) => total += (Number(val) || 0);
+
+  add(pricing.base);
+
+  if (pricing.design && sel.design in pricing.design) add(pricing.design[sel.design]);
+  if (pricing.layout && sel.layout in pricing.layout) add(pricing.layout[sel.layout]);
+  if (pricing.header && sel.header in pricing.header) add(pricing.header[sel.header]);
+
+  const coverKey = sel.cover === "false" ? "false" : sel.cover;
+  if (pricing.cover && coverKey in pricing.cover) add(pricing.cover[coverKey]);
+
+  if (pricing.toggles) {
+    if (sel.benefits && "benefits" in pricing.toggles) add(pricing.toggles.benefits);
+    if (sel.company && "company" in pricing.toggles) add(pricing.toggles.company);
+  }
+
+  return total;
+}
+
+function renderPrice(data) {
+  if (!data) return;
+  const sel = getSelectionsFromParams();
+  const total = computeStatementTotal(data, sel);
+  document.querySelectorAll('[details="price"]').forEach((el) => {
+    el.textContent = formatCurrency(total, el, true, true);
+  });
+}
+
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
@@ -273,6 +306,7 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 }
 
 async function renderAll(data) {
+  // clear per-wrapper donut children (keep template)
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -738,6 +772,7 @@ async function renderAll(data) {
   });
 
   moduleData.forEach((module) => {
+    // 🧩 If the module object or its ID is missing, hide the template
     if (!module || !module.id) return;
     if (
       (!module.label && !module.description && !module.disclaimer) &&
@@ -1225,6 +1260,7 @@ async function renderAll(data) {
   applyButtonStatus();
 
   window.__currentData = data;
+  renderPrice(window.__currentData);
 
   document.querySelectorAll("span").forEach((span) => {
   span.style.color = elementColor.primaryColor;
@@ -1275,6 +1311,8 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     try { donutCharts(); } catch {}
 
+    renderPrice(window.__currentData);
+
     if (reload) debouncedReloadFromParams();
   };
 
@@ -1298,7 +1336,9 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
-  }; 
+
+    renderPrice(window.__currentData);
+  };
 
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
@@ -1319,6 +1359,8 @@ async function renderAll(data) {
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
   };
 
   const applyDesignSwitch = (val, { reload = true } = {}) => {
@@ -1349,6 +1391,8 @@ async function renderAll(data) {
 
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
 
     if (reload) debouncedReloadFromParams();
   };
@@ -1393,6 +1437,8 @@ async function renderAll(data) {
     updateExtras();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
   };
 
   const applyStateFromParams = () => {
@@ -1417,8 +1463,11 @@ async function renderAll(data) {
     _applyEffectiveButtonStates();
 
     debouncedReloadFromParams();
+
+    renderPrice(window.__currentData);
   };
 
+  // --- Employee switcher (full page reload) ---
   function selectEmployee(ekId) {
     setParam("ek", ekId);
     window.location.reload();
@@ -1463,6 +1512,7 @@ async function renderAll(data) {
     $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
     updateZoom();
 
+    // Employee buttons
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
     if (!ek || !document.getElementById(ek)) {
@@ -1538,6 +1588,7 @@ async function renderAll(data) {
       updateExtras();
       computeDesignConstraintsAndApply();
       _applyEffectiveButtonStates();
+      renderPrice(window.__currentData);
     });
 
     safeBindClick("benefitsPage", () => toggleExtra("benefits"));
@@ -1558,7 +1609,8 @@ async function renderAll(data) {
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
+      renderPrice(window.__currentData);
     });
   });
 })();
-console.log("Build v2025.1.5D");
+console.log("Build v2025.1.6D");
