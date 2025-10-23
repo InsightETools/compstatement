@@ -1194,43 +1194,43 @@ async function renderAll(data) {
   }
 
   function applyFontsFromData(data) {
-    if (!data) return;
+  if (!data) return;
 
-    const map = {
-      primaryFont:  data.primaryFont  || "",
-      secondaryFont:data.secondaryFont|| "",
-      bodyFont:     data.bodyFont     || ""
-    };
+  const map = {
+    primary:   data.primaryFont   || "",
+    secondary: data.secondaryFont || "",
+    body:      data.bodyFont      || ""
+  };
 
-    const loadOnce = (family) => {
-      if (!family) return;
-      const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
-      if (document.getElementById(id)) return;
+  const loadOnce = (family) => {
+    if (!family) return;
+    const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
+    if (document.getElementById(id)) return;
 
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
-      document.head.appendChild(link);
-    };
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+  };
 
-    Object.values(map).forEach(loadOnce);
+  Object.values(map).forEach(loadOnce);
 
-    const applyFamilies = () => {
-      for (const [key, family] of Object.entries(map)) {
-        if (!family) continue;
-        document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
-          el.style.fontFamily = `"${family}", sans-serif`;
-        });
-      }
-    };
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(applyFamilies).catch(applyFamilies);
-    } else {
-      setTimeout(applyFamilies, 200);
+  const applyFamilies = () => {
+    for (const [key, family] of Object.entries(map)) {
+      if (!family) continue;
+      document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
+        el.style.fontFamily = `"${family}", sans-serif`;
+      });
     }
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(applyFamilies).catch(applyFamilies);
+  } else {
+    setTimeout(applyFamilies, 200);
   }
+}
 
   function applyCustomFonts(data) { 
     console.log(data);
