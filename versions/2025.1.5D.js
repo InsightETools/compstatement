@@ -1037,7 +1037,8 @@ async function renderAll(data) {
     });
   }
 
-  function applyCardAlignment(card, header, align) {
+  ffunction applyCardAlignment(card, header, align) {
+  // Clear previous settings
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
 
@@ -1045,6 +1046,7 @@ async function renderAll(data) {
 
   const v = String(align).toLowerCase().trim();
 
+  // Apply text and header alignment
   if (["left", "center", "right", "justify"].includes(v)) {
     card.style.textAlign = v;
   }
@@ -1053,8 +1055,9 @@ async function renderAll(data) {
   else if (v === "right") header.style.justifyContent = "flex-end";
   else header.style.justifyContent = "flex-start";
 
-  const listItems = card.querySelectorAll("ul, ol");
-  listItems.forEach((list) => {
+  // ✅ Remove bullet points for center or right alignment
+  const lists = card.querySelectorAll("ul, ol");
+  lists.forEach((list) => {
     if (v === "center" || v === "right") {
       list.style.listStyleType = "none";
       list.style.paddingLeft = "0";
@@ -1065,7 +1068,17 @@ async function renderAll(data) {
       list.style.removeProperty("margin-left");
     }
   });
+
+  // ✅ Apply subclass "center" or "right" to module=list
+  const moduleLists = card.querySelectorAll('[module="list"]');
+  moduleLists.forEach((mod) => {
+    mod.classList.remove("center", "right");
+    if (v === "center" || v === "right") {
+      mod.classList.add(v);
+    }
+  });
 }
+
 
 
   function applyCardHeight(el, h) {
