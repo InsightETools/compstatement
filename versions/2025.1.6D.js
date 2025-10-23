@@ -224,29 +224,6 @@ function getSelectionsFromParams() {
   };
 }
 
-function computeStatementTotal(data, sel) {
-  const pricing = data?.pricing ?? {};
-  let total = 0;
-
-  const add = (val) => total += (Number(val) || 0);
-
-  add(pricing.base);
-
-  if (pricing.design && sel.design in pricing.design) add(pricing.design[sel.design]);
-  if (pricing.layout && sel.layout in pricing.layout) add(pricing.layout[sel.layout]);
-  if (pricing.header && sel.header in pricing.header) add(pricing.header[sel.header]);
-
-  const coverKey = sel.cover === "false" ? "false" : sel.cover;
-  if (pricing.cover && coverKey in pricing.cover) add(pricing.cover[coverKey]);
-
-  if (pricing.toggles) {
-    if (sel.benefits && "benefits" in pricing.toggles) add(pricing.toggles.benefits);
-    if (sel.company && "company" in pricing.toggles) add(pricing.toggles.company);
-  }
-
-  return total;
-}
-
 function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
   const chartContainer = document.getElementById(chartId);
   const legendContainer = document.querySelector(containerSelector);
