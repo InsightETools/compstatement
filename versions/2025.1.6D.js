@@ -491,11 +491,9 @@ async function renderAll(data) {
   }
 
   function applyHeaderEmployeeNameSize(data = window.__currentData) {
-   /* if (!data) return;
-
+   if (!data) return;
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
     if (raw == null) return;
-
     let sizeStr = "";
     if (typeof raw === "number" && !Number.isNaN(raw)) {
       sizeStr = `${raw}px`;
@@ -504,7 +502,7 @@ async function renderAll(data) {
     sizeStr = /^\d+(\.\d+)?$/.test(v) ? `${v}px` : v;
     } else {
       return;
-    } */
+    } 
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize;
     });
