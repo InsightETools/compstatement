@@ -1664,4 +1664,4 @@ updateZoom();
     });
   });
 })();
-console.log("Build v2025.1.6D");
+console.log("Build v2025.1.6");
