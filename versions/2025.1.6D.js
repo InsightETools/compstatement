@@ -7,10 +7,10 @@ const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
   const p = getParams();
-  const hadEdit = p.get("edit") === "true" || sessionStorage.getItem("edit") === "true";
+  const hadPreview = p.get("pr") === "true" || sessionStorage.getItem("pr") === "true";
   if (value === null || value === undefined) p.delete(key);
   else p.set(key, value);
-  if (hadEdit && key !== "edit") p.set("edit", "true");
+  if (hadPreview && key !== "pr") p.set("pr", "true");
   history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
 
@@ -1234,30 +1234,7 @@ async function renderAll(data) {
 
   setTimeout(() => $("#loader")?.classList.add("finished"), 500);
 }
-
-  const params = getParams();
-  const getCurrentDesign = () => params.get("design") || "1";
-  const coverParam = params.get("cover") ?? "0";
-  const isDesign2 = getCurrentDesign() === "2";
-  const showCover = coverParam !== "false" && !isDesign2;
-
-  const coverEl = document.querySelector("#pageCover");
-  if (coverEl) coverEl.style.display = showCover ? "" : "none";
-
-  const isEdit = params.get("edit") === "true";
-  if (isEdit) sessionStorage.setItem("edit", "true");
-  else sessionStorage.removeItem("edit");
-  const editorEl = document.getElementById("editorPanel");
-  const pagesWrapper = document.getElementById("pagesWrapper");
-  if (editorEl) editorEl.style.display = isEdit ? "" : "none";
-  if (pagesWrapper) {
-    if (isEdit) pagesWrapper.classList.remove("centered");
-    else pagesWrapper.classList.add("centered");
-  }
-
-  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
-}
-
+  
   function applyFontsFromData(data) {
   if (!data) return;
 
