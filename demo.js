@@ -7,8 +7,10 @@ const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
   const p = getParams();
+  const hadPreview = p.get("pr") === "true";
   if (value === null || value === undefined) p.delete(key);
   else p.set(key, value);
+  if (hadPreview && key !== "pr") p.set("pr", "true");
   history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
 
@@ -133,7 +135,6 @@ function computeDesignConstraintsAndApply() {
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
-  // Auto-hide editor panel in preview or shared view
   const hasKey = params.has("key");
   const isPreview = params.has("preview");
 
@@ -306,7 +307,6 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 }
 
 async function renderAll(data) {
-  // clear per-wrapper donut children (keep template)
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -481,13 +481,6 @@ async function renderAll(data) {
         else if (elementType === "stroke") el.style.borderColor = elementColor.primaryColor;
       });
     });
-
-    document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
-      el.style.color = elementColor.primaryColor;
-    });
-    document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
-      el.style.color = elementColor.secondaryColor;
-    });
   }
 
   function standardTables() {
@@ -548,20 +541,28 @@ async function renderAll(data) {
           category.items.forEach((lineitem, index) => {
             const lineClone = document.createElement("div");
             lineClone.classList.add("standardtablelineitem");
+            lineClone.setAttribute("element", "text");
+            lineClone.setAttribute("font", "bodyFont");
             if (index % 2 === 1) lineClone.classList.add("alternate");
 
             const labelDiv = document.createElement("div");
             labelDiv.setAttribute("line", "item");
+            labelDiv.setAttribute("element", "text");
+            labelDiv.setAttribute("font", "bodyFont");
             labelDiv.className = "standardtablelinelabel";
             labelDiv.textContent = lineitem.label;
 
             const valueWrapper = document.createElement("div");
             valueWrapper.className = "standardtablelabels";
+            valueWrapper.setAttribute("element", "text");
+            valueWrapper.setAttribute("font", "bodyFont");
 
             if (showCol1) {
               const col1Div = document.createElement("div");
               col1Div.setAttribute("line", "col1");
               col1Div.setAttribute("number", "dynamic");
+              col1Div.setAttribute("element", "text");
+              col1Div.setAttribute("font", "bodyFont");
               col1Div.className = "standardtablevalue";
               col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
               valueWrapper.appendChild(col1Div);
@@ -570,6 +571,8 @@ async function renderAll(data) {
               const col2Div = document.createElement("div");
               col2Div.setAttribute("line", "col2");
               col2Div.setAttribute("number", "dynamic");
+              col2Div.setAttribute("element", "text");
+              col2Div.setAttribute("font", "bodyFont");
               col2Div.className = "standardtablevalue";
               col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
               valueWrapper.appendChild(col2Div);
@@ -578,6 +581,8 @@ async function renderAll(data) {
               const col3Div = document.createElement("div");
               col3Div.setAttribute("line", "col3");
               col3Div.setAttribute("number", "dynamic");
+              col3Div.setAttribute("element", "text");
+              col3Div.setAttribute("font", "bodyFont");
               col3Div.className = "standardtablevalue";
               col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
               valueWrapper.appendChild(col3Div);
@@ -591,18 +596,26 @@ async function renderAll(data) {
           const subtotalClone = document.createElement("div");
           subtotalClone.classList.add("standardtablesubtotalwrapper");
           subtotalClone.setAttribute("category", "subtotal");
+          subtotalClone.setAttribute("element", "text");
+          subtotalClone.setAttribute("font", "bodyFont");
 
           const subLabel = document.createElement("div");
           subLabel.className = "standardtablesubtotallabel";
           subLabel.textContent = table.totalLineName || "Subtotal";
+          subLabel.setAttribute("element", "text");
+          subLabel.setAttribute("font", "bodyFont");
 
           const subWrapper = document.createElement("div");
           subWrapper.className = "standardtablelabels";
+          subWrapper.setAttribute("element", "text");
+          subWrapper.setAttribute("font", "bodyFont");
 
           if (showCol1) {
             const subCol1 = document.createElement("div");
             subCol1.setAttribute("subtotal", "col1");
             subCol1.setAttribute("number", "dynamic");
+            subCol1.setAttribute("element", "text");
+            subCol1.setAttribute("font", "bodyFont");
             subCol1.className = "standardtablesubtotalvalue";
             subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
             subWrapper.appendChild(subCol1);
@@ -611,6 +624,8 @@ async function renderAll(data) {
             const subCol2 = document.createElement("div");
             subCol2.setAttribute("subtotal", "col2");
             subCol2.setAttribute("number", "dynamic");
+            subCol2.setAttribute("element", "text");
+            subCol2.setAttribute("font", "bodyFont");
             subCol2.className = "standardtablesubtotalvalue";
             subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
             subWrapper.appendChild(subCol2);
@@ -619,6 +634,8 @@ async function renderAll(data) {
             const subCol3 = document.createElement("div");
             subCol3.setAttribute("subtotal", "col3");
             subCol3.setAttribute("number", "dynamic");
+            subCol3.setAttribute("element", "text");
+            subCol3.setAttribute("font", "bodyFont");
             subCol3.className = "standardtablesubtotalvalue";
             subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
             subWrapper.appendChild(subCol3);
@@ -772,7 +789,6 @@ async function renderAll(data) {
   });
 
   moduleData.forEach((module) => {
-    // 🧩 If the module object or its ID is missing, hide the template
     if (!module || !module.id) return;
     if (
       (!module.label && !module.description && !module.disclaimer) &&
@@ -1101,144 +1117,191 @@ async function renderAll(data) {
   }
 
   function renderListModules(data, elementColor) {
-    wipeListModules();
+  wipeListModules();
 
-    const items = Array.isArray(data?.listModules) ? data.listModules : [];
-    const validIds = new Set(items.map((i) => String(i.id)));
+  const items = Array.isArray(data?.listModules) ? data.listModules : [];
+  const validIds = new Set(items.map((i) => String(i.id)));
 
-    document.querySelectorAll("#listModule1").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
+  document.querySelectorAll("#listModule1").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule2").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule3").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+  document.querySelectorAll("#listModule4").forEach((el) => {
+    el.style.display = validIds.has(el.id) ? "" : "none";
+  });
+
+  if (!items.length) return;
+
+  const make = (tag, attrs = {}, text = null) => {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(attrs)) {
+      if (k === "class") n.className = v;
+      else n.setAttribute(k, v);
+    }
+    if (text != null) n.textContent = text;
+    return n;
+  };
+
+  items.forEach((item) => {
+    const target = document.getElementById(String(item.id));
+    if (!target) return;
+
+    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+
+    // ⬇️ add element="text" font="bodyFont"
+    const heading  = make("div", { "data": "label", class: "listmoduleheading", element: "text", font: "bodyFont" }, item.label || "Additional Benefits");
+    const header   = make("div", { module: "header", class: "listmoduleheader" });
+    header.appendChild(heading);
+    const headerColor = item.color || elementColor?.tableColor;
+    if (headerColor) header.style.backgroundColor = headerColor;
+
+    // ⬇️ add element="text" font="bodyFont"
+    const detailsEl = make("div", { "data": "details", class: "listdescription", element: "text", font: "bodyFont" });
+    if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+    const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+    (item.values || ["[Bullet Point]"]).forEach((val) => {
+      // ⬇️ add element="text" font="bodyFont"
+      const li = make("li", { "data": "value", class: "listitemtext", element: "text", font: "bodyFont" });
+      li.innerHTML = val;
+      ul.appendChild(li);
     });
-    document.querySelectorAll("#listModule2").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
-    document.querySelectorAll("#listModule3").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
-    document.querySelectorAll("#listModule4").forEach((el) => {
-      el.style.display = validIds.has(el.id) ? "" : "none";
-    });
 
-    if (!items.length) return;
+    const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+    listItems.appendChild(ul);
 
-    const make = (tag, attrs = {}, text = null) => {
-      const n = document.createElement(tag);
-      for (const [k, v] of Object.entries(attrs)) {
-        if (k === "class") n.className = v;
-        else n.setAttribute(k, v);
-      }
-      if (text != null) n.textContent = text;
-      return n;
-    };
+    const orientation = item.orientation || "vertical";
+    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+    listWrapper.appendChild(detailsEl);
+    listWrapper.appendChild(listItems);
 
-    items.forEach((item) => {
-      const target = document.getElementById(String(item.id));
-      if (!target) return;
+    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+    card.appendChild(header);
+    card.appendChild(listWrapper);
 
-      target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-
-      const heading  = make("div", { "data": "label", class: "listmoduleheading" }, item.label || "Additional Benefits");
-      const header   = make("div", { module: "header", class: "listmoduleheader" });
-      header.appendChild(heading);
-      const headerColor = item.color || elementColor?.tableColor;
-      if (headerColor) header.style.backgroundColor = headerColor;
-
-      const detailsEl = make("div", { "data": "details", class: "listdescription" });
-      if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
-
-      const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
-      (item.values || ["[Bullet Point]"]).forEach((val) => {
-        const li = make("li", { "data": "value", class: "listitemtext" });
-        li.innerHTML = val;
-        ul.appendChild(li);
-      });
-
-      const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
-      listItems.appendChild(ul);
-
-      const orientation = item.orientation || "vertical";
-      const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
-      listWrapper.appendChild(detailsEl);
-      listWrapper.appendChild(listItems);
-
-      const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
-      card.appendChild(header);
-      card.appendChild(listWrapper);
-
-      applyCardHeight(card, item.height);
-      applyCardAlignment(card, header, item.align);
-      target.appendChild(card);
-    });
-  }
+    applyCardHeight(card, item.height);
+    applyCardAlignment(card, header, item.align);
+    target.appendChild(card);
+  });
+}
 
   function loadDisplay() {
-    const renderParam = getParams().get("render");
-    if (renderParam === "true") {
-      const body = document.body;
-      body.classList.remove("design");
-      body.classList.add("render");
+  const renderParam = getParams().get("render");
+  if (renderParam === "true") {
+    const body = document.body;
+    body.classList.remove("design");
+    body.classList.add("render");
 
-      const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
-      pageElements.forEach((el) => body.appendChild(el));
+    const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
+    pageElements.forEach((el) => body.appendChild(el));
 
-      Array.from(body.children).forEach((child) => {
-        if (!pageElements.includes(child)) body.removeChild(child);
-      });
+    Array.from(body.children).forEach((child) => {
+      if (!pageElements.includes(child)) body.removeChild(child);
+    });
 
-      Array.from(body.childNodes).forEach((node) => {
-        if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
-      });
-    }
-
-    const params = getParams();
-    const getCurrentDesign = () => params.get("design") || "1";
-    const coverParam = params.get("cover") ?? "0";
-    const isDesign2 = getCurrentDesign() === "2";
-    const showCover = coverParam !== "false" && !isDesign2;
-
-    const coverEl = document.querySelector("#pageCover");
-    if (coverEl) coverEl.style.display = showCover ? "" : "none";
-
-    setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+    Array.from(body.childNodes).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
+    });
   }
 
+  const params = getParams();
+  const getCurrentDesign = () => params.get("design") || "1";
+  const coverParam = params.get("cover") ?? "0";
+  const isDesign2 = getCurrentDesign() === "2";
+  const showCover = coverParam !== "false" && !isDesign2;
+
+  const coverEl = document.querySelector("#pageCover");
+  if (coverEl) coverEl.style.display = showCover ? "" : "none";
+
+  const isPreview = params.get("pr") === "true";
+  const editorEl = document.getElementById("editorPanel");
+  const pagesWrapper = document.getElementById("pagesWrapper");
+
+  if (isPreview) sessionStorage.setItem("pr", "true");
+  else sessionStorage.removeItem("pr");
+
+  const showEditor = !isPreview;
+  if (editorEl) editorEl.style.display = showEditor ? "" : "none";
+  if (pagesWrapper) {
+    if (showEditor) pagesWrapper.classList.remove("centered");
+    else pagesWrapper.classList.add("centered");
+  }
+
+  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+}
+  
   function applyFontsFromData(data) {
-    if (!data) return;
+  if (!data) return;
 
-    const map = {
-      primary:  data.primaryFont  || "",
-      secondary:data.secondaryFont|| "",
-      body:     data.bodyFont     || ""
-    };
+  const map = {
+    primaryFont:   data.primaryFont   || "",
+    secondaryFont: data.secondaryFont || "",
+    bodyFont:      data.bodyFont      || ""
+  };
 
-    const loadOnce = (family) => {
-      if (!family) return;
-      const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
-      if (document.getElementById(id)) return;
+  const loadOnce = (family) => {
+    if (!family) return;
+    const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
+    if (document.getElementById(id)) return;
 
-      const link = document.createElement("link");
-      link.id = id;
-      link.rel = "stylesheet";
-      link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
-      document.head.appendChild(link);
-    };
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+  };
 
-    Object.values(map).forEach(loadOnce);
+  Object.values(map).forEach(loadOnce);
 
-    const applyFamilies = () => {
-      for (const [key, family] of Object.entries(map)) {
-        if (!family) continue;
-        document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
-          el.style.fontFamily = `"${family}", sans-serif`;
-        });
-      }
-    };
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(applyFamilies).catch(applyFamilies);
-    } else {
-      setTimeout(applyFamilies, 200);
+  const applyFamilies = () => {
+    for (const [key, family] of Object.entries(map)) {
+      if (!family) continue;
+      document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
+        el.style.fontFamily = `"${family}", sans-serif`;
+      });
     }
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(applyFamilies).catch(applyFamilies);
+  } else {
+    setTimeout(applyFamilies, 200);
+  }
+}
+
+  function applyCustomFonts(data) { 
+    console.log(data);
+    document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
+      el.style.fontSize = data.headerEmployeeNameSize + "px";
+      el.style.lineHeight = data.headerEmployeeNameSize + "px";
+    });
+    document.querySelectorAll('[px="welcomeFontSize"]').forEach((el) => {
+      el.style.fontSize = data.welcomeFontSize + "px";
+      el.style.lineHeight = data.welcomeFontSize + "px";
+    });
+    document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
+      el.style.fontSize = data.headerYearSize + "px";
+      el.style.lineHeight = data.headerYearSize + "px";
+    });
+    document.querySelectorAll('[px="headerNameSize"]').forEach((el) => {
+      el.style.fontSize = data.headerNameSize + "px";
+      el.style.lineHeight = data.headerNameSize + "px";
+    });
+    document.querySelectorAll('[px="headerEmployeeSize"]').forEach((el) => {
+      el.style.fontSize = data.headerEmployeeSize + "px";
+      el.style.lineHeight = data.headerEmployeeSize + "px";
+    });
+    document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
+      el.style.color = elementColor.primaryColor;
+    });
+    document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
+      el.style.color = elementColor.secondaryColor;
+    });
   }
 
   staticData();
@@ -1256,6 +1319,7 @@ async function renderAll(data) {
   applyCoverContent();
   loadDisplay();
   applyFontsFromData(data);
+  applyCustomFonts(data);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
 
@@ -1501,18 +1565,31 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    let scale = 0.7;
+    const params = getParams();
+    const isPreview = params.get("pr") === "true";
+
+    let scale = isPreview ? 1.0 : 0.7;
+
     const zoomLevelEl = $("#zoomLevel");
     const updateZoom = () => {
       $$('[item="page"]').forEach((el) => (el.style.zoom = scale));
       if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
     };
-    $("#fullScreen")?.addEventListener("click", () => $("#editorPanel")?.classList.toggle("hidden"));
-    $("#zoomOut")?.addEventListener("click", () => { scale = Math.max(0.1, scale - 0.1); updateZoom(); });
-    $("#zoomIn")?.addEventListener("click", () => { scale = Math.min(2, scale + 0.1); updateZoom(); });
-    updateZoom();
 
-    // Employee buttons
+    $("#fullScreen")?.addEventListener("click", () =>
+    $("#editorPanel")?.classList.toggle("hidden")
+    );
+    $("#zoomOut")?.addEventListener("click", () => {
+      scale = Math.max(0.1, scale - 0.1);
+      updateZoom();
+    });
+    $("#zoomIn")?.addEventListener("click", () => {
+      scale = Math.min(2, scale + 0.1);
+      updateZoom();
+    });
+
+updateZoom();
+
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
     if (!ek || !document.getElementById(ek)) {
@@ -1544,33 +1621,7 @@ async function renderAll(data) {
       if (!url.searchParams.has("preview")) url.searchParams.set("preview", "true");
       return url.toString();
     };
-    $("#shareEmail")?.addEventListener("click", () => {
-      const subject = `Design #${getParams().get("design") || "1"} Preview`;
-      const body = `Here is a preview of Compensation Statement Design #${getParams().get("design") || "1"}:\n\n${getUrlWithPreviewParam()}`;
-      window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-    $("#copyButton")?.addEventListener("click", () => {
-      const url = getUrlWithPreviewParam();
-      navigator.clipboard.writeText(url).then(() => {
-        const icon = $("#copyIcon");
-        const alert = $("#copyAlert");
-        if (icon && alert) {
-          icon.style.display = "none";
-          alert.style.display = "block";
-          setTimeout(() => {
-            icon.style.display = "flex";
-            alert.style.display = "none";
-          }, 5000);
-        }
-      });
-    });
-    $("#editButton")?.addEventListener("click", () => {
-      const p = getParams();
-      p.delete("preview"); p.delete("key");
-      const newUrl = `${location.origin}${location.pathname}?${p}${location.hash}`;
-      window.location.href = newUrl;
-    });
-
+    
     const safeBindClick = (id, fn) => safeBind($("#" + id), fn);
 
     safeBindClick("design1", () => applyDesignSwitch("1"));
@@ -1613,4 +1664,4 @@ async function renderAll(data) {
     });
   });
 })();
-console.log("Build v2025.1.5");
+console.log("Build v2025.1.6");
