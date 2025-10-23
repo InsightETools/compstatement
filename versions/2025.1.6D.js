@@ -490,8 +490,6 @@ async function renderAll(data) {
   }
 
   function applyHeaderEmployeeNameSize(size) {
-    console.log(data.headerEmployeeNameSize);
-
     document.querySelectorAll("#headerEmployeeName").forEach((el) => {
       el.style.fontSize = size + "px";
     });
