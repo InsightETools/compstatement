@@ -549,11 +549,13 @@ async function renderAll(data) {
 
             const valueWrapper = document.createElement("div");
             valueWrapper.className = "standardtablelabels";
+            valueWrapper.setAttribute("element", "text");
 
             if (showCol1) {
               const col1Div = document.createElement("div");
               col1Div.setAttribute("line", "col1");
               col1Div.setAttribute("number", "dynamic");
+              col1Div.setAttribute("element", "text");
               col1Div.className = "standardtablevalue";
               col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
               valueWrapper.appendChild(col1Div);
@@ -562,6 +564,7 @@ async function renderAll(data) {
               const col2Div = document.createElement("div");
               col2Div.setAttribute("line", "col2");
               col2Div.setAttribute("number", "dynamic");
+              col2Div.setAttribute("element", "text");
               col2Div.className = "standardtablevalue";
               col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
               valueWrapper.appendChild(col2Div);
@@ -570,6 +573,7 @@ async function renderAll(data) {
               const col3Div = document.createElement("div");
               col3Div.setAttribute("line", "col3");
               col3Div.setAttribute("number", "dynamic");
+              col3Div.setAttribute("element", "text");
               col3Div.className = "standardtablevalue";
               col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
               valueWrapper.appendChild(col3Div);
@@ -590,6 +594,7 @@ async function renderAll(data) {
 
           const subWrapper = document.createElement("div");
           subWrapper.className = "standardtablelabels";
+          subWrapper.setAttribute("element", "text");
 
           if (showCol1) {
             const subCol1 = document.createElement("div");
