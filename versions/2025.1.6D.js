@@ -306,7 +306,6 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 }
 
 async function renderAll(data) {
-  // clear per-wrapper donut children (keep template)
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
       wrapper.querySelector("#moduleDonutTemplate") ||
@@ -490,7 +489,7 @@ async function renderAll(data) {
     });
   }
 
-  function applyHeaderEmployeeNameSize(data = window.__currentData) {
+  function applyHeaderEmployeeNameSize(data) {
    if (!data) return;
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
     if (raw == null) return;
