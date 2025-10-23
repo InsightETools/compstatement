@@ -14,8 +14,6 @@ const setParam = (key, value) => {
   history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
 };
 
-
-
 const toggleActive = (id, isActive) => $("#" + id)?.classList.toggle("active", !!isActive);
 
 const debounced = (fn, ms = 60) => {
@@ -1210,6 +1208,32 @@ async function renderAll(data) {
       if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
     });
   }
+
+  const params = getParams();
+  const getCurrentDesign = () => params.get("design") || "1";
+  const coverParam = params.get("cover") ?? "0";
+  const isDesign2 = getCurrentDesign() === "2";
+  const showCover = coverParam !== "false" && !isDesign2;
+
+  const coverEl = document.querySelector("#pageCover");
+  if (coverEl) coverEl.style.display = showCover ? "" : "none";
+
+  const isPreview = params.get("pr") === "true";
+  const editorEl = document.getElementById("editorPanel");
+  const pagesWrapper = document.getElementById("pagesWrapper");
+
+  if (isPreview) sessionStorage.setItem("pr", "true");
+  else sessionStorage.removeItem("pr");
+
+  const showEditor = !isPreview;
+  if (editorEl) editorEl.style.display = showEditor ? "" : "none";
+  if (pagesWrapper) {
+    if (showEditor) pagesWrapper.classList.remove("centered");
+    else pagesWrapper.classList.add("centered");
+  }
+
+  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+}
 
   const params = getParams();
   const getCurrentDesign = () => params.get("design") || "1";
