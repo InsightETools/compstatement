@@ -540,10 +540,12 @@ async function renderAll(data) {
           category.items.forEach((lineitem, index) => {
             const lineClone = document.createElement("div");
             lineClone.classList.add("standardtablelineitem");
+            lineClone.setAttribute("element", "text");
             if (index % 2 === 1) lineClone.classList.add("alternate");
 
             const labelDiv = document.createElement("div");
             labelDiv.setAttribute("line", "item");
+            labelDiv.setAttribute("element", "text");
             labelDiv.className = "standardtablelinelabel";
             labelDiv.textContent = lineitem.label;
 
@@ -587,10 +589,12 @@ async function renderAll(data) {
           const subtotalClone = document.createElement("div");
           subtotalClone.classList.add("standardtablesubtotalwrapper");
           subtotalClone.setAttribute("category", "subtotal");
+          subtotalClone.setAttribute("element", "text");
 
           const subLabel = document.createElement("div");
           subLabel.className = "standardtablesubtotallabel";
           subLabel.textContent = table.totalLineName || "Subtotal";
+          subLabel.setAttribute("element", "text");
 
           const subWrapper = document.createElement("div");
           subWrapper.className = "standardtablelabels";
@@ -600,6 +604,7 @@ async function renderAll(data) {
             const subCol1 = document.createElement("div");
             subCol1.setAttribute("subtotal", "col1");
             subCol1.setAttribute("number", "dynamic");
+            subCol1.setAttribute("element", "text");
             subCol1.className = "standardtablesubtotalvalue";
             subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
             subWrapper.appendChild(subCol1);
@@ -608,6 +613,7 @@ async function renderAll(data) {
             const subCol2 = document.createElement("div");
             subCol2.setAttribute("subtotal", "col2");
             subCol2.setAttribute("number", "dynamic");
+            subCol2.setAttribute("element", "text");
             subCol2.className = "standardtablesubtotalvalue";
             subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
             subWrapper.appendChild(subCol2);
@@ -616,6 +622,7 @@ async function renderAll(data) {
             const subCol3 = document.createElement("div");
             subCol3.setAttribute("subtotal", "col3");
             subCol3.setAttribute("number", "dynamic");
+            subCol3.setAttribute("element", "text");
             subCol3.className = "standardtablesubtotalvalue";
             subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
             subWrapper.appendChild(subCol3);
