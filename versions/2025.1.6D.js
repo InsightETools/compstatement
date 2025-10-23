@@ -7,7 +7,7 @@ const getParams = () => new URLSearchParams(window.location.search);
 
 const setParam = (key, value) => {
   const p = getParams();
-  const hadPreview = p.get("pr") === "true" || sessionStorage.getItem("pr") === "true";
+  const hadPreview = p.get("pr") === "true";
   if (value === null || value === undefined) p.delete(key);
   else p.set(key, value);
   if (hadPreview && key !== "pr") p.set("pr", "true");
