@@ -491,7 +491,7 @@ async function renderAll(data) {
   }
 
   function applyHeaderEmployeeNameSize(data = window.__currentData) {
-    if (!data) return;
+   /* if (!data) return;
 
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
     if (raw == null) return;
@@ -504,12 +504,11 @@ async function renderAll(data) {
     sizeStr = /^\d+(\.\d+)?$/.test(v) ? `${v}px` : v;
     } else {
       return;
-    }
-
-  document.querySelectorAll(".headeremployeename").forEach((el) => {
-    el.style.fontSize = sizeStr;
-  });
-}
+    } */
+    document.querySelectorAll(".headeremployeename").forEach((el) => {
+      el.style.fontSize = data.headerEmployeeNameSize;
+    });
+  }
 
 
   function standardTables() {
