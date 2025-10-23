@@ -490,7 +490,7 @@ async function renderAll(data) {
     });
   }
 
-  function applyHeaderEmployeeNameSize(data = window.__currentData) {
+  function apply(data = window.__currentData) {
    /* if (!data) return;
 
     let raw = data.HeaderEmployeeNameSize ?? data.headerEmployeeNameSize;
@@ -506,8 +506,7 @@ async function renderAll(data) {
       return;
     } */
     document.querySelectorAll(".headeremployeename").forEach((el) => {
-      console.log("Font Size");
-      //el.style.fontSize = data.headerEmployeeNameSize;
+      el.style.fontSize = data.headerEmployeeNameSize;
     });
   }
 
