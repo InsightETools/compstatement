@@ -1324,6 +1324,7 @@ async function renderAll(data) {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+  }; // <-- ADDED closing brace
 
   const applyCover = (val) => {
     if (getCurrentDesign() === "2") return;
@@ -1418,6 +1419,7 @@ async function renderAll(data) {
     updateExtras();
     computeDesignConstraintsAndApply();
     _applyEffectiveButtonStates();
+  }; // <-- ADDED closing brace
 
   const applyStateFromParams = () => {
     const design = getCurrentDesign();
