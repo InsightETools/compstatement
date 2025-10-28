@@ -688,7 +688,7 @@ async function renderAll(data) {
       return clone || document.createTextNode(value ? "\u2713" : "\u2717");
     };
 
-    (data.tables || []).forEach((tableData) => {
+    (data.booleanTables || []).forEach((tableData) => {
       const container = document.querySelector(`#${tableData.id}`);
       if (!container) return;
 
