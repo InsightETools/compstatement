@@ -391,7 +391,7 @@ async function renderAll(data) {
     "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
     "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
     "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
-    "statementDisclaimer","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
+    "statementDisclaimer","statementDisclaimerContactPage","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
     "employeeSalary","hireDate","position"
   ];
 
@@ -484,166 +484,175 @@ async function renderAll(data) {
   }
 
   function standardTables() {
-  // Templates
-  const tableTemplate = document.querySelector("#standardTableTemplate");
-  const categoryTemplate = document.querySelector("#standardCategoryEntry");
-  const lineTemplate = categoryTemplate?.querySelector('[category="line"]');
+    const categoryEntryTemplate = document.querySelector("#categoryEntry");
+    const baseTableTemplate = document.querySelector("#tableTemplate");
+    const tableContent = baseTableTemplate?.querySelector(".standardtablewrapper");
+    if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) return;
 
-  if (!tableTemplate || !categoryTemplate || !lineTemplate) return;
+    (data.standardTables || []).forEach((table) => {
+      const containers = document.querySelectorAll(`#standard${table.id}`);
+      if (!containers.length) return;
 
-  // Keep the category template hidden; we'll clone it
-  categoryTemplate.style.display = "none";
+      containers.forEach((container) => {
+        container.innerHTML = "";
 
-  // Column label → attribute key mapping (parallel to booleanTables style)
-  const columnMap = {
-    column1Name: "one",
-    column2Name: "two",
-    column3Name: "three",
-  };
+        const showCol1 = !!table.column1Name;
+        const showCol2 = !!table.column2Name;
+        const showCol3 = !!table.column3Name;
 
-  (data.standardTables || []).forEach((tableData) => {
-    // Build into a container with the same ID as the table's id (same convention as booleanTables)
-    const container = document.querySelector(`#${tableData.id}`);
-    if (!container) return;
+        const tableWrapper = tableContent.cloneNode(true);
 
-    container.innerHTML = "";
+        const tableNameEl = tableWrapper.querySelector('[table="name"]');
+        if (tableNameEl) tableNameEl.textContent = table.name || "";
 
-    // Clone the base table
-    const tableClone = tableTemplate.cloneNode(true);
-    tableClone.removeAttribute("id");
+        const headerCol1 = tableWrapper.querySelector('[table="summaryHeaderCol1"]');
+        const headerCol2 = tableWrapper.querySelector('[table="summaryHeaderCol2"]');
+        const headerCol3 = tableWrapper.querySelector('[table="summaryHeaderCol3"]');
 
-    // Table title/name
-    const nameEl = tableClone.querySelector('[table="name"]');
-    if (nameEl) nameEl.textContent = tableData.name || "";
+        if (!showCol1 && headerCol1) headerCol1.remove();
+        else if (headerCol1) headerCol1.textContent = table.column1Name;
 
-    // Handle column labels and hide missing columns
-    const hiddenColumns = [];
+        if (!showCol2 && headerCol2) headerCol2.remove();
+        else if (headerCol2) headerCol2.textContent = table.column2Name;
 
-    // Header elements are expected to exist with these selectors
-    const headerColEls = {
-      one:   tableClone.querySelector('[table="summaryHeaderCol1"]'),
-      two:   tableClone.querySelector('[table="summaryHeaderCol2"]'),
-      three: tableClone.querySelector('[table="summaryHeaderCol3"]'),
-    };
+        if (!showCol3 && headerCol3) headerCol3.remove();
+        else if (headerCol3) headerCol3.textContent = table.column3Name;
 
-    for (const [labelKey, columnAttr] of Object.entries(columnMap)) {
-      const labelValue = tableData[labelKey];
-      const isMissing = labelValue == null || String(labelValue).trim() === "";
-      if (isMissing) {
-        hiddenColumns.push(columnAttr);
-        // Remove everything tied to this column in the template
-        tableClone.querySelectorAll(`[column="${columnAttr}"]`).forEach((el) => el.remove());
-      } else {
-        // Apply header text
-        const headerEl =
-          columnAttr === "one" ? headerColEls.one :
-          columnAttr === "two" ? headerColEls.two :
-          headerColEls.three;
-        if (headerEl) headerEl.textContent = labelValue;
-      }
-    }
+        const categoryListContainer = tableWrapper.querySelector(".standardtablelist");
 
-    // Where categories should be appended
-    const listContainer =
-      tableClone.querySelector('[table="list"]') ||
-      tableClone.querySelector(".standardtablelist");
-    if (!listContainer) {
-      container.appendChild(tableClone);
-      return;
-    }
+        table.categories.forEach((category) => {
+          const categoryClone = categoryEntryTemplate.cloneNode(true);
+          categoryClone.removeAttribute("id");
 
-    // Build each category block
-    (tableData.categories || []).forEach((catData) => {
-      const catClone = categoryTemplate.cloneNode(true);
-      catClone.removeAttribute("id");
-      catClone.style.display = ""; // show the clone
+          const existingList = categoryClone.querySelector("#categoryList");
+          if (existingList) existingList.remove();
 
-      // Category name and color
-      const catNameEl = catClone.querySelector('[category="name"]');
-      const catIconEl = catClone.querySelector('[category="icon"]');
-      if (catNameEl) catNameEl.textContent = catData.label || "";
-      if (catIconEl && catData.color) catIconEl.style.backgroundColor = catData.color;
+          const existingSubtotal = categoryClone.querySelector('[category="subtotal"]');
+          if (existingSubtotal) existingSubtotal.remove();
 
-      // Where line items go inside the category
-      const catList =
-        catClone.querySelector('[category="list"]') ||
-        catClone.querySelector(".standardtablelinewrapper") ||
-        (() => {
-          const div = document.createElement("div");
-          div.className = "standardtablelinewrapper";
-          catClone.appendChild(div);
-          return div;
-        })();
+          const categoryName = categoryClone.querySelector('[category="name"]');
+          const categoryIcon = categoryClone.querySelector('[category="icon"]');
+          if (categoryIcon) categoryIcon.style.backgroundColor = category.color;
+          if (categoryName) categoryName.textContent = category.label;
 
-      // Build each line in the category
-      (catData.items || []).forEach((item, index) => {
-        const rowClone = lineTemplate.cloneNode(true);
-        rowClone.style.display = "";
-        if (index % 2 === 1) rowClone.classList.add("alternate");
+          const categoryList = document.createElement("div");
+          categoryList.classList.add("standardtablelinewrapper");
 
-        // Line label
-        const labelEl = rowClone.querySelector('[line="item"]');
-        if (labelEl) labelEl.textContent = item.label ?? "";
+          category.items.forEach((lineitem, index) => {
+            const lineClone = document.createElement("div");
+            lineClone.classList.add("standardtablelineitem");
+            lineClone.setAttribute("element", "text");
+            lineClone.setAttribute("font", "bodyFont");
+            if (index % 2 === 1) lineClone.classList.add("alternate");
 
-        // Column values: remove cells for hidden columns; format numbers consistently
-        const applyCol = (key, attr) => {
-          const cell = rowClone.querySelector(`[line="${key}"]`);
-          if (!cell) return;
-          if (hiddenColumns.includes(attr)) {
-            cell.remove();
-            return;
+            const labelDiv = document.createElement("div");
+            labelDiv.setAttribute("line", "item");
+            labelDiv.setAttribute("element", "text");
+            labelDiv.setAttribute("font", "bodyFont");
+            labelDiv.className = "standardtablelinelabel";
+            labelDiv.textContent = lineitem.label;
+
+            const valueWrapper = document.createElement("div");
+            valueWrapper.className = "standardtablelabels";
+            valueWrapper.setAttribute("element", "text");
+            valueWrapper.setAttribute("font", "bodyFont");
+
+            if (showCol1) {
+              const col1Div = document.createElement("div");
+              col1Div.setAttribute("line", "col1");
+              col1Div.setAttribute("number", "dynamic");
+              col1Div.setAttribute("element", "text");
+              col1Div.setAttribute("font", "bodyFont");
+              col1Div.className = "standardtablevalue";
+              col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
+              valueWrapper.appendChild(col1Div);
+            }
+            if (showCol2) {
+              const col2Div = document.createElement("div");
+              col2Div.setAttribute("line", "col2");
+              col2Div.setAttribute("number", "dynamic");
+              col2Div.setAttribute("element", "text");
+              col2Div.setAttribute("font", "bodyFont");
+              col2Div.className = "standardtablevalue";
+              col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
+              valueWrapper.appendChild(col2Div);
+            }
+            if (showCol3) {
+              const col3Div = document.createElement("div");
+              col3Div.setAttribute("line", "col3");
+              col3Div.setAttribute("number", "dynamic");
+              col3Div.setAttribute("element", "text");
+              col3Div.setAttribute("font", "bodyFont");
+              col3Div.className = "standardtablevalue";
+              col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
+              valueWrapper.appendChild(col3Div);
+            }
+
+            lineClone.appendChild(labelDiv);
+            lineClone.appendChild(valueWrapper);
+            categoryList.appendChild(lineClone);
+          });
+
+          const subtotalClone = document.createElement("div");
+          subtotalClone.classList.add("standardtablesubtotalwrapper");
+          subtotalClone.setAttribute("category", "subtotal");
+          subtotalClone.setAttribute("element", "text");
+          subtotalClone.setAttribute("font", "bodyFont");
+
+          const subLabel = document.createElement("div");
+          subLabel.className = "standardtablesubtotallabel";
+          subLabel.textContent = table.totalLineName || "Subtotal";
+          subLabel.setAttribute("element", "text");
+          subLabel.setAttribute("font", "bodyFont");
+
+          const subWrapper = document.createElement("div");
+          subWrapper.className = "standardtablelabels";
+          subWrapper.setAttribute("element", "text");
+          subWrapper.setAttribute("font", "bodyFont");
+
+          if (showCol1) {
+            const subCol1 = document.createElement("div");
+            subCol1.setAttribute("subtotal", "col1");
+            subCol1.setAttribute("number", "dynamic");
+            subCol1.setAttribute("element", "text");
+            subCol1.setAttribute("font", "bodyFont");
+            subCol1.className = "standardtablesubtotalvalue";
+            subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
+            subWrapper.appendChild(subCol1);
           }
-          // Treat values as numbers when "number" is present, same as booleanTables formatting
-          if (cell.hasAttribute("number")) {
-            cell.textContent = formatCurrency(item[`${key}_value`], cell, tableData.isDecimal);
-          } else {
-            cell.textContent = item[`${key}_value`] ?? "";
+          if (showCol2) {
+            const subCol2 = document.createElement("div");
+            subCol2.setAttribute("subtotal", "col2");
+            subCol2.setAttribute("number", "dynamic");
+            subCol2.setAttribute("element", "text");
+            subCol2.setAttribute("font", "bodyFont");
+            subCol2.className = "standardtablesubtotalvalue";
+            subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
+            subWrapper.appendChild(subCol2);
           }
-        };
+          if (showCol3) {
+            const subCol3 = document.createElement("div");
+            subCol3.setAttribute("subtotal", "col3");
+            subCol3.setAttribute("number", "dynamic");
+            subCol3.setAttribute("element", "text");
+            subCol3.setAttribute("font", "bodyFont");
+            subCol3.className = "standardtablesubtotalvalue";
+            subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
+            subWrapper.appendChild(subCol3);
+          }
 
-        // Expecting [line="col1"], [line="col2"], [line="col3"]
-        applyCol("col1", "one");
-        applyCol("col2", "two");
-        applyCol("col3", "three");
+          subtotalClone.appendChild(subLabel);
+          subtotalClone.appendChild(subWrapper);
+          categoryList.appendChild(subtotalClone);
 
-        catList.appendChild(rowClone);
+          categoryClone.appendChild(categoryList);
+          categoryListContainer.appendChild(categoryClone);
+        });
+
+        container.appendChild(tableWrapper);
       });
-
-      // Subtotals row inside the category, if present in template
-      const subColKeys = {
-        one:   catClone.querySelector('[subtotal="col1"]'),
-        two:   catClone.querySelector('[subtotal="col2"]'),
-        three: catClone.querySelector('[subtotal="col3"]'),
-      };
-
-      // Remove subtotal cells for hidden columns, otherwise fill and format
-      Object.entries(subColKeys).forEach(([attr, el]) => {
-        if (!el) return;
-        if (hiddenColumns.includes(attr)) {
-          el.remove();
-          return;
-        }
-        el.setAttribute("number", "dynamic");
-        const key =
-          attr === "one" ? "col1_subtotal" :
-          attr === "two" ? "col2_subtotal" :
-          "col3_subtotal";
-        el.textContent = formatCurrency(catData[key], el, tableData.isDecimal);
-      });
-
-      // Optional subtotal label text if present
-      const subLabelEl = catClone.querySelector('[category="subtotalLabel"]');
-      if (subLabelEl) {
-        subLabelEl.textContent = tableData.totalLineName || "Subtotal";
-      }
-
-      listContainer.appendChild(catClone);
     });
-
-    container.appendChild(tableClone);
-  });
-}
-
+  }
 
   function booleanTables() {
     const tableTemplate = document.querySelector("#booleanTableTemplate");
@@ -1024,25 +1033,34 @@ async function renderAll(data) {
     if (!listContainer || !itemTemplate) return;
 
     listContainer.innerHTML = "";
-
+    
     (contactsData || []).forEach((contact, index) => {
-      const itemClone = itemTemplate.cloneNode(true);
-      if (index % 2 === 1) itemClone.classList.add("alternate");
+  const itemClone = itemTemplate.cloneNode(true);
+  if (index % 2 === 1) itemClone.classList.add("alternate");
 
-      const nameEl = itemClone.querySelector('[contact="name"]');
-      const descEl = itemClone.querySelector('[contact="description"]');
-      const linkEl = itemClone.querySelector('[contact="link"]');
+  const nameEl = itemClone.querySelector('[contact="name"]');
+  const descEl = itemClone.querySelector('[contact="description"]');
+  const link1El = itemClone.querySelector('[contact="link1"]');
+  const link2El = itemClone.querySelector('[contact="link2"]');
 
-      if (nameEl) nameEl.textContent = contact.name || "";
-      if (descEl) descEl.textContent = contact.description || "";
-      if (linkEl) {
-        linkEl.textContent = contact.contact || "";
-        linkEl.href = contact.url || "#";
-      }
+  if (nameEl) nameEl.textContent = contact.name || "";
+  if (descEl) descEl.textContent = contact.description || "";
 
-      listContainer.appendChild(itemClone);
-    });
+  if (link1El) {
+    link1El.textContent = contact.contact || "";
+    link1El.href = contact.url || "#";
+    link1El.target = "_blank";
   }
+
+  if (link2El) {
+    link2El.textContent = contact.contact2 || "";
+    link2El.href = contact.url2 || "#";
+    link2El.target = "_blank";
+  }
+
+  listContainer.appendChild(itemClone);
+});
+}
 
   function applyCardAlignment(card, header, align) {
   card.style.removeProperty("text-align");
@@ -1654,4 +1672,4 @@ updateZoom();
     });
   });
 })();
-console.log("Build v2025.1.6");
+console.log("Build v2025.1.7");
