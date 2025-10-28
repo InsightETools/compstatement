@@ -679,7 +679,7 @@ async function renderAll(data) {
       return clone || document.createTextNode(value ? "\u2713" : "\u2717");
     };
 
-    (data.booleanTables || []).forEach((tableData) => {
+    (data.tables || []).forEach((tableData) => {
       const container = document.querySelector(`#${tableData.id}`);
       if (!container) return;
 
@@ -1296,7 +1296,7 @@ async function renderAll(data) {
   }
 
   staticData();
-  standardTables();
+  //standardTables();
   booleanTables();
   modules();
   donutCharts();
