@@ -174,7 +174,7 @@ window.reloadFromParams = async () => {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
-    console.log("Finished");
+    .log("Finished");
     setTimeout(() => {
       $("#loader")?.classList.add("finished");
     }, 3000);
@@ -1280,7 +1280,6 @@ async function renderAll(data) {
 }
 
   function applyCustomFonts(data) { 
-    console.log(data);
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
       el.style.lineHeight = data.headerEmployeeNameSize + "px";
