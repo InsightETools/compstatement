@@ -1040,7 +1040,7 @@ async function renderAll(data) {
 
       const nameEl = itemClone.querySelector('[contact="name"]');
       const descEl = itemClone.querySelector('[contact="description"]');
-      const linkEl = itemClone.querySelector('[contact="link1"]');
+      const linkEl1 = itemClone.querySelector('[contact="link1"]');
       const link2El = itemClone.querySelector('[contact="link2"]');
 
       if (nameEl) nameEl.textContent = contact.name || "";
