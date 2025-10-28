@@ -1040,14 +1040,19 @@ async function renderAll(data) {
 
       const nameEl = itemClone.querySelector('[contact="name"]');
       const descEl = itemClone.querySelector('[contact="description"]');
-      const linkEl = itemClone.querySelector('[contact="link"]');
+      const linkEl = itemClone.querySelector('[contact="link1"]');
+      const link2El = itemClone.querySelector('[contact="link2"]');
 
       if (nameEl) nameEl.textContent = contact.name || "";
       if (descEl) descEl.textContent = contact.description || "";
       if (linkEl) {
         linkEl.textContent = contact.contact || "";
         linkEl.href = contact.url || "#";
-      }
+      };
+      if (link2El) {
+        linkEl.textContent = contact.contact || "";
+        linkEl.href = contact.url || "#";
+      };
 
       listContainer.appendChild(itemClone);
     });
