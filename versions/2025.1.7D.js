@@ -1035,27 +1035,29 @@ async function renderAll(data) {
     listContainer.innerHTML = "";
 
     (contactsData || []).forEach((contact, index) => {
-      const itemClone = itemTemplate.cloneNode(true);
-      if (index % 2 === 1) itemClone.classList.add("alternate");
+  const itemClone = itemTemplate.cloneNode(true);
+  if (index % 2 === 1) itemClone.classList.add("alternate");
 
-      const nameEl = itemClone.querySelector('[contact="name"]');
-      const descEl = itemClone.querySelector('[contact="description"]');
-      const link1El = itemClone.querySelector('[contact="link1"]');
-      const link2El = itemClone.querySelector('[contact="link2"]');
+  const nameEl = itemClone.querySelector('[contact="name"]');
+  const descEl = itemClone.querySelector('[contact="description"]');
+  const link1El = itemClone.querySelector('[contact="link1"]');
+  const link2El = itemClone.querySelector('[contact="link2"]');
 
-      if (nameEl) nameEl.textContent = contact.name || "";
-      if (descEl) descEl.textContent = contact.description || "";
-      if (link1El) {
-        contact.textContent = contact.contact1 || "";
-        link1El.href = contact.url1 || "#";
-      };
-      if (link2El) {
-        contact.textContent = contact.contact2 || "";
-        link2El.href = contact.url2 || "#";
-      };
+  if (nameEl) nameEl.textContent = contact.name || "";
+  if (descEl) descEl.textContent = contact.description || "";
 
-      listContainer.appendChild(itemClone);
-    });
+  if (link1El) {
+    link1El.textContent = contact.contact1 || "";
+    link1El.href = contact.url1 || "#";
+  }
+
+  if (link2El) {
+    link2El.textContent = contact.contact2 || "";
+    link2El.href = contact.url2 || "#";
+  }
+
+  listContainer.appendChild(itemClone);
+});
   }
 
   function applyCardAlignment(card, header, align) {
