@@ -391,7 +391,7 @@ async function renderAll(data) {
     "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
     "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
     "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
-    "statementDisclaimer","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
+    "statementDisclaimer","statementDisclaimerContactPage","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
     "employeeSalary","hireDate","position"
   ];
 
@@ -1033,25 +1033,34 @@ async function renderAll(data) {
     if (!listContainer || !itemTemplate) return;
 
     listContainer.innerHTML = "";
-
+    
     (contactsData || []).forEach((contact, index) => {
-      const itemClone = itemTemplate.cloneNode(true);
-      if (index % 2 === 1) itemClone.classList.add("alternate");
+  const itemClone = itemTemplate.cloneNode(true);
+  if (index % 2 === 1) itemClone.classList.add("alternate");
 
-      const nameEl = itemClone.querySelector('[contact="name"]');
-      const descEl = itemClone.querySelector('[contact="description"]');
-      const linkEl = itemClone.querySelector('[contact="link"]');
+  const nameEl = itemClone.querySelector('[contact="name"]');
+  const descEl = itemClone.querySelector('[contact="description"]');
+  const link1El = itemClone.querySelector('[contact="link1"]');
+  const link2El = itemClone.querySelector('[contact="link2"]');
 
-      if (nameEl) nameEl.textContent = contact.name || "";
-      if (descEl) descEl.textContent = contact.description || "";
-      if (linkEl) {
-        linkEl.textContent = contact.contact || "";
-        linkEl.href = contact.url || "#";
-      }
+  if (nameEl) nameEl.textContent = contact.name || "";
+  if (descEl) descEl.textContent = contact.description || "";
 
-      listContainer.appendChild(itemClone);
-    });
+  if (link1El) {
+    link1El.textContent = contact.contact || "";
+    link1El.href = contact.url || "#";
+    link1El.target = "_blank";
   }
+
+  if (link2El) {
+    link2El.textContent = contact.contact2 || "";
+    link2El.href = contact.url2 || "#";
+    link2El.target = "_blank";
+  }
+
+  listContainer.appendChild(itemClone);
+});
+}
 
   function applyCardAlignment(card, header, align) {
   card.style.removeProperty("text-align");
@@ -1275,7 +1284,6 @@ async function renderAll(data) {
 }
 
   function applyCustomFonts(data) { 
-    console.log(data);
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
       el.style.fontSize = data.headerEmployeeNameSize + "px";
       el.style.lineHeight = data.headerEmployeeNameSize + "px";
@@ -1664,4 +1672,4 @@ updateZoom();
     });
   });
 })();
-console.log("Build v2025.1.6");
+console.log("Build v2025.1.7");
