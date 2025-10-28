@@ -782,7 +782,8 @@
       "name": "Sue Williams",
       "description": "Human Resources",
       "contact": "888-123-4567",
-      "url": "tel:+18881234567"
+      "url": "tel:+18881234567",
+      "url2": "tel:+188812345672"
     }
   ],
   "benefitContacts": [
@@ -790,31 +791,36 @@
       "name": "Medical",
       "description": "Magenta Cross",
       "contact": "www.magentacross.com",
-      "url": "http://www.magentacross.com/"
+      "url": "http://www.magentacross.com/",
+      "url2": "http://www.magentacros2.com/"
     },
     {
       "name": "Dental",
       "description": "Peak Dental",
       "contact": "www.peakdentalwa.com",
-      "url": "http://www.peakdentalwa.com"
+      "url": "http://www.peakdentalwa.com",
+      "url2": "http://www.peakdentalwa2.com"
     },
     {
       "name": "FSA",
       "description": "Sage Financial",
       "contact": "www.sagefinancialwa.com",
-      "url": "http://www.sagefinancialwa.com"
+      "url": "http://www.sagefinancialwa.com",
+      "url2": "http://www.sagefinancialwa2.com"
     },
     {
       "name": "Retirement",
       "description": "River Financial",
       "contact": "www.riverfinancialwa.com",
-      "url": "http://www.riverfinancialwa.com"
+      "url": "http://www.riverfinancialwa.com",
+      "url2": "http://www.riverfinancialwa2.com"
     },
     {
       "name": "Vision",
       "description": "Vision Pro",
       "contact": "www.visionprowa.com",
-      "url": "http://www.visionprowa.com"
+      "url": "http://www.visionprowa.com",
+      "url2": "http://www.visionprowa2.com"
     }
   ]
 }
