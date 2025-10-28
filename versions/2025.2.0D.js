@@ -32,8 +32,7 @@ function buildFetchUrlFromParams() {
   const cpid   = p.get("cpid");
   const yr     = p.get("yr");
   const ck     = p.get("ck");
-  const isTest = p.get("test") === "true";
-  const ek     = isTest ? "test" : (p.get("ek") || "EmployeeA");
+  const ek     = p.get("ek") || "EmployeeA";
   const layout = p.get("layout");
 
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
@@ -133,11 +132,11 @@ function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
 
   const params = getParams();
-  const design = .get("design") || "1";
+  const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
-  const hasKey = .has("key");
-  const isPreview = .has("preview");
+  const hasKey = params.has("key");
+  const isPreview = params.has("preview");
 
   if (!hasKey && !isPreview) {
     $("#editButton")?.classList.add("hidden");
@@ -1219,16 +1218,16 @@ async function renderAll(data) {
     });
   }
 
-  const  = getParams();
-  const getCurrentDesign = () => .get("design") || "1";
-  const coverParam = .get("cover") ?? "0";
+  const params = getParams();
+  const getCurrentDesign = () => params.get("design") || "1";
+  const coverParam = params.get("cover") ?? "0";
   const isDesign2 = getCurrentDesign() === "2";
   const showCover = coverParam !== "false" && !isDesign2;
 
   const coverEl = document.querySelector("#pageCover");
   if (coverEl) coverEl.style.display = showCover ? "" : "none";
 
-  const isPreview = .get("pr") === "true";
+  const isPreview = params.get("pr") === "true";
   const editorEl = document.getElementById("editorPanel");
   const pagesWrapper = document.getElementById("pagesWrapper");
 
@@ -1314,7 +1313,7 @@ async function renderAll(data) {
   }
 
   staticData();
-  //standardTables();
+  standardTables();
   booleanTables();
   modules();
   donutCharts();
@@ -1555,8 +1554,8 @@ async function renderAll(data) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          const  = getParams();
-          history.replaceState(null, "", `/design/design-${idNum}?${.toString()}${location.hash}`);
+          const params = getParams();
+          history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
           setParam("design", idNum);
           applyStateFromParams();
         });
@@ -1574,8 +1573,8 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    const  = getParams();
-    const isPreview = .get("pr") === "true";
+    const params = getParams();
+    const isPreview = params.get("pr") === "true";
 
     let scale = isPreview ? 1.0 : 0.7;
 
@@ -1600,20 +1599,11 @@ async function renderAll(data) {
 updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
-    const isTest  = params.get("test") === "true";
-
-    let ek = params.get("ek");
-
-    if (isTest) {
-      ek = "test";
-      setParam("ek", "test");
-    } else {
-      if (!ek || !document.getElementById(ek)) {
-        ek = "EmployeeA";
-        setParam("ek", ek);
-      }
+    let ek = getParams().get("ek");
+    if (!ek || !document.getElementById(ek)) {
+      ek = "EmployeeA";
+      setParam("ek", ek);
     }
-
     empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
     empBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
