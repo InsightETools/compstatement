@@ -824,10 +824,10 @@
     {
       "name": "Vision",
       "description": "Vision Pro",
-      "contact": "www.visionprowa.com",
-      "contact2": "",
-      "url": "http://www.visionprowa.com",
-      "url2": ""
+      "contact": "",
+      "contact2": "www.visionprowa.com",
+      "url": "",
+      "url2": "http://www.visionprowa.com"
     
     }
   ]
