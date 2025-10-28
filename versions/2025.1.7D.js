@@ -1046,12 +1046,12 @@ async function renderAll(data) {
       if (nameEl) nameEl.textContent = contact.name || "";
       if (descEl) descEl.textContent = contact.description || "";
       if (link1El) {
-        link1El.textContent = contact.contact || "";
+        contact1.textContent = contact.contact || "";
         link1El.href = contact.url1 || "#";
       };
       if (link2El) {
-        link2El.textContent = contact.contact || "";
-        link2El.href = contact.url2 || "#";
+        contact2.textContent = contact2.contact2 || "";
+        link2El.href = contact2.url2 || "#";
       };
 
       listContainer.appendChild(itemClone);
