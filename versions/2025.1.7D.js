@@ -1027,6 +1027,41 @@ async function renderAll(data) {
     });
   }
 
+  function contactsLists(contactsData, listSelector) {
+    const listContainer = document.querySelector(`${listSelector} [contacts="list"]`);
+    const itemTemplate = listContainer?.querySelector('[contact="wrapper"]');
+    if (!listContainer || !itemTemplate) return;
+
+    listContainer.innerHTML = "";
+    
+    (contactsData || []).forEach((contact, index) => {
+  const itemClone = itemTemplate.cloneNode(true);
+  if (index % 2 === 1) itemClone.classList.add("alternate");
+
+  const nameEl = itemClone.querySelector('[contact="name"]');
+  const descEl = itemClone.querySelector('[contact="description"]');
+  const link1El = itemClone.querySelector('[contact="link1"]');
+  const link2El = itemClone.querySelector('[contact="link2"]');
+
+  if (nameEl) nameEl.textContent = contact.name || "";
+  if (descEl) descEl.textContent = contact.description || "";
+
+  if (link1El) {
+    link1El.textContent = contact.contact1 || "";
+    link1El.href = contact.url1 || "#";
+    link1El.target = "_blank";
+  }
+
+  if (link2El) {
+    link2El.textContent = contact.contact2 || "";
+    link2El.href = contact.url2 || "#";
+    link2El.target = "_blank";
+  }
+
+  listContainer.appendChild(itemClone);
+});
+}
+
   function applyCardAlignment(card, header, align) {
   card.style.removeProperty("text-align");
   header.style.removeProperty("justify-content");
