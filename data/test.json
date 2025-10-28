@@ -263,239 +263,9 @@
       ]
     }
   ],
-  "standardTables": [
+  "tables": [
     {
       "id": "table1",
-      "name": "2024 Employer Contributions",
-      "isDecimal": false,
-      "column1Name": "",
-      "column2Name": "",
-      "column3Name": "Employee",
-      "column1Total": 0,
-      "column2Total": 0,
-      "column3Total": 56000,
-      "totalLineName": "Total",
-      "categories": [
-        {
-          "label": "Cash Compensation",
-          "shortLabel": "Cash",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Salary",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Overtime",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Core Benefits",
-          "shortLabel": "Benefits",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Medical",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Life and AD&D",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Long Term Disability",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Employee Assistance Program",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Elective Benefits",
-          "shortLabel": "Elective",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "401(k) Match",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Additional Benefits",
-          "shortLabel": "Additional",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Holiday Bonus",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Education & Other Cash Rewards",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Retirement Plan Deposit (Deferred)",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        }
-      ]
-    },
-    {
-      "id": "table2",
-      "name": "2024 Employee Contributions",
-      "isDecimal": false,
-      "column1Name": "",
-      "column2Name": "",
-      "column3Name": "Employee",
-      "column1Total": 0,
-      "column2Total": 0,
-      "column3Total": 56000,
-      "totalLineName": "Total",
-      "categories": [
-        {
-          "label": "Cash Compensation",
-          "shortLabel": "Cash",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Salary",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Overtime",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Core Benefits",
-          "shortLabel": "Benefits",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Medical",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Life and AD&D",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Long Term Disability",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Employee Assistance Program",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Elective Benefits",
-          "shortLabel": "Elective",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "401(k) Match",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        },
-        {
-          "label": "Additional Benefits",
-          "shortLabel": "Additional",
-          "color": "#b89237",
-          "items": [
-            {
-              "label": "Holiday Bonus",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Education & Other Cash Rewards",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            },
-            {
-              "label": "Retirement Plan Deposit (Deferred)",
-              "col1_value": null,
-              "col2_value": 0,
-              "col3_value": null
-            }
-          ],
-          "col1_subtotal": null,
-          "col2_subtotal": 0,
-          "col3_subtotal": null
-        }
-      ]
-    }
-  ],
-  "booleanTables": [
-    {
-      "id": "booleantable1",
       "name": "Core Benefits",
       "isDecimal": false,
       "columnBoolName": "Enrolled",
@@ -565,7 +335,7 @@
       ]
     },
     {
-      "id": "booleantable2",
+      "id": "table2",
       "name": "Elective Benefits",
       "isDecimal": false,
       "columnBoolName": "Enrolled",
@@ -608,7 +378,7 @@
       ]
     },
     {
-      "id": "booleantable3",
+      "id": "table3",
       "name": "Additional Benefits",
       "isDecimal": false,
       "columnBoolName": "",
