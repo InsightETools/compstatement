@@ -782,10 +782,10 @@
     {
       "name": "Sue Williams",
       "description": "Human Resources",
-      "contact": "888-123-4567-1",
+      "contact": "test@test.com",
       "contact2": "888-123-4567-2",
       "url": "tel:+18881234567",
-      "url2": "tel:+188812345672"
+      "url2": "mailto:test@test.com"
     }
   ],
   "benefitContacts": [
