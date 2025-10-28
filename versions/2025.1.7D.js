@@ -1045,13 +1045,13 @@ async function renderAll(data) {
 
       if (nameEl) nameEl.textContent = contact.name || "";
       if (descEl) descEl.textContent = contact.description || "";
-      if (linkEl) {
-        linkEl.textContent = contact.contact || "";
-        linkEl.href = contact.url || "#";
+      if (link1El) {
+        link1El.textContent = contact.contact || "";
+        link1El.href = contact.url || "#";
       };
       if (link2El) {
-        linkEl.textContent = contact.contact || "";
-        linkEl.href = contact.url || "#";
+        link2El.textContent = contact.contact || "";
+        link2El.href = contact.url || "#";
       };
 
       listContainer.appendChild(itemClone);
