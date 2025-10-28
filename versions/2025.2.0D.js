@@ -1554,7 +1554,6 @@ async function renderAll(data) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          const params = getParams();
           history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
           setParam("design", idNum);
           applyStateFromParams();
