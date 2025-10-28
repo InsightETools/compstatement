@@ -1049,10 +1049,10 @@ async function renderAll(data) {
         link1El.textContent = contact.contact || "";
         link1El.href = contact.url || "#";
       };
-      if (link2El) {
-        link2El.textContent = contact.contact || "";
-        link2El.href = contact.url || "#";
-      };
+      //if (link2El) {
+        //link2El.textContent = contact.contact || "";
+        //link2El.href = contact.url || "#";
+      //};
 
       listContainer.appendChild(itemClone);
     });
