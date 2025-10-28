@@ -1047,11 +1047,11 @@ async function renderAll(data) {
       if (descEl) descEl.textContent = contact.description || "";
       if (link1El) {
         link1El.textContent = contact.contact || "";
-        link1El.href = contact.url || "#";
+        link1El.href = contact.url1 || "#";
       };
       if (link2El) {
         link2El.textContent = contact.contact || "";
-        link2El.href = contact.url || "#";
+        link2El.href = contact.url2 || "#";
       };
 
       listContainer.appendChild(itemClone);
