@@ -132,12 +132,12 @@ function _applyEffectiveButtonStates() {
 function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
 
-  const params = getParams();
-  const design = params.get("design") || "1";
+  const  = getParams();
+  const design = .get("design") || "1";
   const isDesign2 = design === "2";
 
-  const hasKey = params.has("key");
-  const isPreview = params.has("preview");
+  const hasKey = .has("key");
+  const isPreview = .has("preview");
 
   if (!hasKey && !isPreview) {
     $("#editButton")?.classList.add("hidden");
@@ -1219,16 +1219,16 @@ async function renderAll(data) {
     });
   }
 
-  const params = getParams();
-  const getCurrentDesign = () => params.get("design") || "1";
-  const coverParam = params.get("cover") ?? "0";
+  const  = getParams();
+  const getCurrentDesign = () => .get("design") || "1";
+  const coverParam = .get("cover") ?? "0";
   const isDesign2 = getCurrentDesign() === "2";
   const showCover = coverParam !== "false" && !isDesign2;
 
   const coverEl = document.querySelector("#pageCover");
   if (coverEl) coverEl.style.display = showCover ? "" : "none";
 
-  const isPreview = params.get("pr") === "true";
+  const isPreview = .get("pr") === "true";
   const editorEl = document.getElementById("editorPanel");
   const pagesWrapper = document.getElementById("pagesWrapper");
 
@@ -1555,8 +1555,8 @@ async function renderAll(data) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          const params = getParams();
-          history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
+          const  = getParams();
+          history.replaceState(null, "", `/design/design-${idNum}?${.toString()}${location.hash}`);
           setParam("design", idNum);
           applyStateFromParams();
         });
@@ -1574,8 +1574,8 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    const params = getParams();
-    const isPreview = params.get("pr") === "true";
+    const  = getParams();
+    const isPreview = .get("pr") === "true";
 
     let scale = isPreview ? 1.0 : 0.7;
 
@@ -1600,7 +1600,6 @@ async function renderAll(data) {
 updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
-    const params  = getParams();
     const isTest  = params.get("test") === "true";
 
     let ek = params.get("ek");
