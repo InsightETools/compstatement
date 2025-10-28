@@ -1053,7 +1053,6 @@ async function renderAll(data) {
 
   listContainer.appendChild(itemClone);
 });
-  }
 
   function applyCardAlignment(card, header, align) {
   card.style.removeProperty("text-align");
