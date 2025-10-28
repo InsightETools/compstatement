@@ -825,8 +825,9 @@
       "name": "Vision",
       "description": "Vision Pro",
       "contact1": "www.visionprowa.com",
-      "contact2": "www.visionprowa2.com",
-      "url1": "http://www.visionprowa.com"
+      "contact2": null,
+      "url1": "http://www.visionprowa.com",
+      "url1": null
     
     }
   ]
