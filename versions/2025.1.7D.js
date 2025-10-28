@@ -1027,14 +1027,7 @@ async function renderAll(data) {
     });
   }
 
-  function contactsLists(contactsData, listSelector) {
-    const listContainer = document.querySelector(`${listSelector} [contacts="list"]`);
-    const itemTemplate = listContainer?.querySelector('[contact="wrapper"]');
-    if (!listContainer || !itemTemplate) return;
-
-    listContainer.innerHTML = "";
-
-    (contactsData || []).forEach((contact, index) => {
+  (contactsData || []).forEach((contact, index) => {
   const itemClone = itemTemplate.cloneNode(true);
   if (index % 2 === 1) itemClone.classList.add("alternate");
 
@@ -1049,11 +1042,13 @@ async function renderAll(data) {
   if (link1El) {
     link1El.textContent = contact.contact1 || "";
     link1El.href = contact.url1 || "#";
+    link1El.target = "_blank";
   }
 
   if (link2El) {
     link2El.textContent = contact.contact2 || "";
     link2El.href = contact.url2 || "#";
+    link2El.target = "_blank";
   }
 
   listContainer.appendChild(itemClone);
