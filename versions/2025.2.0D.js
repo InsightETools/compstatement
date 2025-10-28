@@ -32,7 +32,8 @@ function buildFetchUrlFromParams() {
   const cpid   = p.get("cpid");
   const yr     = p.get("yr");
   const ck     = p.get("ck");
-  const ek     = p.get("ek") || "EmployeeA";
+  const isTest = p.get("test") === "true";
+  const ek     = isTest ? "test" : (p.get("ek") || "EmployeeA");
   const layout = p.get("layout");
 
   const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
@@ -1599,11 +1600,21 @@ async function renderAll(data) {
 updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
-    let ek = getParams().get("ek");
-    if (!ek || !document.getElementById(ek)) {
-      ek = "EmployeeA";
-      setParam("ek", ek);
+    const params  = getParams();
+    const isTest  = params.get("test") === "true";
+
+    let ek = params.get("ek");
+
+    if (isTest) {
+      ek = "test";
+      setParam("ek", "test");
+    } else {
+      if (!ek || !document.getElementById(ek)) {
+        ek = "EmployeeA";
+        setParam("ek", ek);
+      }
     }
+
     empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
     empBtns.forEach((btn) => {
       btn.addEventListener("click", () => {
