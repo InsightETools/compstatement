@@ -782,9 +782,9 @@
     {
       "name": "Sue Williams",
       "description": "Human Resources",
-      "contact1": "888-123-4567-1",
+      "contact": "888-123-4567-1",
       "contact2": "888-123-4567-2",
-      "url1": "tel:+18881234567",
+      "url": "tel:+18881234567",
       "url2": "tel:+188812345672"
     }
   ],
@@ -792,42 +792,42 @@
     {
       "name": "Medical",
       "description": "Magenta Cross",
-      "contact1": "www.magentacross.com",
+      "contact": "www.magentacross.com",
       "contact2": "www.magentacross2.com",
-      "url1": "http://www.magentacross.com/",
+      "url": "http://www.magentacross.com/",
       "url2": "http://www.magentacros2.com/"
     },
     {
       "name": "Dental",
       "description": "Peak Dental",
-      "contact1": "www.peakdentalwa.com",
+      "contact": "www.peakdentalwa.com",
       "contact2": "www.peakdentalwa2.com",
-      "url1": "http://www.peakdentalwa.com",
+      "url": "http://www.peakdentalwa.com",
       "url2": "http://www.peakdentalwa2.com"
     },
     {
       "name": "FSA",
       "description": "Sage Financial",
-      "contact1": "www.sagefinancialwa.com",
+      "contact": "www.sagefinancialwa.com",
       "contact2": "www.sagefinancialwa2.com",
-      "url1": "http://www.sagefinancialwa.com",
+      "url": "http://www.sagefinancialwa.com",
       "url2": "http://www.sagefinancialwa2.com"
     },
     {
       "name": "Retirement",
       "description": "River Financial",
-      "contact1": "www.riverfinancialwa.com",
+      "contact": "www.riverfinancialwa.com",
       "contact2": "www.riverfinancialwa2.com",
-      "url1": "http://www.riverfinancialwa.com",
+      "url": "http://www.riverfinancialwa.com",
       "url2": "http://www.riverfinancialwa2.com"
     },
     {
       "name": "Vision",
       "description": "Vision Pro",
-      "contact1": "www.visionprowa.com",
-      "contact2": null,
-      "url1": "http://www.visionprowa.com",
-      "url2": null
+      "contact": "www.visionprowa.com",
+      "contact2": "",
+      "url": "http://www.visionprowa.com",
+      "url2": ""
     
     }
   ]
