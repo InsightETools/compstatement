@@ -1047,8 +1047,8 @@ async function renderAll(data) {
   if (descEl) descEl.textContent = contact.description || "";
 
   if (link1El) {
-    link1El.textContent = contact.contact1 || "";
-    link1El.href = contact.url1 || "#";
+    link1El.textContent = contact.contact || "";
+    link1El.href = contact.url || "#";
     link1El.target = "_blank";
   }
 
