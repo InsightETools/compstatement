@@ -132,7 +132,7 @@ function _applyEffectiveButtonStates() {
 function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
 
-  const  = getParams();
+  const params = getParams();
   const design = .get("design") || "1";
   const isDesign2 = design === "2";
 
