@@ -391,7 +391,7 @@ async function renderAll(data) {
     "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
     "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
     "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
-    "statementDisclaimer1","statementDisclaimer2","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
+    "statementDisclaimer","statementDisclaimerContactPage","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
     "employeeSalary","hireDate","position"
   ];
 
