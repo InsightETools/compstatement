@@ -132,7 +132,7 @@ function _applyEffectiveButtonStates() {
 function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
 
-  const params = getParams(); // ← add this
+  const params = getParams(); // ensure local params
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
@@ -776,114 +776,114 @@ async function renderAll(data) {
   }
 
   function modules() {
-  if (!Array.isArray(data.modules) || data.modules.length === 0) {
-    document.querySelectorAll(".moduletemplate").forEach((el) => (el.style.display = "none"));
-    return;
-  }
-
-  const moduleData = data.modules || [];
-  const validIds = new Set(moduleData.map((mod) => mod.id));
-
-  document.querySelectorAll(".moduletemplate").forEach((el) => {
-    const id = el.id?.trim();
-    if (!validIds.has(id)) el.style.display = "none";
-  });
-
-  moduleData.forEach((module) => {
-    if (!module || !module.id) return;
-    if (
-      (!module.label && !module.description && !module.disclaimer) &&
-      (!Array.isArray(module.components) || module.components.length === 0)
-    ) {
-      const el = document.getElementById(module.id);
-      if (el) el.style.display = "none";
+    if (!Array.isArray(data.modules) || data.modules.length === 0) {
+      document.querySelectorAll(".moduletemplate").forEach((el) => (el.style.display = "none"));
       return;
     }
 
-    const containers = document.querySelectorAll(`#${module.id}`);
-    if (!containers.length) return;
+    const moduleData = data.modules || [];
+    const validIds = new Set(moduleData.map((mod) => mod.id));
 
-    containers.forEach((moduleContainer) => {
-      moduleContainer.style.display = "";
-
-      const labelEl = moduleContainer.querySelector('[module="label"]');
-      if (labelEl) {
-        const value = module.label || "";
-        labelEl.textContent = value;
-        labelEl.style.display = value.trim() ? "" : "none";
-      }
-
-      const descEl = moduleContainer.querySelector('[module="description"]');
-      if (descEl) {
-        const value = module.description || "";
-        descEl.textContent = value;
-        descEl.style.display = value.trim() ? "" : "none";
-      }
-
-      const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
-      if (disclaimerEl) {
-        const value = module.disclaimer || "";
-        disclaimerEl.textContent = value;
-        disclaimerEl.style.display = value.trim() ? "" : "none";
-      }
-
-      const listEl = moduleContainer.querySelector('[module="list"]');
-      const template = listEl?.querySelector('[module="component"]');
-      if (!listEl || !template) return;
-
-      listEl.querySelectorAll('[module="component"]').forEach((el) => {
-        if (el !== template) el.remove();
-      });
-
-      let hasValidComponent = false;
-
-      (module.components || []).forEach((component) => {
-        const value = component?.value;
-        const isEmpty = value === null || value === undefined || value === "";
-        if (isEmpty) return;
-
-        const componentClone = template.cloneNode(true);
-        componentClone.style.display = "";
-        componentClone.removeAttribute("id");
-
-        const labelComponentEl = componentClone.querySelector('[category="label"]');
-        if (labelComponentEl) {
-          labelComponentEl.textContent = component.label || "";
-          labelComponentEl.style.display = component.label?.trim() ? "" : "none";
-        }
-
-        const valueEl = componentClone.querySelector('[category="value"]');
-        if (valueEl) {
-          const isCurrency = component.type === "currency";
-          const needsFormatting = ["currency", "number"].includes(component.type);
-          const formattedValue = needsFormatting
-            ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
-            : value;
-          valueEl.textContent = formattedValue;
-        }
-
-        const unitEl = componentClone.querySelector('[category="unit"]');
-        if (unitEl) {
-          unitEl.textContent = component.description || "";
-          unitEl.style.display = component.description?.trim() ? "" : "none";
-        }
-
-        listEl.appendChild(componentClone);
-        hasValidComponent = true;
-      });
-
-      template.style.display = "none";
-
-      const hasTextContent =
-        (module.label && module.label.trim()) ||
-        (module.description && module.description.trim()) ||
-        (module.disclaimer && module.disclaimer.trim());
-      if (!hasValidComponent && !hasTextContent) {
-        moduleContainer.style.display = "none";
-      }
+    document.querySelectorAll(".moduletemplate").forEach((el) => {
+      const id = el.id?.trim();
+      if (!validIds.has(id)) el.style.display = "none";
     });
-  });
-}
+
+    moduleData.forEach((module) => {
+      if (!module || !module.id) return;
+      if (
+        (!module.label && !module.description && !module.disclaimer) &&
+        (!Array.isArray(module.components) || module.components.length === 0)
+      ) {
+        const el = document.getElementById(module.id);
+        if (el) el.style.display = "none";
+        return;
+      }
+
+      const containers = document.querySelectorAll(`#${module.id}`);
+      if (!containers.length) return;
+
+      containers.forEach((moduleContainer) => {
+        moduleContainer.style.display = "";
+
+        const labelEl = moduleContainer.querySelector('[module="label"]');
+        if (labelEl) {
+          const value = module.label || "";
+          labelEl.textContent = value;
+          labelEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const descEl = moduleContainer.querySelector('[module="description"]');
+        if (descEl) {
+          const value = module.description || "";
+          descEl.textContent = value;
+          descEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
+        if (disclaimerEl) {
+          const value = module.disclaimer || "";
+          disclaimerEl.textContent = value;
+          disclaimerEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const listEl = moduleContainer.querySelector('[module="list"]');
+        const template = listEl?.querySelector('[module="component"]');
+        if (!listEl || !template) return;
+
+        listEl.querySelectorAll('[module="component"]').forEach((el) => {
+          if (el !== template) el.remove();
+        });
+
+        let hasValidComponent = false;
+
+        (module.components || []).forEach((component) => {
+          const value = component?.value;
+          const isEmpty = value === null || value === undefined || value === "";
+          if (isEmpty) return;
+
+          const componentClone = template.cloneNode(true);
+          componentClone.style.display = "";
+          componentClone.removeAttribute("id");
+
+          const labelComponentEl = componentClone.querySelector('[category="label"]');
+          if (labelComponentEl) {
+            labelComponentEl.textContent = component.label || "";
+            labelComponentEl.style.display = component.label?.trim() ? "" : "none";
+          }
+
+          const valueEl = componentClone.querySelector('[category="value"]');
+          if (valueEl) {
+            const isCurrency = component.type === "currency";
+            const needsFormatting = ["currency", "number"].includes(component.type);
+            const formattedValue = needsFormatting
+              ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
+              : value;
+            valueEl.textContent = formattedValue;
+          }
+
+          const unitEl = componentClone.querySelector('[category="unit"]');
+          if (unitEl) {
+            unitEl.textContent = component.description || "";
+            unitEl.style.display = component.description?.trim() ? "" : "none";
+          }
+
+          listEl.appendChild(componentClone);
+          hasValidComponent = true;
+        });
+
+        template.style.display = "none";
+
+        const hasTextContent =
+          (module.label && module.label.trim()) ||
+          (module.description && module.description.trim()) ||
+          (module.disclaimer && module.disclaimer.trim());
+        if (!hasValidComponent && !hasTextContent) {
+          moduleContainer.style.display = "none";
+        }
+      });
+    });
+  }
 
   function donutCharts() {
     const isVisible = (el) => {
@@ -1036,70 +1036,70 @@ async function renderAll(data) {
     listContainer.innerHTML = "";
     
     (contactsData || []).forEach((contact, index) => {
-  const itemClone = itemTemplate.cloneNode(true);
-  if (index % 2 === 1) itemClone.classList.add("alternate");
+      const itemClone = itemTemplate.cloneNode(true);
+      if (index % 2 === 1) itemClone.classList.add("alternate");
 
-  const nameEl = itemClone.querySelector('[contact="name"]');
-  const descEl = itemClone.querySelector('[contact="description"]');
-  const link1El = itemClone.querySelector('[contact="link1"]');
-  const link2El = itemClone.querySelector('[contact="link2"]');
+      const nameEl = itemClone.querySelector('[contact="name"]');
+      const descEl = itemClone.querySelector('[contact="description"]');
+      const link1El = itemClone.querySelector('[contact="link1"]');
+      const link2El = itemClone.querySelector('[contact="link2"]');
 
-  if (nameEl) nameEl.textContent = contact.name || "";
-  if (descEl) descEl.textContent = contact.description || "";
+      if (nameEl) nameEl.textContent = contact.name || "";
+      if (descEl) descEl.textContent = contact.description || "";
 
-  if (link1El) {
-    link1El.textContent = contact.contact || "";
-    link1El.href = contact.url || "#";
-    link1El.target = "_blank";
+      if (link1El) {
+        link1El.textContent = contact.contact || "";
+        link1El.href = contact.url || "#";
+        link1El.target = "_blank";
+      }
+
+      if (link2El) {
+        link2El.textContent = contact.contact2 || "";
+        link2El.href = contact.url2 || "#";
+        link2El.target = "_blank";
+      }
+
+      listContainer.appendChild(itemClone);
+    });
   }
-
-  if (link2El) {
-    link2El.textContent = contact.contact2 || "";
-    link2El.href = contact.url2 || "#";
-    link2El.target = "_blank";
-  }
-
-  listContainer.appendChild(itemClone);
-});
-}
 
   function applyCardAlignment(card, header, align) {
-  card.style.removeProperty("text-align");
-  header.style.removeProperty("justify-content");
+    card.style.removeProperty("text-align");
+    header.style.removeProperty("justify-content");
 
-  if (!align) return;
+    if (!align) return;
 
-  const v = String(align).toLowerCase().trim();
+    const v = String(align).toLowerCase().trim();
 
-  if (["left", "center", "right", "justify"].includes(v)) {
-    card.style.textAlign = v;
+    if (["left", "center", "right", "justify"].includes(v)) {
+      card.style.textAlign = v;
+    }
+
+    if (v === "center") header.style.justifyContent = "center";
+    else if (v === "right") header.style.justifyContent = "flex-end";
+    else header.style.justifyContent = "flex-start";
+
+    const lists = card.querySelectorAll("ul, ol");
+    lists.forEach((list) => {
+      if (v === "center" || v === "right") {
+        list.style.listStyleType = "none";
+        list.style.paddingLeft = "0";
+        list.style.marginLeft = "0";
+      } else {
+        list.style.removeProperty("list-style-type");
+        list.style.removeProperty("padding-left");
+        list.style.removeProperty("margin-left");
+      }
+    });
+
+    const moduleLists = card.querySelectorAll('[module="list"]');
+    moduleLists.forEach((mod) => {
+      mod.classList.remove("center", "right");
+      if (v === "center" || v === "right") {
+        mod.classList.add(v);
+      }
+    });
   }
-
-  if (v === "center") header.style.justifyContent = "center";
-  else if (v === "right") header.style.justifyContent = "flex-end";
-  else header.style.justifyContent = "flex-start";
-
-  const lists = card.querySelectorAll("ul, ol");
-  lists.forEach((list) => {
-    if (v === "center" || v === "right") {
-      list.style.listStyleType = "none";
-      list.style.paddingLeft = "0";
-      list.style.marginLeft = "0";
-    } else {
-      list.style.removeProperty("list-style-type");
-      list.style.removeProperty("padding-left");
-      list.style.removeProperty("margin-left");
-    }
-  });
-
-  const moduleLists = card.querySelectorAll('[module="list"]');
-  moduleLists.forEach((mod) => {
-    mod.classList.remove("center", "right");
-    if (v === "center" || v === "right") {
-      mod.classList.add(v);
-    }
-  });
-}
 
   function applyCardHeight(el, h) {
     el.style.removeProperty("height");
@@ -1127,162 +1127,160 @@ async function renderAll(data) {
   }
 
   function renderListModules(data, elementColor) {
-  wipeListModules();
+    wipeListModules();
 
-  const items = Array.isArray(data?.listModules) ? data.listModules : [];
-  const validIds = new Set(items.map((i) => String(i.id)));
+    const items = Array.isArray(data?.listModules) ? data.listModules : [];
+    const validIds = new Set(items.map((i) => String(i.id)));
 
-  document.querySelectorAll("#listModule1").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule2").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule3").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-  document.querySelectorAll("#listModule4").forEach((el) => {
-    el.style.display = validIds.has(el.id) ? "" : "none";
-  });
-
-  if (!items.length) return;
-
-  const make = (tag, attrs = {}, text = null) => {
-    const n = document.createElement(tag);
-    for (const [k, v] of Object.entries(attrs)) {
-      if (k === "class") n.className = v;
-      else n.setAttribute(k, v);
-    }
-    if (text != null) n.textContent = text;
-    return n;
-  };
-
-  items.forEach((item) => {
-    const target = document.getElementById(String(item.id));
-    if (!target) return;
-
-    target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
-
-    // ⬇️ add element="text" font="bodyFont"
-    const heading  = make("div", { "data": "label", class: "listmoduleheading", element: "text", font: "bodyFont" }, item.label || "Additional Benefits");
-    const header   = make("div", { module: "header", class: "listmoduleheader" });
-    header.appendChild(heading);
-    const headerColor = item.color || elementColor?.tableColor;
-    if (headerColor) header.style.backgroundColor = headerColor;
-
-    // ⬇️ add element="text" font="bodyFont"
-    const detailsEl = make("div", { "data": "details", class: "listdescription", element: "text", font: "bodyFont" });
-    if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
-
-    const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
-    (item.values || ["[Bullet Point]"]).forEach((val) => {
-      // ⬇️ add element="text" font="bodyFont"
-      const li = make("li", { "data": "value", class: "listitemtext", element: "text", font: "bodyFont" });
-      li.innerHTML = val;
-      ul.appendChild(li);
+    document.querySelectorAll("#listModule1").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule2").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule3").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
+    });
+    document.querySelectorAll("#listModule4").forEach((el) => {
+      el.style.display = validIds.has(el.id) ? "" : "none";
     });
 
-    const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
-    listItems.appendChild(ul);
+    if (!items.length) return;
 
-    const orientation = item.orientation || "vertical";
-    const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
-    listWrapper.appendChild(detailsEl);
-    listWrapper.appendChild(listItems);
+    const make = (tag, attrs = {}, text = null) => {
+      const n = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (k === "class") n.className = v;
+        else n.setAttribute(k, v);
+      }
+      if (text != null) n.textContent = text;
+      return n;
+    };
 
-    const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
-    card.appendChild(header);
-    card.appendChild(listWrapper);
+    items.forEach((item) => {
+      const target = document.getElementById(String(item.id));
+      if (!target) return;
 
-    applyCardHeight(card, item.height);
-    applyCardAlignment(card, header, item.align);
-    target.appendChild(card);
-  });
-}
+      target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+
+      const heading  = make("div", { "data": "label", class: "listmoduleheading", element: "text", font: "bodyFont" }, item.label || "Additional Benefits");
+      const header   = make("div", { module: "header", class: "listmoduleheader" });
+      header.appendChild(heading);
+      const headerColor = item.color || elementColor?.tableColor;
+      if (headerColor) header.style.backgroundColor = headerColor;
+
+      const detailsEl = make("div", { "data": "details", class: "listdescription", element: "text", font: "bodyFont" });
+      if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+      const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+      (item.values || ["[Bullet Point]"]).forEach((val) => {
+        const li = make("li", { "data": "value", class: "listitemtext", element: "text", font: "bodyFont" });
+        li.innerHTML = val;
+        ul.appendChild(li);
+      });
+
+      const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+      listItems.appendChild(ul);
+
+      const orientation = item.orientation || "vertical";
+      const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+      listWrapper.appendChild(detailsEl);
+      listWrapper.appendChild(listItems);
+
+      const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+      card.appendChild(header);
+      card.appendChild(listWrapper);
+
+      applyCardHeight(card, item.height);
+      applyCardAlignment(card, header, item.align);
+      target.appendChild(card);
+    });
+  }
 
   function loadDisplay() {
-  const params = getParams(); // ← add this
-  const renderParam = getParams().get("render");
-  if (renderParam === "true") {
-    const body = document.body;
-    body.classList.remove("design");
-    body.classList.add("render");
+    const params = getParams(); // ensure local params
 
-    const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
-    pageElements.forEach((el) => body.appendChild(el));
+    const renderParam = params.get("render");
+    if (renderParam === "true") {
+      const body = document.body;
+      body.classList.remove("design");
+      body.classList.add("render");
 
-    Array.from(body.children).forEach((child) => {
-      if (!pageElements.includes(child)) body.removeChild(child);
-    });
+      const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
+      pageElements.forEach((el) => body.appendChild(el));
 
-    Array.from(body.childNodes).forEach((node) => {
-      if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
-    });
-  }
+      Array.from(body.children).forEach((child) => {
+        if (!pageElements.includes(child)) body.removeChild(child);
+      });
 
-  const getCurrentDesign = () => params.get("design") || "1";
-  const coverParam = params.get("cover") ?? "0";
-  const isDesign2 = getCurrentDesign() === "2";
-  const showCover = coverParam !== "false" && !isDesign2;
-
-  const coverEl = document.querySelector("#pageCover");
-  if (coverEl) coverEl.style.display = showCover ? "" : "none";
-
-  const isPreview = params.get("pr") === "true";
-  const editorEl = document.getElementById("editorPanel");
-  const pagesWrapper = document.getElementById("pagesWrapper");
-
-  if (isPreview) sessionStorage.setItem("pr", "true");
-  else sessionStorage.removeItem("pr");
-
-  const showEditor = !isPreview;
-  if (editorEl) editorEl.style.display = showEditor ? "" : "none";
-  if (pagesWrapper) {
-    if (showEditor) pagesWrapper.classList.remove("centered");
-    else pagesWrapper.classList.add("centered");
-  }
-
-  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
-}
-  
-  function applyFontsFromData(data) {
-  if (!data) return;
-
-  const map = {
-    primaryFont:   data.primaryFont   || "",
-    secondaryFont: data.secondaryFont || "",
-    bodyFont:      data.bodyFont      || ""
-  };
-
-  const loadOnce = (family) => {
-    if (!family) return;
-    const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
-    if (document.getElementById(id)) return;
-
-    const link = document.createElement("link");
-    link.id = id;
-    link.rel = "stylesheet";
-    link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
-    document.head.appendChild(link);
-  };
-
-  Object.values(map).forEach(loadOnce);
-
-  const applyFamilies = () => {
-    for (const [key, family] of Object.entries(map)) {
-      if (!family) continue;
-      document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
-        el.style.fontFamily = `"${family}", sans-serif`;
+      Array.from(body.childNodes).forEach((node) => {
+        if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
       });
     }
-  };
 
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(applyFamilies).catch(applyFamilies);
-  } else {
-    setTimeout(applyFamilies, 200);
+    const getCurrentDesign = () => params.get("design") || "1";
+    const coverParam = params.get("cover") ?? "0";
+    const isDesign2 = getCurrentDesign() === "2";
+    const showCover = coverParam !== "false" && !isDesign2;
+
+    const coverEl = document.querySelector("#pageCover");
+    if (coverEl) coverEl.style.display = showCover ? "" : "none";
+
+    const isPreview = params.get("pr") === "true";
+    const editorEl = document.getElementById("editorPanel");
+    const pagesWrapper = document.getElementById("pagesWrapper");
+
+    if (isPreview) sessionStorage.setItem("pr", "true");
+    else sessionStorage.removeItem("pr");
+
+    const showEditor = !isPreview;
+    if (editorEl) editorEl.style.display = showEditor ? "" : "none";
+    if (pagesWrapper) {
+      if (showEditor) pagesWrapper.classList.remove("centered");
+      else pagesWrapper.classList.add("centered");
+    }
+
+    setTimeout(() => $("#loader")?.classList.add("finished"), 500);
   }
-}
+  
+  function applyFontsFromData(data) {
+    if (!data) return;
+
+    const map = {
+      primaryFont:   data.primaryFont   || "",
+      secondaryFont: data.secondaryFont || "",
+      bodyFont:      data.bodyFont      || ""
+    };
+
+    const loadOnce = (family) => {
+      if (!family) return;
+      const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
+      if (document.getElementById(id)) return;
+
+      const link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
+      document.head.appendChild(link);
+    };
+
+    Object.values(map).forEach(loadOnce);
+
+    const applyFamilies = () => {
+      for (const [key, family] of Object.entries(map)) {
+        if (!family) continue;
+        document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
+          el.style.fontFamily = `"${family}", sans-serif`;
+        });
+      }
+    };
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(applyFamilies).catch(applyFamilies);
+    } else {
+      setTimeout(applyFamilies, 200);
+    }
+  }
 
   function applyCustomFonts(data) { 
     document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
@@ -1336,11 +1334,11 @@ async function renderAll(data) {
   renderPrice(window.__currentData);
 
   document.querySelectorAll("span").forEach((span) => {
-  span.style.color = elementColor.primaryColor;
-  span.style.fontWeight = "bold";
-  const dataKey = span.getAttribute("data");
-  if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
-});
+    span.style.color = elementColor.primaryColor;
+    span.style.fontWeight = "bold";
+    const dataKey = span.getAttribute("data");
+    if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
+  });
 }
 
 (function controls() {
@@ -1547,6 +1545,8 @@ async function renderAll(data) {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    let params = getParams(); // define early for this scope
+
     _collectButtons();
     computeDesignConstraintsAndApply();
 
@@ -1555,7 +1555,12 @@ async function renderAll(data) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          history.replaceState(null, "", `/design/design-${idNum}?${getParams().toString()}${location.hash}`);
+          // use fresh params each time
+          history.replaceState(
+            null,
+            "",
+            `/design/design-${idNum}?${getParams().toString()}${location.hash}`
+          );
           setParam("design", idNum);
           applyStateFromParams();
         });
@@ -1583,7 +1588,7 @@ async function renderAll(data) {
     };
 
     $("#fullScreen")?.addEventListener("click", () =>
-    $("#editorPanel")?.classList.toggle("hidden")
+      $("#editorPanel")?.classList.toggle("hidden")
     );
     $("#zoomOut")?.addEventListener("click", () => {
       scale = Math.max(0.1, scale - 0.1);
@@ -1594,10 +1599,9 @@ async function renderAll(data) {
       updateZoom();
     });
 
-updateZoom();
+    updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
-    const params  = getParams();
     const isTest  = params.get("test") === "true";
     let ek = params.get("ek");
 
