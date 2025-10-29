@@ -495,7 +495,7 @@
   ],
   "booleanTables": [
     {
-      "id": "booleantable1",
+      "id": "standardtable1",
       "name": "Core Benefits",
       "isDecimal": false,
       "columnBoolName": "Enrolled",
