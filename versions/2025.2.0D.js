@@ -483,8 +483,8 @@ async function renderAll(data) {
     });
   }
 
- function standardTables() {
-  // Templates
+function standardTables() {
+  // ===== Templates =====
   const tableTemplate = document.querySelector("#standardTableTemplate");
   const categoryTemplateWrapper = document.querySelector("#standardCategoryEntry");
   const categoryBlock = categoryTemplateWrapper?.querySelector('[category="list"]');
@@ -492,43 +492,75 @@ async function renderAll(data) {
 
   if (!tableTemplate || !categoryTemplateWrapper || !categoryBlock || !lineTemplate) return;
 
-  // Keep template wrappers out of layout
   categoryTemplateWrapper.style.display = "none";
 
-  // Helper: apply color to the category icon
+  // Map JSON column keys → template attributes
+  const columnMap = {
+    column1Name: { attr: "one",  headerAttr: 'table="summaryHeaderCol1"', totalKey: "column1Total", lineAttr: 'line="col1"', subtotalAttr: 'subtotal="col1"' },
+    column2Name: { attr: "two",  headerAttr: 'table="summaryHeaderCol2"', totalKey: "column2Total", lineAttr: 'line="col2"', subtotalAttr: 'subtotal="col2"' },
+    column3Name: { attr: "three",headerAttr: 'table="summaryHeaderCol3"', totalKey: "column3Total", lineAttr: 'line="col3"', subtotalAttr: 'subtotal="col3"' },
+  };
+
+  // Paint category icon using explicit color or elementColor map
   const paintIcon = (iconEl, colorKeyOrHex) => {
     if (!iconEl) return;
     let cssColor = colorKeyOrHex;
-    // If the icon has a color attribute key, honor your global elementColor map
-    const colorAttr = iconEl.getAttribute("color");
-    if (!cssColor && colorAttr && typeof elementColor === "object") {
-      cssColor = elementColor[colorAttr];
+    const attrColorKey = iconEl.getAttribute("color");
+    if (!cssColor && attrColorKey && typeof elementColor === "object") {
+      cssColor = elementColor[attrColorKey];
     }
-    if (cssColor) {
-      iconEl.style.backgroundColor = cssColor;
-    }
+    if (cssColor) iconEl.style.backgroundColor = cssColor;
   };
 
-  // Build every standard table
+  // Safely set text
+  const setText = (el, val) => {
+    if (el == null) return;
+    el.textContent = val == null ? "" : String(val);
+  };
+
   (data.standardTables || []).forEach((tableData) => {
     const container = document.querySelector(`#${tableData.id}`);
     if (!container) return;
 
-    // Fresh slate
+    // Start fresh
     container.innerHTML = "";
 
-    // Clone the table template
+    // Clone base table
     const tableClone = tableTemplate.cloneNode(true);
     tableClone.removeAttribute("id");
 
-    // Header: simple key→[table="key"] text fill
-    // Known keys: name, summaryHeaderCol3 (extend if you add more headers later)
-    ["name", "summaryHeaderCol3"].forEach((k) => {
-      const el = tableClone.querySelector(`[table="${k}"]`);
-      if (el && tableData[k] != null) el.textContent = tableData[k];
+    // Header: table name
+    setText(tableClone.querySelector('[table="name"]'), tableData.name);
+
+    // Resolve which columns are visible (non-empty names)
+    const hiddenColumns = [];
+    Object.entries(columnMap).forEach(([labelKey, meta]) => {
+      const labelVal = tableData[labelKey];
+      const isMissing = labelVal == null || String(labelVal).trim() === "";
+      // Set header labels if the node exists
+      const headerNode = tableClone.querySelector(`[${meta.headerAttr.replace(/"/g, '\\"')}]`);
+      if (!isMissing && headerNode) setText(headerNode, labelVal);
+
+      // Hide column if label is empty/missing
+      if (isMissing) {
+        hiddenColumns.push(meta.attr);
+        tableClone.querySelectorAll(`[column="${meta.attr}"]`).forEach((el) => el.remove());
+        // Also remove header cell if present
+        if (headerNode) headerNode.closest?.(".standardtablelabel")?.remove?.();
+      }
     });
 
-    // List container where categories are appended
+    // Optional: table-level totals and total line name, if your template exposes them
+    setText(tableClone.querySelector('[table="totalLineName"]'), tableData.totalLineName);
+    Object.entries(columnMap).forEach(([_, meta]) => {
+      const totalEl = tableClone.querySelector(`[table="${meta.totalKey}"]`);
+      if (totalEl) {
+        totalEl.setAttribute("number", "dynamic");
+        totalEl.textContent = formatCurrency(tableData[meta.totalKey] || 0, totalEl, tableData.isDecimal);
+      }
+    });
+
+    // Where categories land
     const listContainer = tableClone.querySelector('[table="list"]');
     if (!listContainer) {
       container.appendChild(tableClone);
@@ -537,73 +569,104 @@ async function renderAll(data) {
 
     // Build categories
     (tableData.categories || []).forEach((catData) => {
-      // Clone a full category block
       const catClone = categoryBlock.cloneNode(true);
 
-      // Category name
+      // Category label + shortLabel fallback
       const catNameEl = catClone.querySelector('[category="name"]');
-      if (catNameEl) catNameEl.textContent = catData.name ?? "";
+      setText(catNameEl, catData.label ?? catData.shortLabel ?? "");
 
-      // Category icon color
-      const catIconEl = catClone.querySelector('[category="icon"]');
-      // Prefer explicit color on data; fall back to whatever the template/attributes specify
-      paintIcon(catIconEl, catData.color);
+      // Icon color
+      paintIcon(catClone.querySelector('[category="icon"]'), catData.color);
 
-      // Line wrapper and a fresh working template
+      // Lines wrapper
       const lineWrap = catClone.querySelector(".standardtablelinewrapper");
       if (!lineWrap) {
         listContainer.appendChild(catClone);
         return;
       }
-
-      // Clear any demo lines in the template
+      // Clear any demo rows
       lineWrap.innerHTML = "";
 
-      // Build lines
-      (catData.lines || []).forEach((ln, idx) => {
+      // Build each line item
+      (catData.items || []).forEach((item, idx) => {
         const row = lineTemplate.cloneNode(true);
-
-        // Zebra striping
         if (idx % 2 === 1) row.classList.add("alternate");
         else row.classList.remove("alternate");
 
-        // Line label
-        const itemEl = row.querySelector('[line="item"]');
-        if (itemEl) itemEl.textContent = ln.item ?? "";
+        // Label
+        const labelEl = row.querySelector('[line="item"]');
+        setText(labelEl, item.label ?? "");
 
-        // Value column (col3 in the markup you provided)
-        const valEl = row.querySelector('[line="col3"]');
-        if (valEl) {
+        // For each column that remains visible, fill value if the template has it
+        // JSON keys: col1_value, col2_value, col3_value
+        const valueByCol = {
+          one:   item.col1_value,
+          two:   item.col2_value,
+          three: item.col3_value,
+        };
+
+        // Remove hidden column cells within the row
+        hiddenColumns.forEach((colAttr) => {
+          row.querySelectorAll(`[column="${colAttr}"]`).forEach((el) => el.remove());
+        });
+
+        // Fill visible column cells
+        Object.entries(valueByCol).forEach(([attr, val]) => {
+          if (hiddenColumns.includes(attr)) return;
+          // find the value element for this column; default markup uses line="col3"
+          const key = attr === "one" ? "col1" : attr === "two" ? "col2" : "col3";
+          const valEl = row.querySelector(`[line="${key}"]`);
+          if (!valEl) return;
+
           if (valEl.hasAttribute("number")) {
-            valEl.textContent = formatCurrency(ln.col3 ?? 0, valEl, tableData.isDecimal);
+            valEl.textContent = formatCurrency(Number(val || 0), valEl, tableData.isDecimal);
           } else {
-            valEl.textContent = ln.col3 ?? "";
+            setText(valEl, val);
           }
-        }
+        });
 
         lineWrap.appendChild(row);
       });
 
-      // Subtotal for the category (subtotal="col3")
-      const subEl = catClone.querySelector('[subtotal="col3"]');
-      if (subEl) {
-        const subtotalValue =
-          catData.subtotal?.col3 ??
-          // compute on the fly if not provided
-          (catData.lines || [])
-            .map((l) => Number(l?.col3 || 0))
-            .reduce((a, b) => a + b, 0);
+      // Subtotals: prefer provided, else compute from items
+      const subtotalByCol = {
+        col1: catData.col1_subtotal,
+        col2: catData.col2_subtotal,
+        col3: catData.col3_subtotal,
+      };
 
-        subEl.setAttribute("number", "dynamic");
-        subEl.textContent = formatCurrency(subtotalValue, subEl, tableData.isDecimal);
+      // If not provided, compute
+      if (subtotalByCol.col1 == null) {
+        subtotalByCol.col1 = (catData.items || []).reduce((a, it) => a + Number(it.col1_value || 0), 0);
       }
+      if (subtotalByCol.col2 == null) {
+        subtotalByCol.col2 = (catData.items || []).reduce((a, it) => a + Number(it.col2_value || 0), 0);
+      }
+      if (subtotalByCol.col3 == null) {
+        subtotalByCol.col3 = (catData.items || []).reduce((a, it) => a + Number(it.col3_value || 0), 0);
+      }
+
+      // Write subtotals where template exposes them
+      Object.entries(columnMap).forEach(([_, meta]) => {
+        if (hiddenColumns.includes(meta.attr)) {
+          // Remove subtotal cell for hidden column
+          catClone.querySelectorAll(`[${meta.subtotalAttr}]`).forEach((el) => el.remove());
+          return;
+        }
+        const subEl = catClone.querySelector(`[${meta.subtotalAttr}]`);
+        if (subEl) {
+          subEl.setAttribute("number", "dynamic");
+          const key = meta.subtotalAttr.match(/"(col\d)"/)?.[1] || "col3";
+          subEl.textContent = formatCurrency(Number(subtotalByCol[key] || 0), subEl, tableData.isDecimal);
+        }
+      });
 
       listContainer.appendChild(catClone);
     });
 
-    // Normalize any dynamic numbers that may have been set as plain text
+    // Normalize any dynamic numbers
     tableClone
-      .querySelectorAll('.standardtablevalue[number="dynamic"], .standardtablesubtotalvalue[number="dynamic"]')
+      .querySelectorAll('[number="dynamic"]')
       .forEach((el) => {
         const raw = el.textContent?.replace(/[^0-9.-]+/g, "") || "0";
         el.textContent = formatCurrency(parseFloat(raw), el, tableData.isDecimal);
@@ -613,7 +676,7 @@ async function renderAll(data) {
   });
 }
 
-
+  
   function booleanTables() {
     const tableTemplate = document.querySelector("#booleanTableTemplate");
     const rowTemplateWrapper = document.querySelector("#booleanCategoryEntry");
