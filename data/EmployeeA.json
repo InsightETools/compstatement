@@ -301,7 +301,7 @@
         {
           "label": "Core Benefits",
           "shortLabel": "Benefits",
-          "color": "#b89237",
+          "color": "#063d69",
           "items": [
             {
               "label": "Medical",
@@ -335,7 +335,7 @@
         {
           "label": "Elective Benefits",
           "shortLabel": "Elective",
-          "color": "#b89237",
+          "color": "#466c8a",
           "items": [
             {
               "label": "401(k) Match",
