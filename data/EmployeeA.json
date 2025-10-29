@@ -265,7 +265,7 @@
   ],
   "standardTables": [
     {
-      "id": "table1",
+      "id": "standardTable1",
       "name": "2024 Employer Contributions",
       "isDecimal": false,
       "column1Name": "",
@@ -379,7 +379,7 @@
       ]
     },
     {
-      "id": "table2",
+      "id": "standardTable2",
       "name": "2024 Employee Contributions",
       "isDecimal": false,
       "column1Name": "",
