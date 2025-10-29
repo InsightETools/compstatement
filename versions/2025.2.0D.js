@@ -494,7 +494,7 @@ function standardTables() {
 
   (data.standardTables || []).forEach((table) => {
     // Containers follow #standard${table.id} (ex: #standardtable1)
-    const containers = document.querySelectorAll(`#standard${table.id}`);
+    const containers = document.querySelectorAll(`#table.id`);
     if (!containers.length) return;
 
     containers.forEach((container) => {
