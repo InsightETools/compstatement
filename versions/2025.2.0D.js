@@ -132,6 +132,7 @@ function _applyEffectiveButtonStates() {
 function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
 
+  const params = getParams(); // ← add this
   const design = params.get("design") || "1";
   const isDesign2 = design === "2";
 
@@ -1200,6 +1201,7 @@ async function renderAll(data) {
 }
 
   function loadDisplay() {
+  const params = getParams(); // ← add this
   const renderParam = getParams().get("render");
   if (renderParam === "true") {
     const body = document.body;
@@ -1553,7 +1555,7 @@ async function renderAll(data) {
       designBtns.forEach((btn) => {
         btn.addEventListener("click", () => {
           const idNum = btn.id.split("-")[1];
-          history.replaceState(null, "", `/design/design-${idNum}?${params.toString()}${location.hash}`);
+          history.replaceState(null, "", `/design/design-${idNum}?${getParams().toString()}${location.hash}`);
           setParam("design", idNum);
           applyStateFromParams();
         });
