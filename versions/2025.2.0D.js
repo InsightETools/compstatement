@@ -1571,9 +1571,7 @@ async function renderAll(data) {
     const demoEl = document.getElementById("demo");
     if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
 
-    const params = getParams();
     const isPreview = params.get("pr") === "true";
-
     let scale = isPreview ? 1.0 : 0.7;
 
     const zoomLevelEl = $("#zoomLevel");
