@@ -489,18 +489,20 @@ function standardTables() {
   const tableContent = baseTableTemplate?.querySelector(".standardtablewrapper");
   if (!baseTableTemplate || !categoryEntryTemplate || !tableContent) return;
 
-  // Helper
+  // Safe CSS escape for IDs (fallback if CSS.escape not available)
+  const cssEscape = (s) => (window.CSS && CSS.escape ? CSS.escape(s) : String(s).replace(/([ #.;?+*~\\:'"!^$[\]()=>|/@])/g, "\\$1"));
+
   const setText = (el, val) => { if (el) el.textContent = val == null ? "" : String(val); };
 
   (data.standardTables || []).forEach((table) => {
-    // Containers follow #standard${table.id} (ex: #standardtable1)
-    const containers = document.querySelectorAll(`#table.id`);
+    // Target divs whose id EXACTLY equals the table.id (e.g., id="table1")
+    const selector = `#${cssEscape(table.id)}`;
+    const containers = document.querySelectorAll(selector);
     if (!containers.length) return;
 
     containers.forEach((container) => {
       container.innerHTML = "";
 
-      // Column visibility by name (hide if empty string or null)
       const showCol1 = !!(table.column1Name && String(table.column1Name).trim());
       const showCol2 = !!(table.column2Name && String(table.column2Name).trim());
       const showCol3 = !!(table.column3Name && String(table.column3Name).trim());
@@ -510,7 +512,6 @@ function standardTables() {
       if (!showCol2) hiddenCols.push("col2");
       if (!showCol3) hiddenCols.push("col3");
 
-      // Clone table
       const tableWrapper = tableContent.cloneNode(true);
 
       // Table name
@@ -530,29 +531,27 @@ function standardTables() {
       if (!showCol3 && headerCol3) headerCol3.remove();
       else if (headerCol3) setText(headerCol3, table.column3Name);
 
-      // Category list container inside the table
+      // Category list container
       const categoryListContainer = tableWrapper.querySelector(".standardtablelist");
 
-      // Build categories
       (table.categories || []).forEach((category) => {
         const catClone = categoryEntryTemplate.cloneNode(true);
         catClone.removeAttribute("id");
 
-        // Clean any baked-in list/subtotal inside the template
+        // Clean baked-in demo elements
         catClone.querySelector("#categoryList")?.remove();
         catClone.querySelector('[category="subtotal"]')?.remove();
 
-        // Category label and icon color
+        // Category header
         const catNameEl = catClone.querySelector('[category="name"]');
         const catIconEl = catClone.querySelector('[category="icon"]');
         if (catIconEl && category.color) catIconEl.style.backgroundColor = category.color;
         setText(catNameEl, category.label ?? category.shortLabel ?? "");
 
-        // Create a fresh line wrapper
+        // Build lines
         const lineWrap = document.createElement("div");
         lineWrap.className = "standardtablelinewrapper";
 
-        // Build line items
         (category.items || []).forEach((item, idx) => {
           const row = document.createElement("div");
           row.className = "standardtablelineitem";
@@ -560,22 +559,18 @@ function standardTables() {
           row.setAttribute("font", "bodyFont");
           if (idx % 2 === 1) row.classList.add("alternate");
 
-          // Label
           const labelDiv = document.createElement("div");
           labelDiv.className = "standardtablelinelabel";
           labelDiv.setAttribute("line", "item");
           labelDiv.setAttribute("element", "text");
           labelDiv.setAttribute("font", "bodyFont");
           labelDiv.textContent = item.label ?? "";
-          row.appendChild(labelDiv);
 
-          // Values wrapper
           const valueWrap = document.createElement("div");
           valueWrap.className = "standardtablelabels";
           valueWrap.setAttribute("element", "text");
           valueWrap.setAttribute("font", "bodyFont");
 
-          // Helper to add a numeric value cell if column is visible
           const addVal = (colKey, jsonVal) => {
             if (hiddenCols.includes(colKey)) return;
             const el = document.createElement("div");
@@ -592,11 +587,12 @@ function standardTables() {
           addVal("col2", item.col2_value);
           addVal("col3", item.col3_value);
 
+          row.appendChild(labelDiv);
           row.appendChild(valueWrap);
           lineWrap.appendChild(row);
         });
 
-        // Subtotals row
+        // Subtotal row
         const subtotalRow = document.createElement("div");
         subtotalRow.className = "standardtablesubtotalwrapper";
         subtotalRow.setAttribute("category", "subtotal");
@@ -608,18 +604,16 @@ function standardTables() {
         subLabel.setAttribute("element", "text");
         subLabel.setAttribute("font", "bodyFont");
         subLabel.textContent = table.totalLineName || "Total";
-        subtotalRow.appendChild(subLabel);
 
         const subVals = document.createElement("div");
         subVals.className = "standardtablelabels";
         subVals.setAttribute("element", "text");
         subVals.setAttribute("font", "bodyFont");
 
-        // Compute subtotals if not provided
-        const safeSum = (arr, key) => arr.reduce((a, it) => a + Number(it?.[key] || 0), 0);
-        const sub1 = category.col1_subtotal != null ? category.col1_subtotal : safeSum(category.items || [], "col1_value");
-        const sub2 = category.col2_subtotal != null ? category.col2_subtotal : safeSum(category.items || [], "col2_value");
-        const sub3 = category.col3_subtotal != null ? category.col3_subtotal : safeSum(category.items || [], "col3_value");
+        const sum = (arr, k) => (arr || []).reduce((a, it) => a + Number(it?.[k] || 0), 0);
+        const sub1 = category.col1_subtotal != null ? category.col1_subtotal : sum(category.items, "col1_value");
+        const sub2 = category.col2_subtotal != null ? category.col2_subtotal : sum(category.items, "col2_value");
+        const sub3 = category.col3_subtotal != null ? category.col3_subtotal : sum(category.items, "col3_value");
 
         const addSub = (colKey, value) => {
           if (hiddenCols.includes(colKey)) return;
@@ -637,6 +631,7 @@ function standardTables() {
         addSub("col2", sub2);
         addSub("col3", sub3);
 
+        subtotalRow.appendChild(subLabel);
         subtotalRow.appendChild(subVals);
 
         // Assemble category
@@ -645,10 +640,11 @@ function standardTables() {
         categoryListContainer.appendChild(subtotalRow);
       });
 
-      // Optional: if your template exposes table-level totals, fill them here
+      // Optional overall column totals, if your template exposes them
       const totalCol1 = tableWrapper.querySelector('[table="column1Total"]');
       const totalCol2 = tableWrapper.querySelector('[table="column2Total"]');
       const totalCol3 = tableWrapper.querySelector('[table="column3Total"]');
+
       if (totalCol1) {
         totalCol1.setAttribute("number", "dynamic");
         totalCol1.textContent = formatCurrency(Number(table.column1Total || 0), totalCol1, table.isDecimal);
@@ -669,6 +665,7 @@ function standardTables() {
     });
   });
 }
+
   
   function booleanTables() {
     const tableTemplate = document.querySelector("#booleanTableTemplate");
