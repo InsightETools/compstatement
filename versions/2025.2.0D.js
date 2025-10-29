@@ -483,176 +483,136 @@ async function renderAll(data) {
     });
   }
 
-  function standardTables() {
-    const categoryEntryTemplate = document.querySelector("#categoryEntry");
-    const baseTableTemplate = document.querySelector("#tableTemplate");
-    const tableContent = baseTableTemplate?.querySelector(".standardtablewrapper");
-    if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) return;
+ function standardTables() {
+  // Templates
+  const tableTemplate = document.querySelector("#standardTableTemplate");
+  const categoryTemplateWrapper = document.querySelector("#standardCategoryEntry");
+  const categoryBlock = categoryTemplateWrapper?.querySelector('[category="list"]');
+  const lineTemplate = categoryTemplateWrapper?.querySelector(".standardtablelinewrapper .standardtablelineitem");
 
-    (data.standardTables || []).forEach((table) => {
-      const containers = document.querySelectorAll(`#standard${table.id}`);
-      if (!containers.length) return;
+  if (!tableTemplate || !categoryTemplateWrapper || !categoryBlock || !lineTemplate) return;
 
-      containers.forEach((container) => {
-        container.innerHTML = "";
+  // Keep template wrappers out of layout
+  categoryTemplateWrapper.style.display = "none";
 
-        const showCol1 = !!table.column1Name;
-        const showCol2 = !!table.column2Name;
-        const showCol3 = !!table.column3Name;
+  // Helper: apply color to the category icon
+  const paintIcon = (iconEl, colorKeyOrHex) => {
+    if (!iconEl) return;
+    let cssColor = colorKeyOrHex;
+    // If the icon has a color attribute key, honor your global elementColor map
+    const colorAttr = iconEl.getAttribute("color");
+    if (!cssColor && colorAttr && typeof elementColor === "object") {
+      cssColor = elementColor[colorAttr];
+    }
+    if (cssColor) {
+      iconEl.style.backgroundColor = cssColor;
+    }
+  };
 
-        const tableWrapper = tableContent.cloneNode(true);
+  // Build every standard table
+  (data.standardTables || []).forEach((tableData) => {
+    const container = document.querySelector(`#${tableData.id}`);
+    if (!container) return;
 
-        const tableNameEl = tableWrapper.querySelector('[table="name"]');
-        if (tableNameEl) tableNameEl.textContent = table.name || "";
+    // Fresh slate
+    container.innerHTML = "";
 
-        const headerCol1 = tableWrapper.querySelector('[table="summaryHeaderCol1"]');
-        const headerCol2 = tableWrapper.querySelector('[table="summaryHeaderCol2"]');
-        const headerCol3 = tableWrapper.querySelector('[table="summaryHeaderCol3"]');
+    // Clone the table template
+    const tableClone = tableTemplate.cloneNode(true);
+    tableClone.removeAttribute("id");
 
-        if (!showCol1 && headerCol1) headerCol1.remove();
-        else if (headerCol1) headerCol1.textContent = table.column1Name;
-
-        if (!showCol2 && headerCol2) headerCol2.remove();
-        else if (headerCol2) headerCol2.textContent = table.column2Name;
-
-        if (!showCol3 && headerCol3) headerCol3.remove();
-        else if (headerCol3) headerCol3.textContent = table.column3Name;
-
-        const categoryListContainer = tableWrapper.querySelector(".standardtablelist");
-
-        table.categories.forEach((category) => {
-          const categoryClone = categoryEntryTemplate.cloneNode(true);
-          categoryClone.removeAttribute("id");
-
-          const existingList = categoryClone.querySelector("#categoryList");
-          if (existingList) existingList.remove();
-
-          const existingSubtotal = categoryClone.querySelector('[category="subtotal"]');
-          if (existingSubtotal) existingSubtotal.remove();
-
-          const categoryName = categoryClone.querySelector('[category="name"]');
-          const categoryIcon = categoryClone.querySelector('[category="icon"]');
-          if (categoryIcon) categoryIcon.style.backgroundColor = category.color;
-          if (categoryName) categoryName.textContent = category.label;
-
-          const categoryList = document.createElement("div");
-          categoryList.classList.add("standardtablelinewrapper");
-
-          category.items.forEach((lineitem, index) => {
-            const lineClone = document.createElement("div");
-            lineClone.classList.add("standardtablelineitem");
-            lineClone.setAttribute("element", "text");
-            lineClone.setAttribute("font", "bodyFont");
-            if (index % 2 === 1) lineClone.classList.add("alternate");
-
-            const labelDiv = document.createElement("div");
-            labelDiv.setAttribute("line", "item");
-            labelDiv.setAttribute("element", "text");
-            labelDiv.setAttribute("font", "bodyFont");
-            labelDiv.className = "standardtablelinelabel";
-            labelDiv.textContent = lineitem.label;
-
-            const valueWrapper = document.createElement("div");
-            valueWrapper.className = "standardtablelabels";
-            valueWrapper.setAttribute("element", "text");
-            valueWrapper.setAttribute("font", "bodyFont");
-
-            if (showCol1) {
-              const col1Div = document.createElement("div");
-              col1Div.setAttribute("line", "col1");
-              col1Div.setAttribute("number", "dynamic");
-              col1Div.setAttribute("element", "text");
-              col1Div.setAttribute("font", "bodyFont");
-              col1Div.className = "standardtablevalue";
-              col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
-              valueWrapper.appendChild(col1Div);
-            }
-            if (showCol2) {
-              const col2Div = document.createElement("div");
-              col2Div.setAttribute("line", "col2");
-              col2Div.setAttribute("number", "dynamic");
-              col2Div.setAttribute("element", "text");
-              col2Div.setAttribute("font", "bodyFont");
-              col2Div.className = "standardtablevalue";
-              col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
-              valueWrapper.appendChild(col2Div);
-            }
-            if (showCol3) {
-              const col3Div = document.createElement("div");
-              col3Div.setAttribute("line", "col3");
-              col3Div.setAttribute("number", "dynamic");
-              col3Div.setAttribute("element", "text");
-              col3Div.setAttribute("font", "bodyFont");
-              col3Div.className = "standardtablevalue";
-              col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
-              valueWrapper.appendChild(col3Div);
-            }
-
-            lineClone.appendChild(labelDiv);
-            lineClone.appendChild(valueWrapper);
-            categoryList.appendChild(lineClone);
-          });
-
-          const subtotalClone = document.createElement("div");
-          subtotalClone.classList.add("standardtablesubtotalwrapper");
-          subtotalClone.setAttribute("category", "subtotal");
-          subtotalClone.setAttribute("element", "text");
-          subtotalClone.setAttribute("font", "bodyFont");
-
-          const subLabel = document.createElement("div");
-          subLabel.className = "standardtablesubtotallabel";
-          subLabel.textContent = table.totalLineName || "Subtotal";
-          subLabel.setAttribute("element", "text");
-          subLabel.setAttribute("font", "bodyFont");
-
-          const subWrapper = document.createElement("div");
-          subWrapper.className = "standardtablelabels";
-          subWrapper.setAttribute("element", "text");
-          subWrapper.setAttribute("font", "bodyFont");
-
-          if (showCol1) {
-            const subCol1 = document.createElement("div");
-            subCol1.setAttribute("subtotal", "col1");
-            subCol1.setAttribute("number", "dynamic");
-            subCol1.setAttribute("element", "text");
-            subCol1.setAttribute("font", "bodyFont");
-            subCol1.className = "standardtablesubtotalvalue";
-            subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
-            subWrapper.appendChild(subCol1);
-          }
-          if (showCol2) {
-            const subCol2 = document.createElement("div");
-            subCol2.setAttribute("subtotal", "col2");
-            subCol2.setAttribute("number", "dynamic");
-            subCol2.setAttribute("element", "text");
-            subCol2.setAttribute("font", "bodyFont");
-            subCol2.className = "standardtablesubtotalvalue";
-            subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
-            subWrapper.appendChild(subCol2);
-          }
-          if (showCol3) {
-            const subCol3 = document.createElement("div");
-            subCol3.setAttribute("subtotal", "col3");
-            subCol3.setAttribute("number", "dynamic");
-            subCol3.setAttribute("element", "text");
-            subCol3.setAttribute("font", "bodyFont");
-            subCol3.className = "standardtablesubtotalvalue";
-            subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
-            subWrapper.appendChild(subCol3);
-          }
-
-          subtotalClone.appendChild(subLabel);
-          subtotalClone.appendChild(subWrapper);
-          categoryList.appendChild(subtotalClone);
-
-          categoryClone.appendChild(categoryList);
-          categoryListContainer.appendChild(categoryClone);
-        });
-
-        container.appendChild(tableWrapper);
-      });
+    // Header: simple key→[table="key"] text fill
+    // Known keys: name, summaryHeaderCol3 (extend if you add more headers later)
+    ["name", "summaryHeaderCol3"].forEach((k) => {
+      const el = tableClone.querySelector(`[table="${k}"]`);
+      if (el && tableData[k] != null) el.textContent = tableData[k];
     });
-  }
+
+    // List container where categories are appended
+    const listContainer = tableClone.querySelector('[table="list"]');
+    if (!listContainer) {
+      container.appendChild(tableClone);
+      return;
+    }
+
+    // Build categories
+    (tableData.categories || []).forEach((catData) => {
+      // Clone a full category block
+      const catClone = categoryBlock.cloneNode(true);
+
+      // Category name
+      const catNameEl = catClone.querySelector('[category="name"]');
+      if (catNameEl) catNameEl.textContent = catData.name ?? "";
+
+      // Category icon color
+      const catIconEl = catClone.querySelector('[category="icon"]');
+      // Prefer explicit color on data; fall back to whatever the template/attributes specify
+      paintIcon(catIconEl, catData.color);
+
+      // Line wrapper and a fresh working template
+      const lineWrap = catClone.querySelector(".standardtablelinewrapper");
+      if (!lineWrap) {
+        listContainer.appendChild(catClone);
+        return;
+      }
+
+      // Clear any demo lines in the template
+      lineWrap.innerHTML = "";
+
+      // Build lines
+      (catData.lines || []).forEach((ln, idx) => {
+        const row = lineTemplate.cloneNode(true);
+
+        // Zebra striping
+        if (idx % 2 === 1) row.classList.add("alternate");
+        else row.classList.remove("alternate");
+
+        // Line label
+        const itemEl = row.querySelector('[line="item"]');
+        if (itemEl) itemEl.textContent = ln.item ?? "";
+
+        // Value column (col3 in the markup you provided)
+        const valEl = row.querySelector('[line="col3"]');
+        if (valEl) {
+          if (valEl.hasAttribute("number")) {
+            valEl.textContent = formatCurrency(ln.col3 ?? 0, valEl, tableData.isDecimal);
+          } else {
+            valEl.textContent = ln.col3 ?? "";
+          }
+        }
+
+        lineWrap.appendChild(row);
+      });
+
+      // Subtotal for the category (subtotal="col3")
+      const subEl = catClone.querySelector('[subtotal="col3"]');
+      if (subEl) {
+        const subtotalValue =
+          catData.subtotal?.col3 ??
+          // compute on the fly if not provided
+          (catData.lines || [])
+            .map((l) => Number(l?.col3 || 0))
+            .reduce((a, b) => a + b, 0);
+
+        subEl.setAttribute("number", "dynamic");
+        subEl.textContent = formatCurrency(subtotalValue, subEl, tableData.isDecimal);
+      }
+
+      listContainer.appendChild(catClone);
+    });
+
+    // Normalize any dynamic numbers that may have been set as plain text
+    tableClone
+      .querySelectorAll('.standardtablevalue[number="dynamic"], .standardtablesubtotalvalue[number="dynamic"]')
+      .forEach((el) => {
+        const raw = el.textContent?.replace(/[^0-9.-]+/g, "") || "0";
+        el.textContent = formatCurrency(parseFloat(raw), el, tableData.isDecimal);
+      });
+
+    container.appendChild(tableClone);
+  });
+}
+
 
   function booleanTables() {
     const tableTemplate = document.querySelector("#booleanTableTemplate");
