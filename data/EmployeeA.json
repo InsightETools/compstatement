@@ -267,7 +267,7 @@
   ],
   "standardTables": [
     {
-      "id": "standardTable1",
+      "id": "table1",
       "name": "2024 Employer Contributions",
       "isDecimal": false,
       "column1Name": "",
@@ -303,7 +303,7 @@
         {
           "label": "Core Benefits",
           "shortLabel": "Benefits",
-          "color": "#063d69",
+          "color": "#b89237",
           "items": [
             {
               "label": "Medical",
@@ -337,7 +337,7 @@
         {
           "label": "Elective Benefits",
           "shortLabel": "Elective",
-          "color": "#466c8a",
+          "color": "#b89237",
           "items": [
             {
               "label": "401(k) Match",
@@ -381,7 +381,7 @@
       ]
     },
     {
-      "id": "standardTable2",
+      "id": "table2",
       "name": "2024 Employee Contributions",
       "isDecimal": false,
       "column1Name": "",
