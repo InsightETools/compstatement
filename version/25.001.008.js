@@ -1617,9 +1617,18 @@ updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
-    if (!ek || !document.getElementById(ek)) {
-      ek = "EmployeeA";
-      setParam("ek", ek);
+    if (window.location.hostname !== "etools.secure-solutions.biz") {
+        if (!ek || !document.getElementById(ek)) {
+            ek = "EmployeeA";
+            setParam("ek", ek);
+        }
+    }
+    else
+    {
+        if (!ek) {
+            ek = "EmployeeA";
+            setParam("ek", ek);
+        }
     }
     empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
     empBtns.forEach((btn) => {
