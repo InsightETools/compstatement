@@ -410,7 +410,7 @@ async function renderAll(data) {
 
     document.querySelectorAll(".coverletterwrapper").forEach((el) => {
       el.classList.remove("left", "center", "right");
-      const justify = (data.companymessagejustification || "").toLowerCase();
+      const justify = (data.companyMessageWrapperJustification || "").toLowerCase();
       if (["left", "center", "right"].includes(justify)) {
         el.classList.add(justify);
       }
