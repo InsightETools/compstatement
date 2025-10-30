@@ -408,11 +408,28 @@ async function renderAll(data) {
       });
     });
 
+    document.querySelectorAll(".coverletterwrapper").forEach((el) => {
+      el.classList.remove("left", "center", "right");
+      const justify = (data.companymessagejustification || "").toLowerCase();
+      if (["left", "center", "right"].includes(justify)) {
+        el.classList.add(justify);
+      }
+    });  
+    
     document.querySelectorAll('[data="companyLogoCover"]').forEach((el) => {
+      const wrapper = el.closest(".coverlogowrapper");
       if (data.companyLogoCover) {
         el.setAttribute("src", data.companyLogoCover);
         if (data.companyLogoCoverHeight) el.style.height = data.companyLogoCoverHeight + "px";
         el.style.display = "";
+
+        if (wrapper) {
+          wrapper.classList.remove("left", "center", "right");
+          const justify = (data.companyLogoCoverJustification || "").toLowerCase();
+          if (["left", "center", "right"].includes(justify)) {
+            wrapper.classList.add(justify);
+          }
+        }
       } else {
         el.removeAttribute("src");
         el.style.display = "none";
