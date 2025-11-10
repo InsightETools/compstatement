@@ -28,9 +28,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   pips[pips.length - 1].innerHTML = "21+";
 
-  const directTotal = document.getElementById("directTotal");
-  const providerTotal = document.getElementById("providerTotal");
-  const providerSavings = document.getElementById("providerSavings");
+  //const directTotal = document.getElementById("directTotal");
+  //const providerTotal = document.getElementById("providerTotal");
+  //const providerSavings = document.getElementById("providerSavings");
 
   slider.noUiSlider.on("update", function (values, handle) {
     const directValue = values[handle] * 97;
@@ -69,11 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-  const selectContainer = document.getElementById("select-container");
-  const searchInput = document.getElementById("search-input");
-  const dropdown = document.getElementById("dropdown");
-  const signup = document.getElementById("signup");
-  const container = document.getElementById("providerList");
+ // const selectContainer = document.getElementById("select-container");
+//  const searchInput = document.getElementById("search-input");
+//  const dropdown = document.getElementById("dropdown");
+//  const signup = document.getElementById("signup");
+//  const container = document.getElementById("providerList");
 
   const providerList = [
     "ADP",
