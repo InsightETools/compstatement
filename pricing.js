@@ -2,15 +2,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var slider = document.getElementById("slider");
 
   noUiSlider.create(slider, {
-    step: 50,
+    step: 1,
     range: {
-      min: 50,
-      max: 2000,
+      min: 0,
+      max: 21,
     },
     start: [1],
     connect: [true, false],
     padding: [1, 0],
-    pips: { mode: "count", values: 10, density: 10 },
+    pips: { mode: "count", values: 22, density: 22 },
   });
 
   var pips = slider.querySelectorAll(".noUi-value");
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pips[i].addEventListener("click", clickOnPip);
   }
 
-  pips[pips.length - 1].innerHTML = "2000+";
+  pips[pips.length - 1].innerHTML = "21+";
 
   const directTotal = document.getElementById("directTotal");
   const providerTotal = document.getElementById("providerTotal");
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const customElements = document.querySelectorAll(".customvalue");
     const signupButton = document.querySelectorAll(".signupbutton");
 
-    if (currentValue === 2000) {
+    if (currentValue === 21) {
       userElements.forEach((el) => (el.style.display = "none"));
       customElements.forEach((el) => (el.style.display = "block"));
       signupButton.forEach((el) => (el.textContent = "Contact Us"));
@@ -179,14 +179,3 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
-
-  const radios = document.querySelectorAll('input[name="typeSelect"]');
-  const target = document.querySelector('[details="type"]');
-
-  radios.forEach(radio => {
-    radio.addEventListener('change', () => {
-      if (radio.checked) {
-        target.textContent = radio.value;
-      }
-    });
-  });
