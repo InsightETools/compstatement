@@ -37,6 +37,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const providerValue = values[handle] * (97 - 97 * 0.4);
     const savingsValue = directValue - providerValue;
 
+    /*
+
     directTotal.textContent = directValue.toLocaleString(undefined, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -51,6 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
+
+    */
 
     const currentValue = Number(values[handle]);
 
@@ -105,6 +109,7 @@ document.addEventListener("DOMContentLoaded", function () {
     searchInput.blur();
   }
 
+  /*
   function buildDropdown() {
     const existingProviders = container.querySelectorAll('[search="provider"]');
     existingProviders.forEach((el) => el.remove());
@@ -178,4 +183,5 @@ document.addEventListener("DOMContentLoaded", function () {
       dropdown.style.display = "none";
     }
   });
+  */
 });
