@@ -1,34 +1,38 @@
 // Full JavaScript — Pricing slider with JSON config, input-driven max expansion,
-// TRUE reset, checkbox dependency logic, and explanatory toasts.
-// NOTE: Slider NO LONGER expands the max when dragged to the end.
-//       Instead, it shows a toast prompting the user to type a larger number.
-//       Typing a value above max in the input STILL expands max to typed+10.
+// TRUE reset, checkbox dependency logic, centered toasts (with autofocus on input),
+// and JSON→DOM field binding with "Unknown"/hide-wrapper behavior.
+//
+// Requirements this file covers:
+// - Fetch JSON (DATA_URL) and initialize everything from it
+// - Slider uses sliderMin/sliderMax and statementCount from JSON
+// - Dragging slider to max DOES NOT expand max; shows a toast and focuses input
+// - Typing > max in the input expands max to typed+10 and sets the value
+// - Pricing: baseFee + (statementFee + mailing fee + optional insertCost) * count
+// - Mailing/insert rules with toasts:
+//     * Inserts require Home Mail; enabling inserts enables Home Mail and disables Single Mail
+//     * Single Mail disables Home Mail and Inserts
+//     * If both mails are false, Inserts is forced false
+// - Reset restores EXACT JSON defaults (range, count, toggles)
+// - "K" labels on pips (1k, 2k, ...), clickable pips
+// - applyJsonFields(json, fields): writes values into #<key>; if "" → "Unknown"; if null → hide #<key>Wrapper
+// - Maps these new fields: payrollSystem, payrollDataMethod, supplementalCostMethod, targetDate
 
 // ====== CONFIG ======
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
-// ====== TOAST MODULE (lightweight, modular) ======
+// ====== TOAST MODULE (centered horizontally near bottom; autofocus supported) ======
 const Toast = (() => {
-  let container,
-    stylesInjected = false;
+  let container, stylesInjected = false;
 
   function injectStyles() {
     if (stylesInjected) return;
     stylesInjected = true;
     const css = `
-      .toast-container {
-  position: fixed;
-  left: 50%;
-  bottom: 24px; /* slightly higher for centered look */
-  transform: translateX(-50%); /* centers horizontally */
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  pointer-events: none;
-  width: auto;
-  max-width: calc(100% - 40px); /* prevents edge overflow on small screens */
-}
+      .toast-container{
+        position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
+        z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;
+        width:auto;max-width:calc(100% - 40px);
+      }
       .toast{
         pointer-events:auto;min-width:240px;max-width:420px;padding:12px 14px;border-radius:10px;
         box-shadow:0 6px 18px rgba(0,0,0,.18);background:#111;color:#fff;
@@ -56,10 +60,9 @@ const Toast = (() => {
     return container;
   }
 
-  const iconFor = (type) =>
-    type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️";
+  const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
 
-  function show(message, { type = "info", duration = 2800 } = {}) {
+  function show(message, { type = "info", duration = 2800, onShow = null } = {}) {
     injectStyles();
     const parent = ensureContainer();
 
@@ -78,7 +81,10 @@ const Toast = (() => {
 
     el.querySelector(".toast__close").addEventListener("click", close);
     parent.appendChild(el);
-    requestAnimationFrame(() => el.classList.add("show"));
+    requestAnimationFrame(() => {
+      el.classList.add("show");
+      if (typeof onShow === "function") onShow();
+    });
     if (duration > 0) setTimeout(close, duration);
     return { close };
   }
@@ -86,48 +92,96 @@ const Toast = (() => {
   return { show };
 })();
 
+// ====== JSON → DOM FIELD BINDER ======
+/**
+ * Apply JSON values to elements by ID with wrapper-hiding and "Unknown" fallback.
+ * Convention:
+ *  - Element id:            #<key>
+ *  - Optional wrapper id:   #<key>Wrapper
+ *
+ * Rules:
+ *  - If value === null → hide wrapper (or element if wrapper missing)
+ *  - If value is "" (blank/whitespace) → set element to "Unknown"
+ *  - Otherwise → set element to value (type-aware for img/a/input/textarea/others)
+ */
+function applyJsonFields(json, fields) {
+  const isBlank = (v) => typeof v === "string" && v.trim() === "";
+  const hideEl = (el) => { if (el) el.style.display = "none"; };
+
+  fields.forEach((key) => {
+    const val = json?.[key] ?? null;
+    const el = document.getElementById(key);
+    const wrapper = document.getElementById(`${key}Wrapper`);
+
+    if (val === null) {
+      hideEl(wrapper || el);
+      return;
+    }
+    if (!el) return;
+
+    // Ensure visible if not null
+    if (wrapper) wrapper.style.display = "";
+    el.style.display = "";
+
+    const out = isBlank(val) ? "Unknown" : String(val);
+    const tag = el.tagName.toLowerCase();
+
+    if (tag === "img") {
+      if (isBlank(val)) {
+        el.removeAttribute("src");
+        el.alt = "Unknown";
+      } else {
+        el.src = out;
+        if (!el.alt) el.alt = key;
+      }
+    } else if (tag === "a") {
+      el.textContent = out;
+      if (isBlank(val)) {
+        el.removeAttribute("href");
+      } else if (/^https?:\/\//i.test(out) || out.startsWith("mailto:") || out.startsWith("tel:")) {
+        el.href = out;
+      }
+    } else if (tag === "input" || tag === "textarea") {
+      el.value = out;
+    } else {
+      el.textContent = out;
+    }
+  });
+}
+
 // ====== APP ======
 document.addEventListener("DOMContentLoaded", async () => {
   // --- DOM refs ---
-  const sliderEl = document.getElementById("slider");
-  const empInputEl = document.getElementById("empInput");
-  const grandTotalEl = document.getElementById("grandTotal");
-  const perEmployeeEl = document.getElementById("perEmployee");
-  const resetBtn = document.getElementById("toZero");
+  const sliderEl       = document.getElementById("slider");
+  const empInputEl     = document.getElementById("empInput");
+  const grandTotalEl   = document.getElementById("grandTotal");
+  const perEmployeeEl  = document.getElementById("perEmployee");
+  const resetBtn       = document.getElementById("toZero");
 
-  const cbHasInserts = document.getElementById("hasInserts");
-  const cbSingleMail = document.getElementById("isSingleMail");
-  const cbHomeMail = document.getElementById("isHomeMail");
+  const cbHasInserts   = document.getElementById("hasInserts");
+  const cbSingleMail   = document.getElementById("isSingleMail");
+  const cbHomeMail     = document.getElementById("isHomeMail");
 
   // Optional labels
-  const labelBaseFee = document.getElementById("baseFee");
-  const labelStatementFee = document.getElementById("statementFee");
-  const labelSingleMailFee = document.getElementById("singleAddressMailFee");
-  const labelHomeMailFee = document.getElementById("homeAddressMailFee");
-  const labelCanadaMailFee = document.getElementById(
-    "singleAddressCanadaMailFee"
-  );
-  const labelInsertCost = document.getElementById("insertCost");
+  const labelBaseFee             = document.getElementById("baseFee");
+  const labelStatementFee        = document.getElementById("statementFee");
+  const labelSingleMailFee       = document.getElementById("singleAddressMailFee");
+  const labelHomeMailFee         = document.getElementById("homeAddressMailFee");
+  const labelCanadaMailFee       = document.getElementById("singleAddressCanadaMailFee");
+  const labelInsertCost          = document.getElementById("insertCost");
 
   // --- Utils ---
   const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) =>
-    Number(n).toLocaleString(undefined, {
-      style: "currency",
-      currency: "USD",
-      maximumFractionDigits: 2,
-    });
-  const fmtInt = (n) =>
-    Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+    Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+  const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   const formatK = (v) => {
     const abs = Math.abs(v);
     if (abs >= 1000) {
       const k = v / 1000;
-      const label = Number.isInteger(k)
-        ? String(k)
-        : k.toFixed(1).replace(/\.0$/, "");
+      const label = Number.isInteger(k) ? String(k) : k.toFixed(1).replace(/\.0$/, "");
       return `${label}k`;
     }
     return String(v);
@@ -138,9 +192,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const span = max - min;
     return span <= 0
       ? [min]
-      : Array.from({ length: steps + 1 }, (_, i) =>
-          Math.round(min + (span * i) / steps)
-        );
+      : Array.from({ length: steps + 1 }, (_, i) => Math.round(min + (span * i) / steps));
   };
 
   const renderPips = () => {
@@ -162,39 +214,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     data = {};
   }
 
-  // --- Extract values ---
-  const baseFee = toNum(data.baseFee);
-  const statementFee = toNum(data.statementFee);
-  const mailSingleFee = toNum(data.singleAddressMailFee);
-  const mailHomeFee = toNum(data.homeAddressMailFee);
-  const insertCost = toNum(data.insertCost);
-  const canadaMailFee = toNum(data.singleAddressCanadaMailFee);
+  // --- Apply new JSON fields to DOM (Unknown/null-hiding rules) ---
+  applyJsonFields(data, [
+    "payrollSystem",
+    "payrollDataMethod",
+    "supplementalCostMethod",
+    "targetDate"
+  ]);
+
+  // --- Extract pricing values ---
+  const baseFee             = toNum(data.baseFee);
+  const statementFee        = toNum(data.statementFee);
+  const mailSingleFee       = toNum(data.singleAddressMailFee);
+  const mailHomeFee         = toNum(data.homeAddressMailFee);
+  const insertCost          = toNum(data.insertCost);
+  const canadaMailFee       = toNum(data.singleAddressCanadaMailFee); // labeled but unused in calc unless you want to switch by country
 
   // Original (factory) state for full reset
   const ORIG = {
-    hasInserts: !!data.hasInserts,
-    isSingleMail: !!data.isSingleMail,
-    isHomeMail: !!data.isHomeMail,
-    sliderMin: toNum(data.sliderMin),
-    sliderMax: toNum(data.sliderMax),
+    hasInserts:    !!data.hasInserts,
+    isSingleMail:  !!data.isSingleMail,
+    isHomeMail:    !!data.isHomeMail,
+    sliderMin:      toNum(data.sliderMin),
+    sliderMax:      toNum(data.sliderMax),
     statementCount: toNum(data.statementCount),
   };
-  if (ORIG.sliderMax < ORIG.sliderMin)
-    [ORIG.sliderMin, ORIG.sliderMax] = [ORIG.sliderMax, ORIG.sliderMin];
-  ORIG.statementCount = clamp(
-    ORIG.statementCount,
-    ORIG.sliderMin,
-    ORIG.sliderMax
-  );
+  if (ORIG.sliderMax < ORIG.sliderMin) [ORIG.sliderMin, ORIG.sliderMax] = [ORIG.sliderMax, ORIG.sliderMin];
+  ORIG.statementCount = clamp(ORIG.statementCount, ORIG.sliderMin, ORIG.sliderMax);
 
   // Mutable runtime state
-  let hasInserts = ORIG.hasInserts;
+  let hasInserts   = ORIG.hasInserts;
   let isSingleMail = ORIG.isSingleMail;
-  let isHomeMail = ORIG.isHomeMail;
-  let SLIDER_MIN = ORIG.sliderMin;
-  let SLIDER_MAX = ORIG.sliderMax;
+  let isHomeMail   = ORIG.isHomeMail;
+  let SLIDER_MIN   = ORIG.sliderMin;
+  let SLIDER_MAX   = ORIG.sliderMax;
 
-  // Normalize initial state by rules:
+  // Normalize initial state by business rules:
   // - Inserts requires Home Mail; cannot coexist with Single Mail.
   if (hasInserts) {
     isHomeMail = true;
@@ -206,19 +261,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // --- Optional labels ---
-  if (labelBaseFee) labelBaseFee.textContent = fmtUSD(baseFee);
-  if (labelStatementFee) labelStatementFee.textContent = fmtUSD(statementFee);
-  if (labelSingleMailFee)
-    labelSingleMailFee.textContent = fmtUSD(mailSingleFee);
-  if (labelHomeMailFee) labelHomeMailFee.textContent = fmtUSD(mailHomeFee);
-  if (labelCanadaMailFee)
-    labelCanadaMailFee.textContent = fmtUSD(canadaMailFee);
-  if (labelInsertCost) labelInsertCost.textContent = fmtUSD(insertCost);
+  if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(baseFee);
+  if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(statementFee);
+  if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(mailSingleFee);
+  if (labelHomeMailFee)   labelHomeMailFee.textContent = fmtUSD(mailHomeFee);
+  if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(canadaMailFee);
+  if (labelInsertCost)    labelInsertCost.textContent = fmtUSD(insertCost);
 
   // --- Initialize checkboxes from normalized state ---
   if (cbHasInserts) cbHasInserts.checked = hasInserts;
   if (cbSingleMail) cbSingleMail.checked = isSingleMail;
-  if (cbHomeMail) cbHomeMail.checked = isHomeMail;
+  if (cbHomeMail)   cbHomeMail.checked   = isHomeMail;
 
   // --- Create slider ---
   noUiSlider.create(sliderEl, {
@@ -226,11 +279,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     start: ORIG.statementCount,
     step: 1,
     connect: [true, false],
-    pips: {
-      mode: "values",
-      values: makePips(SLIDER_MIN, SLIDER_MAX),
-      density: 10,
-    },
+    pips: { mode: "values", values: makePips(SLIDER_MIN, SLIDER_MAX), density: 10 },
   });
   renderPips();
 
@@ -242,19 +291,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // --- Pricing helpers ---
-  const currentMailingFee = () =>
-    isHomeMail ? mailHomeFee : isSingleMail ? mailSingleFee : 0;
-  const perStatementCost = () =>
-    statementFee + currentMailingFee() + (hasInserts ? insertCost : 0);
+  const currentMailingFee = () => (isHomeMail ? mailHomeFee : isSingleMail ? mailSingleFee : 0);
+  const perStatementCost  = () => statementFee + currentMailingFee() + (hasInserts ? insertCost : 0);
 
   function recalc(rawCount) {
     const n = clamp(Math.round(toNum(rawCount)), SLIDER_MIN, SLIDER_MAX);
-    const perEmp =
-      n > 0 ? perStatementCost() + baseFee / n : perStatementCost();
-    const grand = baseFee + perStatementCost() * n;
+    const perEmp = (n > 0) ? (perStatementCost() + baseFee / n) : perStatementCost();
+    const grand  = baseFee + perStatementCost() * n;
 
     if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(perEmp);
-    if (grandTotalEl) grandTotalEl.textContent = fmtUSD(grand);
+    if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grand);
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
   }
 
@@ -285,28 +331,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   // --- Initial paint ---
   recalc(ORIG.statementCount);
 
-  // --- Slider → recalc + (NO EXPAND). Show toast when hitting max. ---
+  // --- Slider → recalc + NO EXPAND. Show toast when hitting max & autofocus input. ---
   let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = toNum(vals[0]);
 
-    // When user drags handle to max, show a one-time toast (reset once below max)
     if (val >= SLIDER_MAX) {
       if (!maxToastShown) {
         Toast.show(
-          `If your employee count is more than ${fmtInt(
-            SLIDER_MAX
-          )} then type the size in the input.`,
-          { type: "info", duration: 3800 }
+          `If your employee count is more than ${fmtInt(SLIDER_MAX)} then type the size in the input.`,
+          {
+            type: "info",
+            duration: 3800,
+            onShow: () => {
+              if (empInputEl) {
+                // Focus and place cursor at the end
+                setTimeout(() => {
+                  empInputEl.focus();
+                  const v = empInputEl.value;
+                  empInputEl.value = "";
+                  empInputEl.value = v;
+                }, 50);
+              }
+            }
+          }
         );
-        // ✅ Auto-focus the employee input when this toast appears
-        if (empInputEl) {
-          setTimeout(() => empInputEl.focus(), 50);
-        }
         maxToastShown = true;
       }
     } else {
-      // reset flag once the user moves below max again
       maxToastShown = false;
     }
 
@@ -336,9 +388,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
 
       // Restore factory booleans
-      hasInserts = ORIG.hasInserts;
+      hasInserts   = ORIG.hasInserts;
       isSingleMail = ORIG.isSingleMail;
-      isHomeMail = ORIG.isHomeMail;
+      isHomeMail   = ORIG.isHomeMail;
 
       // Normalize by rules
       if (hasInserts) {
@@ -352,7 +404,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Reflect in checkboxes
       if (cbHasInserts) cbHasInserts.checked = hasInserts;
       if (cbSingleMail) cbSingleMail.checked = isSingleMail;
-      if (cbHomeMail) cbHomeMail.checked = isHomeMail;
+      if (cbHomeMail)   cbHomeMail.checked   = isHomeMail;
 
       // Restore slider range & value
       updateSliderRange(ORIG.sliderMin, ORIG.sliderMax, ORIG.statementCount);
@@ -370,10 +422,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ===== CHECKBOXES with explanatory toasts =====
   // Rules enforced:
-  // - Inserts requires Home Mail and cannot coexist with Single Mail.
+  // - Inserts require Home Mail and cannot coexist with Single Mail.
   // - Single Mail is exclusive with Home Mail and disables Inserts.
   // - If both mail types are off, Inserts must be off.
-  // - If Inserts is turned on, ensure Home Mail is on and Single Mail off.
 
   if (cbHasInserts) {
     cbHasInserts.addEventListener("change", () => {
@@ -383,22 +434,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!isHomeMail) {
           isHomeMail = true;
           if (cbHomeMail) cbHomeMail.checked = true;
-          Toast.show(
-            "Inserts require Home Address mailing, so Home Address Mail was enabled.",
-            { type: "info" }
-          );
+          Toast.show("Inserts require Home Address mailing, so Home Address Mail was enabled.", { type: "info" });
         }
         if (isSingleMail) {
           isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          Toast.show(
-            "Inserts can’t be used with Single Address Mail, so Single Address Mail was turned off.",
-            { type: "warn" }
-          );
+          Toast.show("Inserts can’t be used with Single Address Mail, so Single Address Mail was turned off.", { type: "warn" });
         }
       } else {
         if (!isSingleMail && !isHomeMail && cbHasInserts.checked) {
-          cbHasInserts.checked = false;
+          cbHasInserts.checked = false; // defensive
         }
       }
 
@@ -414,28 +459,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (isHomeMail) {
           isHomeMail = false;
           if (cbHomeMail) cbHomeMail.checked = false;
-          Toast.show(
-            "Single Address Mail is exclusive, so Home Address Mail was turned off.",
-            { type: "info" }
-          );
+          Toast.show("Single Address Mail is exclusive, so Home Address Mail was turned off.", { type: "info" });
         }
         if (hasInserts) {
           hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show(
-            "Inserts aren’t supported with Single Address Mail, so Inserts were turned off.",
-            { type: "warn" }
-          );
+          Toast.show("Inserts aren’t supported with Single Address Mail, so Inserts were turned off.", { type: "warn" });
         }
       } else {
         isSingleMail = false;
         if (!isHomeMail && hasInserts) {
           hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show(
-            "No mailing method is selected, so Inserts were turned off.",
-            { type: "info" }
-          );
+          Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
         }
       }
 
@@ -449,10 +485,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (isSingleMail) {
           isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          Toast.show(
-            "Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.",
-            { type: "info" }
-          );
+          Toast.show("Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.", { type: "info" });
         }
         isHomeMail = true;
       } else {
@@ -460,10 +493,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!isSingleMail && hasInserts) {
           hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show(
-            "No mailing method is selected, so Inserts were turned off.",
-            { type: "info" }
-          );
+          Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
         }
       }
 
