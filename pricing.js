@@ -216,7 +216,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- Pricing Lock visibility (multiple elements) ---
 const pricingLockEls = document.querySelectorAll('[lock="pricingLock"]');
-
 pricingLockEls.forEach(el => {
   if (data.pricingLocked === true) {
     el.style.display = "none";
@@ -224,6 +223,26 @@ pricingLockEls.forEach(el => {
     el.style.display = "";
   }
 });
+
+  // --- When pricing is locked, hide wrappers for disabled mailing options ---
+if (data.pricingLocked === true) {
+  const singleWrapper = document.getElementById("isSingleMailWrapper");
+  const homeWrapper   = document.getElementById("isHomeMailWrapper");
+  const insertWrapper = document.getElementById("hasInsertsWrapper");
+
+  // Hide wrapper if its toggle is false
+  if (singleWrapper && data.isSingleMail === false) {
+    singleWrapper.style.display = "none";
+  }
+
+  if (homeWrapper && data.isHomeMail === false) {
+    homeWrapper.style.display = "none";
+  }
+
+  if (insertWrapper && data.hasInserts === false) {
+    insertWrapper.style.display = "none";
+  }
+}
   
   // --- Apply new JSON fields to DOM (Unknown/null-hiding rules) ---
   applyJsonFields(data, [
