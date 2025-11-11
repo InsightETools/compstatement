@@ -196,24 +196,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
 // ----- CHECKBOXES -----
+
 cbHasInserts.addEventListener("change", () => {
   hasInserts = cbHasInserts.checked;
 
-  // Inserts require ONE mail type active
-  if (hasInserts && !isSingleMail && !isHomeMail) {
-    // Cannot allow inserts with no mail type
-    hasInserts = false;
-    cbHasInserts.checked = false;
+  if (hasInserts) {
+    // ✅ Inserts require HOME mail (new rule)
+    isHomeMail = true;
+    cbHomeMail.checked = true;
+
+    // ✅ Inserts cannot coexist with single-address mail
+    isSingleMail = false;
+    cbSingleMail.checked = false;
   }
 
-  // Inserts also cannot coexist with single-address mail if disabled
-  if (hasInserts && isSingleMail === false && isHomeMail === false) {
-    hasInserts = false;
-    cbHasInserts.checked = false;
-  }
-
-  // Inserts cannot coexist with single mail (your earlier rule)
-  if (hasInserts && isSingleMail) {
+  // ✅ If user tries to enable inserts while NO mail types exist
+  if (!isSingleMail && !isHomeMail) {
     hasInserts = false;
     cbHasInserts.checked = false;
   }
@@ -227,14 +225,14 @@ cbSingleMail.addEventListener("change", () => {
     isHomeMail = false;
     cbHomeMail.checked = false;
 
-    // Single mail disallows inserts
+    // ✅ Single mail forbids inserts
     hasInserts = false;
     cbHasInserts.checked = false;
   } else {
     isSingleMail = false;
   }
 
-  // If both mails off → inserts must be off
+  // ✅ If no mail types active → inserts must turn off
   if (!isSingleMail && !isHomeMail) {
     hasInserts = false;
     cbHasInserts.checked = false;
@@ -252,7 +250,7 @@ cbHomeMail.addEventListener("change", () => {
     isHomeMail = false;
   }
 
-  // If both mails off → inserts must be off
+  // ✅ If turning off home mail leaves NO mail types → inserts off
   if (!isSingleMail && !isHomeMail) {
     hasInserts = false;
     cbHasInserts.checked = false;
