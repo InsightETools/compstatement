@@ -5,12 +5,12 @@ document.addEventListener("DOMContentLoaded", function () {
     step: 1,
     range: {
       min: 0,
-      max: 21,
+      max: 10,
     },
     start: [1],
     connect: [true, false],
     padding: [1, 0],
-    pips: { mode: "count", values: 22, density: 22 },
+    pips: { mode: "count", values: 10, density: 10 },
   });
 
   var pips = slider.querySelectorAll(".noUi-value");
