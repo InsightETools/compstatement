@@ -15,6 +15,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var pips = slider.querySelectorAll(".noUi-value");
 
+  for (let i = 0; i < pips.length; i++) {
+    let val = Number(pips[i].getAttribute("data-value"));
+
+    if (i === pips.length - 1) {
+      continue;
+    }
+
+    pips[i].innerHTML = (val + 1) + "k";
+  }
+
+  pips[pips.length - 1].innerHTML = "10+";
+
   function clickOnPip() {
     var value = Number(this.getAttribute("data-value"));
     slider.noUiSlider.set(value);
@@ -26,35 +38,10 @@ document.addEventListener("DOMContentLoaded", function () {
     pips[i].addEventListener("click", clickOnPip);
   }
 
-  pips[pips.length - 1].innerHTML = "10+";
-
-  //const directTotal = document.getElementById("directTotal");
-  //const providerTotal = document.getElementById("providerTotal");
-  //const providerSavings = document.getElementById("providerSavings");
-
   slider.noUiSlider.on("update", function (values, handle) {
     const directValue = values[handle] * 97;
     const providerValue = values[handle] * (97 - 97 * 0.4);
     const savingsValue = directValue - providerValue;
-
-    /*
-
-    directTotal.textContent = directValue.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
-    providerTotal.textContent = providerValue.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
-    providerSavings.textContent = savingsValue.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-
-    */
 
     const currentValue = Number(values[handle]);
 
@@ -73,19 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
- // const selectContainer = document.getElementById("select-container");
-//  const searchInput = document.getElementById("search-input");
-//  const dropdown = document.getElementById("dropdown");
-//  const signup = document.getElementById("signup");
-//  const container = document.getElementById("providerList");
-
-  const providerList = [
-    "ADP",
-    "Fire & Vine",
-    "Paylocity",
-    "Pivot Sales",
-    "Workday",
-  ];
+  const providerList = ["ADP", "Fire & Vine", "Paylocity", "Pivot Sales", "Workday"];
   const customOption = "Can't Find Your Provider? Let's Talk!";
 
   function updateSignupState() {
@@ -108,80 +83,4 @@ document.addEventListener("DOMContentLoaded", function () {
     updateSignupState();
     searchInput.blur();
   }
-
-  /*
-  function buildDropdown() {
-    const existingProviders = container.querySelectorAll('[search="provider"]');
-    existingProviders.forEach((el) => el.remove());
-
-    providerList.forEach(function (provider) {
-      const item = document.createElement("div");
-      item.setAttribute("search", "provider");
-      item.setAttribute("select", "provider");
-      item.textContent = provider;
-      item.classList.add("providerselect");
-
-      item.addEventListener("mousedown", function (e) {
-        e.preventDefault();
-        handleOptionClick(provider);
-      });
-
-      container.appendChild(item);
-    });
-  }
-
-  function attachStaticSelectableHandlers() {
-    const staticItems = dropdown.querySelectorAll(
-      '[select="provider"]:not([search])'
-    );
-    staticItems.forEach((item) => {
-      item.addEventListener("mousedown", function (e) {
-        e.preventDefault();
-        handleOptionClick(item.textContent.trim());
-      });
-    });
-  }
-
-  // Initial setup
-  buildDropdown();
-  attachStaticSelectableHandlers();
-
-  searchInput.addEventListener("focus", function () {
-    dropdown.style.display = "flex";
-    searchInput.classList.remove("closed");
-  });
-
-  searchInput.addEventListener("input", function () {
-    dropdown.style.display = "flex";
-    searchInput.classList.remove("closed");
-    updateSignupState();
-
-    const filter = searchInput.value.toLowerCase();
-    const allOptions = dropdown.querySelectorAll("[search]");
-
-    allOptions.forEach((option) => {
-      const isSearchable = option.getAttribute("search") === "provider";
-      const text = option.textContent.toLowerCase();
-
-      if (isSearchable) {
-        option.style.display = text.includes(filter) ? "flex" : "none";
-      } else {
-        option.style.display = "flex";
-      }
-    });
-  });
-
-  searchInput.addEventListener("blur", function () {
-    setTimeout(function () {
-      searchInput.classList.add("closed");
-      dropdown.style.display = "none";
-    }, 100);
-  });
-
-  document.addEventListener("click", function (event) {
-    if (!selectContainer.contains(event.target)) {
-      dropdown.style.display = "none";
-    }
-  });
-  */
 });
