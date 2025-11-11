@@ -257,13 +257,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // When user drags handle to max, show a one-time toast (reset once below max)
     if (val >= SLIDER_MAX) {
       if (!maxToastShown) {
-        Toast.show(
-          `If your employee count is more than ${fmtInt(SLIDER_MAX)} then type the size in the input.`,
-          { type: "info", duration: 3800 }
-        );
-        maxToastShown = true;
-      }
-    } else {
+      Toast.show(
+      `If your employee count is more than ${fmtInt(SLIDER_MAX)} then type the size in the input.`,
+      { type: "info", duration: 3800 }
+    );
+    // ✅ Auto-focus the employee input when this toast appears
+    if (empInputEl) {
+      setTimeout(() => empInputEl.focus(), 50);
+    }
+    maxToastShown = true;
+  }
+}
+ else {
       // reset flag once the user moves below max again
       maxToastShown = false;
     }
