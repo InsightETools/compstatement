@@ -199,10 +199,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 cbHasInserts.addEventListener("change", () => {
   hasInserts = cbHasInserts.checked;
 
-  // ✅ If inserts were turned on but single mail is active → turn inserts off
+  // If inserts turned on, single-address mail must be off
   if (hasInserts && isSingleMail) {
-    hasInserts = false;
-    cbHasInserts.checked = false;
+    isSingleMail = false;
+    cbSingleMail.checked = false;
   }
 
   recalc(sliderEl.noUiSlider.get());
@@ -211,12 +211,16 @@ cbHasInserts.addEventListener("change", () => {
 cbSingleMail.addEventListener("change", () => {
   if (cbSingleMail.checked) {
     isSingleMail = true;
+
+    // single-address mail excludes inserts
+    if (hasInserts) {
+      hasInserts = false;
+      cbHasInserts.checked = false;
+    }
+
+    // keep single/home mutually exclusive
     isHomeMail = false;
     cbHomeMail.checked = false;
-
-    // ✅ If single mail is selected → inserts are not allowed
-    hasInserts = false;
-    cbHasInserts.checked = false;
   } else {
     isSingleMail = false;
   }
@@ -227,11 +231,11 @@ cbSingleMail.addEventListener("change", () => {
 cbHomeMail.addEventListener("change", () => {
   if (cbHomeMail.checked) {
     isHomeMail = true;
+
+    // home mail does NOT conflict with inserts
+    // but remains mutually exclusive with single-address mail
     isSingleMail = false;
     cbSingleMail.checked = false;
-
-    // ✅ Home mail does NOT force inserts off
-    // (Only singleAddressMail does)
   } else {
     isHomeMail = false;
   }
@@ -248,10 +252,15 @@ cbHomeMail.addEventListener("change", () => {
     isSingleMail = ORIG.isSingleMail;
     isHomeMail = ORIG.isHomeMail;
 
+    // Enforce exclusivity at load: inserts wins over single-mail if both were true in JSON
+    if (hasInserts && isSingleMail) {
+      isSingleMail = false;
+    }
+
     cbHasInserts.checked = hasInserts;
     cbSingleMail.checked = isSingleMail;
-    cbHomeMail.checked = isHomeMail;
-
+    cbHomeMail.checked   = isHomeMail;
+    
     // Reset slider min/max + full rebuild
     updateSliderRange(ORIG.sliderMin, ORIG.sliderMax, ORIG.statementCount);
 
