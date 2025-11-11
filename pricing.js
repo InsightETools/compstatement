@@ -1,12 +1,16 @@
-// Pricing Slider — full JavaScript (dynamic min/max from JSON)
-// Requires noUiSlider on the page and these IDs in your markup:
+// Pricing Slider — full JavaScript with conditional fees from JSON
+// IDs expected on the page (create any you want to display):
 // #slider, #empInput, #grandTotal, #perEmployee, #perEmployeeNote, #toZero
-// Optional display labels: #baseFee, #statementFee, #mailingFee
+// Optional labels (values auto-filled if present, matched by JSON keys):
+// #baseFee, #statementFee, #singleAddressMailFee, #homeAddressMailFee, #singleAddressCanadaMailFee,
+// #insertCost, #statementCount, #isSingleMail, #isHomeMail, #hasInserts, #pricingLocked, #sliderMin, #sliderMax
+//
+// Requires noUiSlider (CSS+JS) loaded.
 
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // ----- DOM refs -----
+  // ------- DOM refs -------
   const sliderEl = document.getElementById("slider");
   const empInputEl = document.getElementById("empInput");
   const grandTotalEl = document.getElementById("grandTotal");
@@ -14,23 +18,35 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perEmployeeNoteEl = document.getElementById("perEmployeeNote");
   const resetBtn = document.getElementById("toZero");
 
-  const baseFeeText = document.getElementById("baseFee");
-  const statementFeeText = document.getElementById("statementFee");
-  const mailingFeeText = document.getElementById("mailingFee");
+  // Matching-id value labels (populate if they exist)
+  const ids = {
+    baseFee: document.getElementById("baseFee"),
+    statementFee: document.getElementById("statementFee"),
+    singleAddressMailFee: document.getElementById("singleAddressMailFee"),
+    homeAddressMailFee: document.getElementById("homeAddressMailFee"),
+    singleAddressCanadaMailFee: document.getElementById("singleAddressCanadaMailFee"),
+    insertCost: document.getElementById("insertCost"),
+    statementCount: document.getElementById("statementCount"),
+    isSingleMail: document.getElementById("isSingleMail"),
+    isHomeMail: document.getElementById("isHomeMail"),
+    hasInserts: document.getElementById("hasInserts"),
+    pricingLocked: document.getElementById("pricingLocked"),
+    sliderMin: document.getElementById("sliderMin"),
+    sliderMax: document.getElementById("sliderMax"),
+  };
 
-  // ----- Utils -----
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+  // ------- Utils -------
   const toNum = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? n : 0;
   };
+  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) =>
     Number(n).toLocaleString(undefined, {
       style: "currency",
       currency: "USD",
       maximumFractionDigits: 2,
     });
-
   const formatK = (v) => {
     const abs = Math.abs(v);
     if (abs >= 1000) {
@@ -40,7 +56,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     return String(v);
   };
-
   const makePips = (min, max) => {
     // 11 evenly spaced pips from min..max
     const steps = 10;
@@ -51,50 +66,70 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
   };
 
-  // ----- Fetch JSON & map to config/fees -----
-  let FEES = { base: 0, statement: 0, mailing: 0 };
-  let JSON_COUNT = 0;      // statementCount
-  let SLIDER_MIN = 0;      // from json.sliderMin
-  let SLIDER_MAX = 10000;  // from json.sliderMax
-
+  // ------- Load JSON -------
+  let data = {};
   try {
     const res = await fetch(DATA_URL, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-
-    // Dynamic slider bounds
-    SLIDER_MIN = Number.isFinite(toNum(data.sliderMin)) ? toNum(data.sliderMin) : 0;
-    SLIDER_MAX = Number.isFinite(toNum(data.sliderMax)) ? toNum(data.sliderMax) : 10000;
-    if (SLIDER_MAX < SLIDER_MIN) {
-      // swap if accidentally inverted
-      const t = SLIDER_MIN;
-      SLIDER_MIN = SLIDER_MAX;
-      SLIDER_MAX = t;
-    }
-
-    // Fees
-    FEES.base = toNum(data.baseFee);
-    FEES.statement = toNum(data.statementFee);
-
-    // Mailing choice (extend as needed)
-    if (data.isHomeMail) FEES.mailing = toNum(data.homeAddressMailFee);
-    else if (data.isSingleMail) FEES.mailing = toNum(data.singleAddressMailFee);
-    else FEES.mailing = 0;
-
-    // Employee count (statementCount)
-    JSON_COUNT = clamp(Math.floor(toNum(data.statementCount)), SLIDER_MIN, SLIDER_MAX);
+    data = await res.json();
   } catch (err) {
-    console.error("Failed to load pricing JSON:", err);
-    // keep defaults
-    JSON_COUNT = SLIDER_MIN; // safe start
+    console.error("Failed to fetch JSON:", err);
+    data = {};
   }
 
-  // Reflect fees in UI (optional)
-  if (baseFeeText) baseFeeText.textContent = fmtUSD(FEES.base);
-  if (statementFeeText) statementFeeText.textContent = fmtUSD(FEES.statement);
-  if (mailingFeeText) mailingFeeText.textContent = fmtUSD(FEES.mailing);
+  // ------- Map values from JSON -------
+  const baseFee = toNum(data.baseFee);
+  const statementFee = toNum(data.statementFee);
+  const singleAddressMailFee = toNum(data.singleAddressMailFee);
+  const homeAddressMailFee = toNum(data.homeAddressMailFee);
+  const singleAddressCanadaMailFee = toNum(data.singleAddressCanadaMailFee); // not used in math unless you add a flag
+  const insertCost = toNum(data.insertCost);
 
-  // ----- Slider init (uses dynamic min/max) -----
+  const isSingleMail = !!data.isSingleMail;
+  const isHomeMail = !!data.isHomeMail;
+  const hasInserts = !!data.hasInserts;
+  const pricingLocked = !!data.pricingLocked;
+
+  // dynamic slider bounds + initial count
+  let SLIDER_MIN = toNum(data.sliderMin);
+  let SLIDER_MAX = toNum(data.sliderMax);
+  if (SLIDER_MAX < SLIDER_MIN) {
+    const t = SLIDER_MIN;
+    SLIDER_MIN = SLIDER_MAX;
+    SLIDER_MAX = t;
+  }
+  const JSON_COUNT = clamp(Math.floor(toNum(data.statementCount)), SLIDER_MIN, SLIDER_MAX);
+
+  // ------- Populate matching-id elements (if present) -------
+  if (ids.baseFee) ids.baseFee.textContent = fmtUSD(baseFee);
+  if (ids.statementFee) ids.statementFee.textContent = fmtUSD(statementFee);
+  if (ids.singleAddressMailFee) ids.singleAddressMailFee.textContent = fmtUSD(singleAddressMailFee);
+  if (ids.homeAddressMailFee) ids.homeAddressMailFee.textContent = fmtUSD(homeAddressMailFee);
+  if (ids.singleAddressCanadaMailFee) ids.singleAddressCanadaMailFee.textContent = fmtUSD(singleAddressCanadaMailFee);
+  if (ids.insertCost) ids.insertCost.textContent = fmtUSD(insertCost);
+
+  if (ids.statementCount) ids.statementCount.textContent = String(JSON_COUNT);
+  if (ids.isSingleMail) ids.isSingleMail.textContent = String(isSingleMail);
+  if (ids.isHomeMail) ids.isHomeMail.textContent = String(isHomeMail);
+  if (ids.hasInserts) ids.hasInserts.textContent = String(hasInserts);
+  if (ids.pricingLocked) ids.pricingLocked.textContent = String(pricingLocked);
+  if (ids.sliderMin) ids.sliderMin.textContent = String(SLIDER_MIN);
+  if (ids.sliderMax) ids.sliderMax.textContent = String(SLIDER_MAX);
+
+  // ------- Determine conditional per-statement fees -------
+  // Mailing fee rule:
+  // - if isHomeMail === true -> use homeAddressMailFee
+  // - else if isSingleMail === true -> use singleAddressMailFee
+  // - else 0
+  const mailingFee =
+    isHomeMail ? homeAddressMailFee :
+    isSingleMail ? singleAddressMailFee : 0;
+
+  // Insert cost rule:
+  // - add insertCost if hasInserts === true
+  const perStatement = statementFee + mailingFee + (hasInserts ? insertCost : 0);
+
+  // ------- Slider init (using JSON min/max and count) -------
   noUiSlider.create(sliderEl, {
     range: { min: SLIDER_MIN, max: SLIDER_MAX },
     start: JSON_COUNT,
@@ -107,7 +142,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  // Pip labels (clickable)
+  // Pip labels + click
   sliderEl.querySelectorAll(".noUi-value").forEach((pip) => {
     const v = Number(pip.getAttribute("data-value"));
     pip.textContent = formatK(v);
@@ -115,40 +150,42 @@ document.addEventListener("DOMContentLoaded", async () => {
     pip.addEventListener("click", () => sliderEl.noUiSlider.set(v));
   });
 
-  // Keep input min/max aligned with slider bounds
+  // Keep input bounds aligned & set starting value
   if (empInputEl) {
     empInputEl.min = String(SLIDER_MIN);
     empInputEl.max = String(SLIDER_MAX);
     empInputEl.value = String(JSON_COUNT);
   }
 
-  // ----- Calculation -----
-  function recalc(raw) {
-    const n = clamp(Math.round(toNum(raw)), SLIDER_MIN, SLIDER_MAX);
-    const perStatement = FEES.statement + FEES.mailing;
-    const grandTotal = n * perStatement + FEES.base;
+  // ------- Calculation -------
+  function recalc(rawCount) {
+    const n = clamp(Math.round(toNum(rawCount)), SLIDER_MIN, SLIDER_MAX);
 
-    // Sync input (without fighting typing)
-    if (empInputEl && empInputEl.value !== String(n)) {
-      empInputEl.value = String(n);
-    }
+    // Grand total = employees * perStatement + baseFee
+    const grandTotal = n * perStatement + baseFee;
 
+    // Per-employee price = perStatement + (baseFee / n) when n > 0, else "—"
     if (n > 0) {
-      const perEmployee = perStatement + FEES.base / n;
+      const perEmployee = perStatement + baseFee / n;
       perEmployeeEl.textContent = fmtUSD(perEmployee);
       if (perEmployeeNoteEl) perEmployeeNoteEl.style.display = "none";
     } else {
       perEmployeeEl.textContent = "—";
       if (perEmployeeNoteEl) {
         perEmployeeNoteEl.style.display = "block";
-        perEmployeeNoteEl.textContent = fmtUSD(FEES.base);
+        perEmployeeNoteEl.textContent = fmtUSD(baseFee);
       }
     }
 
     grandTotalEl.textContent = fmtUSD(grandTotal);
+
+    // Keep the input synced
+    if (empInputEl && empInputEl.value !== String(n)) {
+      empInputEl.value = String(n);
+    }
   }
 
-  // Initial paint from JSON count
+  // Initial paint
   recalc(JSON_COUNT);
 
   // Slider -> totals
@@ -161,16 +198,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         sliderEl.noUiSlider.set(SLIDER_MIN);
         return;
       }
-      let v = clamp(Math.floor(toNum(empInputEl.value)), SLIDER_MIN, SLIDER_MAX);
+      const v = clamp(Math.floor(toNum(empInputEl.value)), SLIDER_MIN, SLIDER_MAX);
       sliderEl.noUiSlider.set(v);
     });
   }
 
-  // Reset -> back to JSON statementCount (respecting current bounds)
+  // Reset -> JSON statementCount
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      sliderEl.noUiSlider.set(clamp(JSON_COUNT, SLIDER_MIN, SLIDER_MAX));
+      sliderEl.noUiSlider.set(JSON_COUNT);
     });
   }
 });
