@@ -46,7 +46,7 @@ const Toast = (() => {
 
   const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
 
-  function show(message, { type = "info", duration = 2800 } = {}) {
+  function show(message, { type = "info", duration = 5000 } = {}) {
     injectStyles();
     const parent = ensureContainer();
 
