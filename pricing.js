@@ -199,10 +199,23 @@ document.addEventListener("DOMContentLoaded", async () => {
 cbHasInserts.addEventListener("change", () => {
   hasInserts = cbHasInserts.checked;
 
-  // If inserts turned on, single-address mail must be off
+  // Inserts require ONE mail type active
+  if (hasInserts && !isSingleMail && !isHomeMail) {
+    // Cannot allow inserts with no mail type
+    hasInserts = false;
+    cbHasInserts.checked = false;
+  }
+
+  // Inserts also cannot coexist with single-address mail if disabled
+  if (hasInserts && isSingleMail === false && isHomeMail === false) {
+    hasInserts = false;
+    cbHasInserts.checked = false;
+  }
+
+  // Inserts cannot coexist with single mail (your earlier rule)
   if (hasInserts && isSingleMail) {
-    isSingleMail = false;
-    cbSingleMail.checked = false;
+    hasInserts = false;
+    cbHasInserts.checked = false;
   }
 
   recalc(sliderEl.noUiSlider.get());
@@ -211,18 +224,20 @@ cbHasInserts.addEventListener("change", () => {
 cbSingleMail.addEventListener("change", () => {
   if (cbSingleMail.checked) {
     isSingleMail = true;
-
-    // single-address mail excludes inserts
-    if (hasInserts) {
-      hasInserts = false;
-      cbHasInserts.checked = false;
-    }
-
-    // keep single/home mutually exclusive
     isHomeMail = false;
     cbHomeMail.checked = false;
+
+    // Single mail disallows inserts
+    hasInserts = false;
+    cbHasInserts.checked = false;
   } else {
     isSingleMail = false;
+  }
+
+  // If both mails off → inserts must be off
+  if (!isSingleMail && !isHomeMail) {
+    hasInserts = false;
+    cbHasInserts.checked = false;
   }
 
   recalc(sliderEl.noUiSlider.get());
@@ -231,13 +246,16 @@ cbSingleMail.addEventListener("change", () => {
 cbHomeMail.addEventListener("change", () => {
   if (cbHomeMail.checked) {
     isHomeMail = true;
-
-    // home mail does NOT conflict with inserts
-    // but remains mutually exclusive with single-address mail
     isSingleMail = false;
     cbSingleMail.checked = false;
   } else {
     isHomeMail = false;
+  }
+
+  // If both mails off → inserts must be off
+  if (!isSingleMail && !isHomeMail) {
+    hasInserts = false;
+    cbHasInserts.checked = false;
   }
 
   recalc(sliderEl.noUiSlider.get());
