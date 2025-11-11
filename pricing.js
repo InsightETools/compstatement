@@ -1,26 +1,25 @@
-// Full JavaScript — Pricing slider with JSON config, input-driven max expansion,
-// TRUE reset, checkbox dependency logic, centered toasts (with autofocus on input),
-// and JSON→DOM field binding with "Unknown"/hide-wrapper behavior.
+// Full JavaScript — now with URL parameter sync + share mode.
+// - On load:
+//    • If ?share=true → use ONLY URL params as data (ignore JSON values)
+//    • If ?share missing or false → use JSON, and RESET the URL params to mirror JSON
+// - While interacting: any changes (slider, input, checkboxes, range changes, reset) are reflected in URL params
+// - Keeps all previously implemented behaviors:
+//    • Pricing calc, slider/input sync, centered toasts with autofocus, checkbox dependency rules
+//    • JSON→DOM binding w/ "Unknown" fallback & wrapper hide on null
+//    • pricingLocked hiding via [lock="pricingLock"] and hiding wrappers for false toggles when locked
 //
-// Requirements this file covers:
-// - Fetch JSON (DATA_URL) and initialize everything from it
-// - Slider uses sliderMin/sliderMax and statementCount from JSON
-// - Dragging slider to max DOES NOT expand max; shows a toast and focuses input
-// - Typing > max in the input expands max to typed+10 and sets the value
-// - Pricing: baseFee + (statementFee + mailing fee + optional insertCost) * count
-// - Mailing/insert rules with toasts:
-//     * Inserts require Home Mail; enabling inserts enables Home Mail and disables Single Mail
-//     * Single Mail disables Home Mail and Inserts
-//     * If both mails are false, Inserts is forced false
-// - Reset restores EXACT JSON defaults (range, count, toggles)
-// - "K" labels on pips (1k, 2k, ...), clickable pips
-// - applyJsonFields(json, fields): writes values into #<key>; if "" → "Unknown"; if null → hide #<key>Wrapper
-// - Maps these new fields: payrollSystem, payrollDataMethod, supplementalCostMethod, targetDate
+// IMPORTANT: Parameter keys we sync:
+//   share (true/false)
+//   baseFee, statementFee, singleAddressMailFee, homeAddressMailFee, insertCost
+//   sliderMin, sliderMax, statementCount
+//   isSingleMail, isHomeMail, hasInserts, pricingLocked
+//   payrollSystem, payrollDataMethod, supplementalCostMethod, targetDate
+//
+// Feel free to add/remove keys from PARAM_KEYS below if you want to include fewer/more in the share link.
 
-// ====== CONFIG ======
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
-// ====== TOAST MODULE (centered horizontally near bottom; autofocus supported) ======
+// ====== Toast (centered) ======
 const Toast = (() => {
   let container, stylesInjected = false;
 
@@ -93,17 +92,6 @@ const Toast = (() => {
 })();
 
 // ====== JSON → DOM FIELD BINDER ======
-/**
- * Apply JSON values to elements by ID with wrapper-hiding and "Unknown" fallback.
- * Convention:
- *  - Element id:            #<key>
- *  - Optional wrapper id:   #<key>Wrapper
- *
- * Rules:
- *  - If value === null → hide wrapper (or element if wrapper missing)
- *  - If value is "" (blank/whitespace) → set element to "Unknown"
- *  - Otherwise → set element to value (type-aware for img/a/input/textarea/others)
- */
 function applyJsonFields(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
   const hideEl = (el) => { if (el) el.style.display = "none"; };
@@ -119,7 +107,6 @@ function applyJsonFields(json, fields) {
     }
     if (!el) return;
 
-    // Ensure visible if not null
     if (wrapper) wrapper.style.display = "";
     el.style.display = "";
 
@@ -147,6 +134,91 @@ function applyJsonFields(json, fields) {
       el.textContent = out;
     }
   });
+}
+
+// ====== PARAMS HELPERS ======
+const PARAM_KEYS = [
+  "share",
+  "baseFee", "statementFee", "singleAddressMailFee", "homeAddressMailFee", "insertCost",
+  "sliderMin", "sliderMax", "statementCount",
+  "isSingleMail", "isHomeMail", "hasInserts", "pricingLocked",
+  "payrollSystem", "payrollDataMethod", "supplementalCostMethod", "targetDate"
+];
+
+const qs = () => new URLSearchParams(window.location.search);
+
+function setParamsBulk(obj) {
+  const p = qs();
+  for (const k of PARAM_KEYS) {
+    if (obj[k] === undefined) continue;
+    const v = obj[k];
+    if (v === null || v === undefined) p.delete(k);
+    else p.set(k, String(v));
+  }
+  history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
+}
+
+function getParamBool(name, def = false) {
+  const p = qs();
+  const v = p.get(name);
+  if (v === null) return def;
+  return v === "true" || v === "1";
+}
+
+function getParamNum(name, def = 0) {
+  const p = qs();
+  const v = Number(p.get(name));
+  return Number.isFinite(v) ? v : def;
+}
+
+function getParamStr(name, def = "") {
+  const p = qs();
+  const v = p.get(name);
+  return v !== null ? v : def;
+}
+
+function stateFromParams(defaults = {}) {
+  return {
+    share: getParamBool("share", false),
+    baseFee: getParamNum("baseFee", defaults.baseFee ?? 0),
+    statementFee: getParamNum("statementFee", defaults.statementFee ?? 0),
+    singleAddressMailFee: getParamNum("singleAddressMailFee", defaults.singleAddressMailFee ?? 0),
+    homeAddressMailFee: getParamNum("homeAddressMailFee", defaults.homeAddressMailFee ?? 0),
+    insertCost: getParamNum("insertCost", defaults.insertCost ?? 0),
+    sliderMin: getParamNum("sliderMin", defaults.sliderMin ?? 0),
+    sliderMax: getParamNum("sliderMax", defaults.sliderMax ?? 100),
+    statementCount: getParamNum("statementCount", defaults.statementCount ?? 0),
+    isSingleMail: getParamBool("isSingleMail", !!defaults.isSingleMail),
+    isHomeMail: getParamBool("isHomeMail", !!defaults.isHomeMail),
+    hasInserts: getParamBool("hasInserts", !!defaults.hasInserts),
+    pricingLocked: getParamBool("pricingLocked", !!defaults.pricingLocked),
+    payrollSystem: getParamStr("payrollSystem", defaults.payrollSystem ?? ""),
+    payrollDataMethod: getParamStr("payrollDataMethod", defaults.payrollDataMethod ?? ""),
+    supplementalCostMethod: getParamStr("supplementalCostMethod", defaults.supplementalCostMethod ?? ""),
+    targetDate: getParamStr("targetDate", defaults.targetDate ?? ""),
+  };
+}
+
+function paramsFromState(s) {
+  return {
+    share: s.share,
+    baseFee: s.baseFee,
+    statementFee: s.statementFee,
+    singleAddressMailFee: s.singleAddressMailFee,
+    homeAddressMailFee: s.homeAddressMailFee,
+    insertCost: s.insertCost,
+    sliderMin: s.sliderMin,
+    sliderMax: s.sliderMax,
+    statementCount: s.statementCount,
+    isSingleMail: s.isSingleMail,
+    isHomeMail: s.isHomeMail,
+    hasInserts: s.hasInserts,
+    pricingLocked: s.pricingLocked,
+    payrollSystem: s.payrollSystem,
+    payrollDataMethod: s.payrollDataMethod,
+    supplementalCostMethod: s.supplementalCostMethod,
+    targetDate: s.targetDate,
+  };
 }
 
 // ====== APP ======
@@ -204,140 +276,145 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
-  // --- Fetch JSON ---
-  let data = {};
+  // --- Fetch JSON (we may ignore it if share=true) ---
+  let json = {};
   try {
     const res = await fetch(DATA_URL, { cache: "no-store" });
-    data = await res.json();
+    json = await res.json();
   } catch (e) {
     console.error("Error loading JSON:", e);
-    data = {};
+    json = {};
   }
 
-  // --- Pricing Lock visibility (multiple elements) ---
-const pricingLockEls = document.querySelectorAll('[lock="pricingLock"]');
-pricingLockEls.forEach(el => {
-  if (data.pricingLocked === true) {
-    el.style.display = "none";
-  } else {
-    el.style.display = "";
-  }
-});
+  // ---- Build initial state (share mode vs json mode) ----
+  const urlShare = getParamBool("share", false);
 
-  // --- When pricing is locked, hide wrappers for disabled mailing options ---
-if (data.pricingLocked === true) {
-  const singleWrapper = document.getElementById("isSingleMailWrapper");
-  const homeWrapper   = document.getElementById("isHomeMailWrapper");
-  const insertWrapper = document.getElementById("hasInsertsWrapper");
+  // Defaults from JSON
+  const defaults = {
+    baseFee: toNum(json.baseFee),
+    statementFee: toNum(json.statementFee),
+    singleAddressMailFee: toNum(json.singleAddressMailFee),
+    homeAddressMailFee: toNum(json.homeAddressMailFee),
+    insertCost: toNum(json.insertCost),
+    sliderMin: toNum(json.sliderMin),
+    sliderMax: toNum(json.sliderMax),
+    statementCount: toNum(json.statementCount),
+    isSingleMail: !!json.isSingleMail,
+    isHomeMail: !!json.isHomeMail,
+    hasInserts: !!json.hasInserts,
+    pricingLocked: !!json.pricingLocked,
+    payrollSystem: json.payrollSystem ?? "",
+    payrollDataMethod: json.payrollDataMethod ?? "",
+    supplementalCostMethod: json.supplementalCostMethod ?? "",
+    targetDate: json.targetDate ?? ""
+  };
 
-  // Hide wrapper if its toggle is false
-  if (singleWrapper && data.isSingleMail === false) {
-    singleWrapper.style.display = "none";
+  // If share=true → use ONLY params (with defaults as fallbacks)
+  // Else → use JSON and reset URL params to mirror JSON (share=false)
+  let state = urlShare ? stateFromParams(defaults) : { ...defaults, share: false };
+
+  // Normalize slider range
+  if (state.sliderMax < state.sliderMin) {
+    const t = state.sliderMin;
+    state.sliderMin = state.sliderMax;
+    state.sliderMax = t;
+  }
+  state.statementCount = clamp(state.statementCount, state.sliderMin, state.sliderMax);
+
+  // Business rules normalize
+  if (state.hasInserts) {
+    state.isHomeMail = true;
+    state.isSingleMail = false;
+  }
+  if (!state.isSingleMail && !state.isHomeMail) {
+    state.hasInserts = false;
   }
 
-  if (homeWrapper && data.isHomeMail === false) {
-    homeWrapper.style.display = "none";
-  }
+  // On load, sync URL params:
+  //  - If share=true was present: keep share=true and ensure all params exist to match current state
+  //  - If share was absent/false: write params from JSON and set share=false
+  setParamsBulk(paramsFromState(state));
 
-  if (insertWrapper && data.hasInserts === false) {
-    insertWrapper.style.display = "none";
-  }
-}
-  
-  // --- Apply new JSON fields to DOM (Unknown/null-hiding rules) ---
-  applyJsonFields(data, [
+  // Keep an immutable copy for "Reset"
+  const ORIG = { ...state };
+
+  // --- Apply data to DOM fields (use state values, NOT raw JSON) ---
+  applyJsonFields(state, [
     "payrollSystem",
     "payrollDataMethod",
     "supplementalCostMethod",
     "targetDate"
   ]);
 
-  // --- Extract pricing values ---
-  const baseFee             = toNum(data.baseFee);
-  const statementFee        = toNum(data.statementFee);
-  const mailSingleFee       = toNum(data.singleAddressMailFee);
-  const mailHomeFee         = toNum(data.homeAddressMailFee);
-  const insertCost          = toNum(data.insertCost);
-  const canadaMailFee       = toNum(data.singleAddressCanadaMailFee); // labeled but unused in calc unless you want to switch by country
+  // --- pricingLocked visibility via attribute [lock="pricingLock"] ---
+  document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
+    el.style.display = state.pricingLocked ? "none" : "";
+  });
 
-  // Original (factory) state for full reset
-  const ORIG = {
-    hasInserts:    !!data.hasInserts,
-    isSingleMail:  !!data.isSingleMail,
-    isHomeMail:    !!data.isHomeMail,
-    sliderMin:      toNum(data.sliderMin),
-    sliderMax:      toNum(data.sliderMax),
-    statementCount: toNum(data.statementCount),
-  };
-  if (ORIG.sliderMax < ORIG.sliderMin) [ORIG.sliderMin, ORIG.sliderMax] = [ORIG.sliderMax, ORIG.sliderMin];
-  ORIG.statementCount = clamp(ORIG.statementCount, ORIG.sliderMin, ORIG.sliderMax);
-
-  // Mutable runtime state
-  let hasInserts   = ORIG.hasInserts;
-  let isSingleMail = ORIG.isSingleMail;
-  let isHomeMail   = ORIG.isHomeMail;
-  let SLIDER_MIN   = ORIG.sliderMin;
-  let SLIDER_MAX   = ORIG.sliderMax;
-
-  // Normalize initial state by business rules:
-  // - Inserts requires Home Mail; cannot coexist with Single Mail.
-  if (hasInserts) {
-    isHomeMail = true;
-    isSingleMail = false;
-  }
-  // - If both mail types off, inserts off.
-  if (!isSingleMail && !isHomeMail) {
-    hasInserts = false;
+  // When locked, hide wrappers for false toggles
+  if (state.pricingLocked) {
+    const singleW = document.getElementById("isSingleMailWrapper");
+    const homeW   = document.getElementById("isHomeMailWrapper");
+    const insW    = document.getElementById("hasInsertsWrapper");
+    if (singleW && state.isSingleMail === false) singleW.style.display = "none";
+    if (homeW   && state.isHomeMail   === false) homeW.style.display   = "none";
+    if (insW    && state.hasInserts   === false) insW.style.display    = "none";
   }
 
-  // --- Optional labels ---
-  if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(baseFee);
-  if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(statementFee);
-  if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(mailSingleFee);
-  if (labelHomeMailFee)   labelHomeMailFee.textContent = fmtUSD(mailHomeFee);
-  if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(canadaMailFee);
-  if (labelInsertCost)    labelInsertCost.textContent = fmtUSD(insertCost);
+  // --- Optional label displays (use state values)
+  if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
+  if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(state.statementFee);
+  if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
+  if (labelHomeMailFee)   labelHomeMailFee.textContent = fmtUSD(state.homeAddressMailFee);
+  if (labelInsertCost)    labelInsertCost.textContent = fmtUSD(state.insertCost);
+  if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
 
-  // --- Initialize checkboxes from normalized state ---
-  if (cbHasInserts) cbHasInserts.checked = hasInserts;
-  if (cbSingleMail) cbSingleMail.checked = isSingleMail;
-  if (cbHomeMail)   cbHomeMail.checked   = isHomeMail;
+  // --- Initialize checkboxes
+  if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
+  if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
+  if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
 
-  // --- Create slider ---
+  // --- Create slider
   noUiSlider.create(sliderEl, {
-    range: { min: SLIDER_MIN, max: SLIDER_MAX },
-    start: ORIG.statementCount,
+    range: { min: state.sliderMin, max: state.sliderMax },
+    start: state.statementCount,
     step: 1,
     connect: [true, false],
-    pips: { mode: "values", values: makePips(SLIDER_MIN, SLIDER_MAX), density: 10 },
+    pips: { mode: "values", values: makePips(state.sliderMin, state.sliderMax), density: 10 },
   });
   renderPips();
 
-  // Input bounds/value
   if (empInputEl) {
-    empInputEl.min = SLIDER_MIN;
-    empInputEl.max = SLIDER_MAX;
-    empInputEl.value = ORIG.statementCount;
+    empInputEl.min = state.sliderMin;
+    empInputEl.max = state.sliderMax;
+    empInputEl.value = state.statementCount;
   }
 
-  // --- Pricing helpers ---
-  const currentMailingFee = () => (isHomeMail ? mailHomeFee : isSingleMail ? mailSingleFee : 0);
-  const perStatementCost  = () => statementFee + currentMailingFee() + (hasInserts ? insertCost : 0);
+  // --- Pricing helpers
+  const currentMailingFee = () =>
+    state.isHomeMail ? state.homeAddressMailFee :
+    state.isSingleMail ? state.singleAddressMailFee : 0;
+
+  const perStatementCost  = () =>
+    state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
   function recalc(rawCount) {
-    const n = clamp(Math.round(toNum(rawCount)), SLIDER_MIN, SLIDER_MAX);
-    const perEmp = (n > 0) ? (perStatementCost() + baseFee / n) : perStatementCost();
-    const grand  = baseFee + perStatementCost() * n;
+    const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
+    const perEmp = (n > 0) ? (perStatementCost() + state.baseFee / n) : perStatementCost();
+    const grand  = state.baseFee + perStatementCost() * n;
 
     if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(perEmp);
     if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grand);
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
+
+    // reflect to URL
+    state.statementCount = n;
+    setParamsBulk(paramsFromState(state));
   }
 
-  // --- Update slider range/pips; optionally set a value to reflect handle ---
   function updateSliderRange(min, max, setVal = null) {
-    SLIDER_MIN = min;
-    SLIDER_MAX = max;
+    state.sliderMin = min;
+    state.sliderMax = max;
     if (empInputEl) {
       empInputEl.min = String(min);
       empInputEl.max = String(max);
@@ -347,35 +424,32 @@ if (data.pricingLocked === true) {
         range: { min, max },
         pips: { mode: "values", values: makePips(min, max), density: 10 },
       },
-      true // fire 'set'
+      true
     );
     renderPips();
     if (setVal != null) sliderEl.noUiSlider.set(setVal);
+
+    // reflect to URL
+    setParamsBulk(paramsFromState(state));
   }
 
-  // --- Auto-expand max ONLY via input ---
-  function expandMaxTo(newMax, targetValue = null) {
-    updateSliderRange(SLIDER_MIN, newMax, targetValue);
-  }
+  // --- Initial paint
+  recalc(state.statementCount);
 
-  // --- Initial paint ---
-  recalc(ORIG.statementCount);
-
-  // --- Slider → recalc + NO EXPAND. Show toast when hitting max & autofocus input. ---
+  // --- Slider update (NO auto-expand). Show toast when hitting max & autofocus.
   let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
-    const val = toNum(vals[0]);
+    const val = Number(vals[0]);
 
-    if (val >= SLIDER_MAX) {
+    if (val >= state.sliderMax) {
       if (!maxToastShown) {
         Toast.show(
-          `If your employee count is more than ${fmtInt(SLIDER_MAX)} then type the size in the input.`,
+          `If your employee count is more than ${fmtInt(state.sliderMax)} then type the size in the input.`,
           {
             type: "info",
             duration: 3800,
             onShow: () => {
               if (empInputEl) {
-                // Focus and place cursor at the end
                 setTimeout(() => {
                   empInputEl.focus();
                   const v = empInputEl.value;
@@ -395,139 +469,150 @@ if (data.pricingLocked === true) {
     recalc(val);
   });
 
-  // --- Input → slider + expand when typing above max (newMax = typed+10) ---
+  // --- Input → slider + expand when typing above max (newMax = typed+10)
   if (empInputEl) {
     empInputEl.addEventListener("input", () => {
       if (empInputEl.value === "") {
-        sliderEl.noUiSlider.set(SLIDER_MIN);
+        sliderEl.noUiSlider.set(state.sliderMin);
         return;
       }
-      let v = Math.floor(toNum(empInputEl.value));
-      if (v > SLIDER_MAX) {
-        expandMaxTo(v + 10, v); // input still drives expansion
+      let v = Math.floor(Number(empInputEl.value));
+      if (!Number.isFinite(v)) return;
+
+      if (v > state.sliderMax) {
+        updateSliderRange(state.sliderMin, v + 10, v);
       } else {
-        v = clamp(v, SLIDER_MIN, SLIDER_MAX);
+        v = clamp(v, state.sliderMin, state.sliderMax);
         sliderEl.noUiSlider.set(v);
       }
     });
   }
 
-  // --- RESET: restore EXACT JSON defaults (min/max, count, booleans) ---
+  // --- RESET (to ORIG = initial state source; params updated too)
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
 
-      // Restore factory booleans
-      hasInserts   = ORIG.hasInserts;
-      isSingleMail = ORIG.isSingleMail;
-      isHomeMail   = ORIG.isHomeMail;
+      // Restore state from ORIG
+      state = { ...ORIG };
 
-      // Normalize by rules
-      if (hasInserts) {
-        isHomeMail = true;
-        isSingleMail = false;
-      }
-      if (!isSingleMail && !isHomeMail) {
-        hasInserts = false;
+      // Re-apply lock visibilities
+      document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
+        el.style.display = state.pricingLocked ? "none" : "";
+      });
+      if (state.pricingLocked) {
+        const singleW = document.getElementById("isSingleMailWrapper");
+        const homeW   = document.getElementById("isHomeMailWrapper");
+        const insW    = document.getElementById("hasInsertsWrapper");
+        if (singleW) singleW.style.display = state.isSingleMail ? "" : "none";
+        if (homeW)   homeW.style.display   = state.isHomeMail   ? "" : "none";
+        if (insW)    insW.style.display    = state.hasInserts   ? "" : "none";
+      } else {
+        ["isSingleMailWrapper","isHomeMailWrapper","hasInsertsWrapper"]
+          .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
       }
 
-      // Reflect in checkboxes
-      if (cbHasInserts) cbHasInserts.checked = hasInserts;
-      if (cbSingleMail) cbSingleMail.checked = isSingleMail;
-      if (cbHomeMail)   cbHomeMail.checked   = isHomeMail;
+      // Reflect checkboxes
+      if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
+      if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
+      if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
 
       // Restore slider range & value
-      updateSliderRange(ORIG.sliderMin, ORIG.sliderMax, ORIG.statementCount);
+      updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
 
-      // Reset the one-time toast flag
+      // Reflect input
+      if (empInputEl) {
+        empInputEl.min = state.sliderMin;
+        empInputEl.max = state.sliderMax;
+        empInputEl.value = state.statementCount;
+      }
+
+      // Reset max-toast flag
       maxToastShown = false;
 
-      // Input reflect
-      if (empInputEl) empInputEl.value = ORIG.statementCount;
-
       // Recalc
-      recalc(ORIG.statementCount);
+      recalc(state.statementCount);
     });
   }
 
-  // ===== CHECKBOXES with explanatory toasts =====
-  // Rules enforced:
-  // - Inserts require Home Mail and cannot coexist with Single Mail.
-  // - Single Mail is exclusive with Home Mail and disables Inserts.
-  // - If both mail types are off, Inserts must be off.
+  // ===== CHECKBOXES with toasts + URL sync =====
+  const onStateChanged = () => setParamsBulk(paramsFromState(state));
 
   if (cbHasInserts) {
     cbHasInserts.addEventListener("change", () => {
-      hasInserts = cbHasInserts.checked;
+      state.hasInserts = cbHasInserts.checked;
 
-      if (hasInserts) {
-        if (!isHomeMail) {
-          isHomeMail = true;
+      if (state.hasInserts) {
+        if (!state.isHomeMail) {
+          state.isHomeMail = true;
           if (cbHomeMail) cbHomeMail.checked = true;
           Toast.show("Inserts require Home Address mailing, so Home Address Mail was enabled.", { type: "info" });
         }
-        if (isSingleMail) {
-          isSingleMail = false;
+        if (state.isSingleMail) {
+          state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
           Toast.show("Inserts can’t be used with Single Address Mail, so Single Address Mail was turned off.", { type: "warn" });
         }
       } else {
-        if (!isSingleMail && !isHomeMail && cbHasInserts.checked) {
-          cbHasInserts.checked = false; // defensive
+        if (!state.isSingleMail && !state.isHomeMail && cbHasInserts.checked) {
+          cbHasInserts.checked = false;
         }
       }
 
       recalc(sliderEl.noUiSlider.get());
+      onStateChanged();
     });
   }
 
   if (cbSingleMail) {
     cbSingleMail.addEventListener("change", () => {
       if (cbSingleMail.checked) {
-        isSingleMail = true;
+        state.isSingleMail = true;
 
-        if (isHomeMail) {
-          isHomeMail = false;
+        if (state.isHomeMail) {
+          state.isHomeMail = false;
           if (cbHomeMail) cbHomeMail.checked = false;
           Toast.show("Single Address Mail is exclusive, so Home Address Mail was turned off.", { type: "info" });
         }
-        if (hasInserts) {
-          hasInserts = false;
+        if (state.hasInserts) {
+          state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
           Toast.show("Inserts aren’t supported with Single Address Mail, so Inserts were turned off.", { type: "warn" });
         }
       } else {
-        isSingleMail = false;
-        if (!isHomeMail && hasInserts) {
-          hasInserts = false;
+        state.isSingleMail = false;
+        if (!state.isHomeMail && state.hasInserts) {
+          state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
           Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
         }
       }
 
       recalc(sliderEl.noUiSlider.get());
+      onStateChanged();
     });
   }
 
   if (cbHomeMail) {
     cbHomeMail.addEventListener("change", () => {
       if (cbHomeMail.checked) {
-        if (isSingleMail) {
-          isSingleMail = false;
+        if (state.isSingleMail) {
+          state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
           Toast.show("Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.", { type: "info" });
         }
-        isHomeMail = true;
+        state.isHomeMail = true;
       } else {
-        isHomeMail = false;
-        if (!isSingleMail && hasInserts) {
-          hasInserts = false;
+        state.isHomeMail = false;
+        if (!state.isSingleMail && state.hasInserts) {
+          state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
           Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
         }
       }
 
       recalc(sliderEl.noUiSlider.get());
+      onStateChanged();
     });
   }
 });
