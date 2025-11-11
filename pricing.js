@@ -1,6 +1,8 @@
-// Full JavaScript — Pricing slider with JSON config, auto-expand max,
-// input sync, TRUE reset, checkbox dependency logic, and explanatory toasts.
-// Note element logic is intentionally omitted.
+// Full JavaScript — Pricing slider with JSON config, input-driven max expansion,
+// TRUE reset, checkbox dependency logic, and explanatory toasts.
+// NOTE: Slider NO LONGER expands the max when dragged to the end.
+//       Instead, it shows a toast prompting the user to type a larger number.
+//       Typing a value above max in the input STILL expands max to typed+10.
 
 // ====== CONFIG ======
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
@@ -46,7 +48,7 @@ const Toast = (() => {
 
   const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
 
-  function show(message, { type = "info", duration = 5000 } = {}) {
+  function show(message, { type = "info", duration = 2800 } = {}) {
     injectStyles();
     const parent = ensureContainer();
 
@@ -67,7 +69,6 @@ const Toast = (() => {
     parent.appendChild(el);
     requestAnimationFrame(() => el.classList.add("show"));
     if (duration > 0) setTimeout(close, duration);
-
     return { close };
   }
 
@@ -100,6 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) =>
     Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
+  const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
   const formatK = (v) => {
     const abs = Math.abs(v);
@@ -158,14 +160,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (ORIG.sliderMax < ORIG.sliderMin) [ORIG.sliderMin, ORIG.sliderMax] = [ORIG.sliderMax, ORIG.sliderMin];
   ORIG.statementCount = clamp(ORIG.statementCount, ORIG.sliderMin, ORIG.sliderMax);
 
-  // Mutable runtime state (can change due to user actions)
+  // Mutable runtime state
   let hasInserts   = ORIG.hasInserts;
   let isSingleMail = ORIG.isSingleMail;
   let isHomeMail   = ORIG.isHomeMail;
   let SLIDER_MIN   = ORIG.sliderMin;
   let SLIDER_MAX   = ORIG.sliderMax;
 
-  // Normalize initial state by business rules:
+  // Normalize initial state by rules:
   // - Inserts requires Home Mail; cannot coexist with Single Mail.
   if (hasInserts) {
     isHomeMail = true;
@@ -212,7 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function recalc(rawCount) {
     const n = clamp(Math.round(toNum(rawCount)), SLIDER_MIN, SLIDER_MAX);
-    const perEmp = (n > 0) ? (perStatementCost() + baseFee / n) : perStatementCost(); // no note/zero handling
+    const perEmp = (n > 0) ? (perStatementCost() + baseFee / n) : perStatementCost();
     const grand  = baseFee + perStatementCost() * n;
 
     if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(perEmp);
@@ -239,7 +241,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (setVal != null) sliderEl.noUiSlider.set(setVal);
   }
 
-  // --- Auto-expand max helpers ---
+  // --- Auto-expand max ONLY via input ---
   function expandMaxTo(newMax, targetValue = null) {
     updateSliderRange(SLIDER_MIN, newMax, targetValue);
   }
@@ -247,12 +249,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   // --- Initial paint ---
   recalc(ORIG.statementCount);
 
-  // --- Slider → recalc + expand if hitting max (use val+10 rule) ---
+  // --- Slider → recalc + (NO EXPAND). Show toast when hitting max. ---
+  let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = toNum(vals[0]);
+
+    // When user drags handle to max, show a one-time toast (reset once below max)
     if (val >= SLIDER_MAX) {
-      expandMaxTo(val + 10, val);
+      if (!maxToastShown) {
+        Toast.show(
+          `If your employee count is more than ${fmtInt(SLIDER_MAX)} then type the size in the input.`,
+          { type: "info", duration: 3800 }
+        );
+        maxToastShown = true;
+      }
+    } else {
+      // reset flag once the user moves below max again
+      maxToastShown = false;
     }
+
     recalc(val);
   });
 
@@ -265,7 +280,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       let v = Math.floor(toNum(empInputEl.value));
       if (v > SLIDER_MAX) {
-        expandMaxTo(v + 10, v);
+        expandMaxTo(v + 10, v); // input still drives expansion
       } else {
         v = clamp(v, SLIDER_MIN, SLIDER_MAX);
         sliderEl.noUiSlider.set(v);
@@ -300,6 +315,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       // Restore slider range & value
       updateSliderRange(ORIG.sliderMin, ORIG.sliderMax, ORIG.statementCount);
 
+      // Reset the one-time toast flag
+      maxToastShown = false;
+
       // Input reflect
       if (empInputEl) empInputEl.value = ORIG.statementCount;
 
@@ -332,7 +350,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
       } else {
         if (!isSingleMail && !isHomeMail && cbHasInserts.checked) {
-          // defensive (shouldn't normally hit)
           cbHasInserts.checked = false;
         }
       }
@@ -344,7 +361,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (cbSingleMail) {
     cbSingleMail.addEventListener("change", () => {
       if (cbSingleMail.checked) {
-        // Single Mail ON
         isSingleMail = true;
 
         if (isHomeMail) {
@@ -358,7 +374,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           Toast.show("Inserts aren’t supported with Single Address Mail, so Inserts were turned off.", { type: "warn" });
         }
       } else {
-        // Single Mail OFF
         isSingleMail = false;
         if (!isHomeMail && hasInserts) {
           hasInserts = false;
@@ -374,7 +389,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (cbHomeMail) {
     cbHomeMail.addEventListener("change", () => {
       if (cbHomeMail.checked) {
-        // Home Mail ON → Single Mail OFF
         if (isSingleMail) {
           isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
@@ -382,7 +396,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
         isHomeMail = true;
       } else {
-        // Home Mail OFF
         isHomeMail = false;
         if (!isSingleMail && hasInserts) {
           hasInserts = false;
