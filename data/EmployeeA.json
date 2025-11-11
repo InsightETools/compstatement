@@ -73,7 +73,7 @@
   "insertCost": "1.00",
   "statementCount": "60",
   "isSingleMail": false,
-  "isHomeMail": false,
+  "isHomeMail": true,
   "hasInserts": true,
   "pricingLocked": false,
   "sliderMin": "0",
