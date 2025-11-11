@@ -5,7 +5,7 @@
 // Requires noUiSlider to be loaded on the page.
 
 // === Easy slider config (change one line to set the max) ===
-const SLIDER_MAX = 20000; // e.g. 5000, 10000, 20000, 50000, etc.
+const SLIDER_MAX = 200; // e.g. 5000, 10000, 20000, 50000, etc.
 
 // === Data source ===
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
