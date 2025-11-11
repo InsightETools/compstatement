@@ -74,7 +74,7 @@
   "statementCount": "60",
   "isSingleMail": false,
   "isHomeMail": false,
-  "hasInserts": false,
+  "hasInserts": true,
   "pricingLocked": false,
   "sliderMin": "0",
   "sliderMax": "200",
