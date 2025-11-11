@@ -77,7 +77,7 @@
   "hasInserts": true,
   "pricingLocked": false,
   "sliderMin": "0",
-  "sliderMax": "10000",
+  "sliderMax": "2000",
   "statementDisclaimerContactPage": "DISCLAIMER CONTACT: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details.",
   "primaryColor": "#f5c527",
   "secondaryColor": "#00406c",
