@@ -214,6 +214,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     data = {};
   }
 
+  // --- Pricing Lock visibility (multiple elements) ---
+const pricingLockEls = document.querySelectorAll('[lock="pricingLock"]');
+
+pricingLockEls.forEach(el => {
+  if (data.pricingLocked === true) {
+    el.style.display = "none";
+  } else {
+    el.style.display = "";
+  }
+});
+  
   // --- Apply new JSON fields to DOM (Unknown/null-hiding rules) ---
   applyJsonFields(data, [
     "payrollSystem",
