@@ -69,7 +69,7 @@
   "statementFee": "2.10",
   "singleAddressMailFee": "1.90",
   "homeAddressMailFee": "3.85",
-  "singleAddressCanadaMailFee": ""4.10,
+  "singleAddressCanadaMailFee": "4.10",
   "insertCost": "1.00",
   "statementCount": "60",
   "isSingleMail": false,
