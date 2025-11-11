@@ -1,12 +1,18 @@
-// Full JavaScript — pricing slider w/ conditional fees, JSON loading,
-// checkbox logic, dynamic min/max, auto-expand max, and NEW RULE:
-// If user types a value > current max → newMax = typedValue + 10.
-
+// Full JavaScript — pricing slider w/ JSON loading, conditional fees, checkboxes,
+// dynamic min/max, and auto-expand max. Now GUARANTEED that any expanded max
+// is immediately reflected in the slider (handle position + pips + aria).
+//
+// DOM IDs required:
+//  #slider, #empInput, #grandTotal, #perEmployee, #perEmployeeNote, #toZero
+//  Checkboxes: #hasInserts, #isSingleMail, #isHomeMail
+// Optional labels (auto-filled if present):
+//  #baseFee, #statementFee, #singleAddressMailFee, #homeAddressMailFee, #singleAddressCanadaMailFee, #insertCost
+//
+// Requires noUiSlider (CSS + JS) to be included on the page.
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
 document.addEventListener("DOMContentLoaded", async () => {
-
-  // ===== DOM ELEMENTS =====
+  // ===== DOM =====
   const sliderEl = document.getElementById("slider");
   const empInputEl = document.getElementById("empInput");
   const grandTotalEl = document.getElementById("grandTotal");
@@ -25,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const labelCanadaMailFee = document.getElementById("singleAddressCanadaMailFee");
   const labelInsertCost = document.getElementById("insertCost");
 
-  // ===== UTILS =====
+  // ===== Utils =====
   const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) =>
@@ -34,12 +40,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       currency: "USD",
       maximumFractionDigits: 2,
     });
-
   const formatK = (v) =>
     Math.abs(v) >= 1000
       ? (Number.isInteger(v / 1000) ? v / 1000 : (v / 1000).toFixed(1).replace(/\.0$/, "")) + "k"
       : String(v);
-
   const makePips = (min, max) =>
     max - min <= 0
       ? [min]
@@ -47,7 +51,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           Math.round(min + ((max - min) * i) / 10)
         );
 
-  // ===== LOAD JSON =====
+  // ===== Load JSON =====
   let data = {};
   try {
     const res = await fetch(DATA_URL, { cache: "no-store" });
@@ -57,27 +61,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     data = {};
   }
 
-  // ===== EXTRACT VALUES =====
+  // ===== Extract values =====
   let baseFee = toNum(data.baseFee);
   let statementFee = toNum(data.statementFee);
   let singleAddressMailFee = toNum(data.singleAddressMailFee);
   let homeAddressMailFee = toNum(data.homeAddressMailFee);
   let insertCost = toNum(data.insertCost);
 
-  // Booleans (controlled by checkboxes)
   let hasInserts = !!data.hasInserts;
   let isSingleMail = !!data.isSingleMail;
   let isHomeMail = !!data.isHomeMail;
 
-  // Slider dynamic range
   let SLIDER_MIN = toNum(data.sliderMin);
   let SLIDER_MAX = toNum(data.sliderMax);
   if (SLIDER_MAX < SLIDER_MIN) [SLIDER_MIN, SLIDER_MAX] = [SLIDER_MAX, SLIDER_MIN];
 
-  // Initial count
   let JSON_COUNT = clamp(toNum(data.statementCount), SLIDER_MIN, SLIDER_MAX);
 
-  // ===== POPULATE LABELS =====
+  // ===== Labels =====
   if (labelBaseFee) labelBaseFee.textContent = fmtUSD(baseFee);
   if (labelStatementFee) labelStatementFee.textContent = fmtUSD(statementFee);
   if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(singleAddressMailFee);
@@ -85,12 +86,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(data.singleAddressCanadaMailFee));
   if (labelInsertCost) labelInsertCost.textContent = fmtUSD(insertCost);
 
-  // ===== INITIAL CHECKBOX STATES =====
+  // ===== Checkboxes initial =====
   if (cbHasInserts) cbHasInserts.checked = hasInserts;
   if (cbSingleMail) cbSingleMail.checked = isSingleMail;
   if (cbHomeMail) cbHomeMail.checked = isHomeMail;
 
-  // ===== SLIDER CREATION =====
+  // ===== Slider create =====
   noUiSlider.create(sliderEl, {
     range: { min: SLIDER_MIN, max: SLIDER_MAX },
     start: JSON_COUNT,
@@ -109,17 +110,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   };
   renderPipLabels();
 
-  // Input range config
+  // Input bounds/value
   empInputEl.min = SLIDER_MIN;
   empInputEl.max = SLIDER_MAX;
   empInputEl.value = JSON_COUNT;
 
-  // ===== CALCULATIONS =====
-  const currentMailingFee = () =>
-    isHomeMail ? homeAddressMailFee : isSingleMail ? singleAddressMailFee : 0;
-
-  const perStatementCost = () =>
-    statementFee + currentMailingFee() + (hasInserts ? insertCost : 0);
+  // ===== Pricing =====
+  const currentMailingFee = () => (isHomeMail ? homeAddressMailFee : isSingleMail ? singleAddressMailFee : 0);
+  const perStatementCost = () => statementFee + currentMailingFee() + (hasInserts ? insertCost : 0);
 
   function recalc(rawCount) {
     const n = clamp(toNum(rawCount), SLIDER_MIN, SLIDER_MAX);
@@ -136,68 +134,75 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     grandTotalEl.textContent = fmtUSD(grand);
 
-    // sync input
     if (empInputEl.value !== String(n)) empInputEl.value = n;
   }
 
-  // ===== AUTO-EXPAND MAX =====
-  function expandMaxTo(newMax) {
+  // ===== Expand max AND reflect it in the slider =====
+  function expandMaxTo(newMax, targetValue = null) {
     SLIDER_MAX = newMax;
 
+    // Update input attributes
     empInputEl.max = SLIDER_MAX;
 
-    sliderEl.noUiSlider.updateOptions({
-      range: { min: SLIDER_MIN, max: SLIDER_MAX },
-      pips: {
-        mode: "values",
-        values: makePips(SLIDER_MIN, SLIDER_MAX),
-        density: 10,
+    // Update slider options (range + pips)
+    sliderEl.noUiSlider.updateOptions(
+      {
+        range: { min: SLIDER_MIN, max: SLIDER_MAX },
+        pips: {
+          mode: "values",
+          values: makePips(SLIDER_MIN, SLIDER_MAX),
+          density: 10,
+        },
       },
-    });
+      // Fire 'set' event to ensure UI sync after update
+      true
+    );
 
+    // Re-label pips
     renderPipLabels();
+
+    // Critically: set the slider to the intended value so the handle reflects it.
+    if (targetValue != null) {
+      sliderEl.noUiSlider.set(targetValue);
+    }
   }
 
-  // ===== INITIAL RENDER =====
+  // ===== Initial paint =====
   recalc(JSON_COUNT);
 
-  // ===== SLIDER → RECALC + EXPAND =====
+  // Slider → recalc; expand if user hits/exceeds max (keep handle at value)
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = toNum(vals[0]);
-
-    // Dragging past max expands max using new rule
     if (val >= SLIDER_MAX) {
-      expandMaxTo(val + 10);
+      // Expand to val + 10, then explicitly set slider to `val` so the UI reflects it.
+      expandMaxTo(val + 10, val);
     }
-
     recalc(val);
   });
 
-  // ===== INPUT → SLIDER + EXPAND ON OVERSHOOT =====
+  // Input → slider; expand if typed over max (keep handle at typed value)
   empInputEl.addEventListener("input", () => {
     if (empInputEl.value === "") {
       sliderEl.noUiSlider.set(SLIDER_MIN);
       return;
     }
-
-    let v = toNum(empInputEl.value);
-
-    // ✅ NEW RULE: If typedValue > max → new max = typedValue + 10
+    let v = Math.floor(toNum(empInputEl.value));
     if (v > SLIDER_MAX) {
-      expandMaxTo(v + 10);
+      // New rule: set max to typed value + 10 and set slider to typed value.
+      expandMaxTo(v + 10, v);
+    } else {
+      v = clamp(v, SLIDER_MIN, SLIDER_MAX);
+      sliderEl.noUiSlider.set(v);
     }
-
-    v = clamp(v, SLIDER_MIN, SLIDER_MAX);
-    sliderEl.noUiSlider.set(v);
   });
 
-  // ===== RESET BUTTON =====
+  // Reset → back to JSON count (clamped to current bounds)
   resetBtn.addEventListener("click", (e) => {
     e.preventDefault();
     sliderEl.noUiSlider.set(clamp(JSON_COUNT, SLIDER_MIN, SLIDER_MAX));
   });
 
-  // ===== CHECKBOXES =====
+  // Checkboxes
   cbHasInserts.addEventListener("change", () => {
     hasInserts = cbHasInserts.checked;
     recalc(sliderEl.noUiSlider.get());
@@ -208,8 +213,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       isSingleMail = true;
       isHomeMail = false;
       cbHomeMail.checked = false;
-    } else isSingleMail = false;
-
+    } else {
+      isSingleMail = false;
+    }
     recalc(sliderEl.noUiSlider.get());
   });
 
@@ -218,9 +224,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       isHomeMail = true;
       isSingleMail = false;
       cbSingleMail.checked = false;
-    } else isHomeMail = false;
-
+    } else {
+      isHomeMail = false;
+    }
     recalc(sliderEl.noUiSlider.get());
   });
-
 });
