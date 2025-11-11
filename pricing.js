@@ -1,162 +1,100 @@
 document.addEventListener("DOMContentLoaded", function () {
   const sliderEl = document.getElementById("slider");
-
-  // --- Utilities ---
-  const parseCurrency = (txt) => {
-    if (!txt) return 0;
-    const n = String(txt).replace(/[^0-9.-]/g, "");
-    const num = Number(n);
-    return isNaN(num) ? 0 : num;
-  };
-
-  const fmtUSD = (n) =>
-    Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
-
-  // --- Fee sources: DIVs with text like "$600.00" ---
-  const baseFeeEl = document.getElementById("baseFee");
-  const statementFeeEl = document.getElementById("statementFee");
-  const mailingFeeEl = document.getElementById("mailingFee");
-
-  // --- Outputs ---
+  const empInputEl = document.getElementById("empInput"); // numeric input you added
   const grandTotalEl = document.getElementById("grandTotal");
   const perEmployeeEl = document.getElementById("perEmployee");
   const perEmployeeNoteEl = document.getElementById("perEmployeeNote");
   const resetBtn = document.getElementById("toZero");
 
-  // New input for employees (two-way with slider)
-  const empInputEl = document.getElementById("empInput");
-  // (Optional: if you kept #empCount as a display elsewhere, we still support it)
-  const legacyEmpCountDisplay = document.getElementById("empCount");
+  // (Optional) if you still show fee values on the page:
+  const baseFeeText = document.getElementById("baseFee");
+  const statementFeeText = document.getElementById("statementFee");
+  const mailingFeeText = document.getElementById("mailingFee");
 
-  function getFees() {
-    return {
-      baseFee: 600,
-      statementFee: 2.1,
-      mailingFee: 1.9,
-    };
-  }
+  // === FEES: set them here ===
+  const FEES = {
+    base: 600.00,
+    statement: 2.10,
+    mailing: 1.90
+  };
 
-  // --- Create slider if not already initialized ---
-  if (!sliderEl.noUiSlider) {
-    noUiSlider.create(sliderEl, {
-      range: { min: 0, max: 10000 },
-      start: Number(empInputEl?.value ?? 0) || 0,
-      step: 1,
-      connect: [true, false],
-      pips: {
-        mode: "values",
-        values: [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000],
-        density: 10
-      }
-    });
-  }
+  // (Optional) reflect constants into any visible labels
+  const fmtUSD = (n) => Number(n).toLocaleString(
+    undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 }
+  );
+  if (baseFeeText) baseFeeText.textContent = fmtUSD(FEES.base);
+  if (statementFeeText) statementFeeText.textContent = fmtUSD(FEES.statement);
+  if (mailingFeeText) mailingFeeText.textContent = fmtUSD(FEES.mailing);
 
-  // --- Format pip labels and make them clickable ---
-  function setupPips() {
-    const pips = sliderEl.querySelectorAll(".noUi-value");
-    pips.forEach((pip) => {
-      const v = Number(pip.getAttribute("data-value"));
-      pip.style.paddingTop = "5px";
-      pip.style.cursor = "pointer";
-      pip.textContent = v === 0 ? "0" : (v / 1000) + "k";
-      pip.addEventListener("click", () => sliderEl.noUiSlider.set(v));
-    });
-  }
-  setupPips();
+  // Create slider 0..10000
+  const startVal = Math.max(0, Math.min(10000, Math.floor(Number(empInputEl?.value ?? 0) || 0)));
+  noUiSlider.create(sliderEl, {
+    range: { min: 0, max: 10000 },
+    start: startVal,
+    step: 1,
+    connect: [true, false],
+    pips: {
+      mode: "values",
+      values: [0,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000],
+      density: 10
+    }
+  });
 
-  // --- Calculation & render ---
+  // Format pip labels and make clickable
+  const pips = sliderEl.querySelectorAll(".noUi-value");
+  pips.forEach((pip) => {
+    const v = Number(pip.getAttribute("data-value"));
+    pip.style.paddingTop = "5px";
+    pip.style.cursor = "pointer";
+    pip.textContent = v === 0 ? "0" : (v / 1000) + "k";
+    pip.addEventListener("click", () => sliderEl.noUiSlider.set(v));
+  });
+
   function recalc(nRaw) {
-    const n = Math.max(0, Math.min(10000, Math.round(Number(nRaw) || 0))); // clamp 0..10000
-    const { baseFee, statementFee, mailingFee } = getFees();
+    const n = Math.max(0, Math.min(10000, Math.round(Number(nRaw) || 0)));
+    const perStatement = FEES.statement + FEES.mailing;
+    const grandTotal = n * perStatement + FEES.base;
 
-    const perStatement = statementFee + mailingFee;                // variable per employee
-    const grandTotal = n * perStatement + baseFee;                 // total cost
-    let perEmployeeDisplay = "—";
-    let noteText = "";
+    if (empInputEl && String(empInputEl.value) !== String(n)) {
+      empInputEl.value = String(n);
+    }
 
     if (n > 0) {
-      const perEmployee = perStatement + (baseFee / n);            // allocated base
-      perEmployeeDisplay = fmtUSD(perEmployee);
-      noteText = "";
+      const perEmployee = perStatement + (FEES.base / n);
+      perEmployeeEl.textContent = fmtUSD(perEmployee);
+      if (perEmployeeNoteEl) perEmployeeNoteEl.style.display = "none";
     } else {
-      noteText = fmtUSD(baseFee);                                  // show base fee when n == 0
+      perEmployeeEl.textContent = "—";
+      if (perEmployeeNoteEl) {
+        perEmployeeNoteEl.style.display = "block";
+        perEmployeeNoteEl.textContent = fmtUSD(FEES.base);
+      }
     }
-
-    // Write to DOM
-    if (empInputEl) empInputEl.value = String(n);
-    if (legacyEmpCountDisplay) legacyEmpCountDisplay.textContent = n.toLocaleString();
 
     grandTotalEl.textContent = fmtUSD(grandTotal);
-    perEmployeeEl.textContent = perEmployeeDisplay;
-    if (perEmployeeNoteEl) {
-      perEmployeeNoteEl.style.display = noteText ? "block" : "none";
-      perEmployeeNoteEl.textContent = noteText;
-    }
   }
 
   // Initial paint
   recalc(sliderEl.noUiSlider.get());
 
-  // Recalc on slider move + reflect in input
-  sliderEl.noUiSlider.on("update", function (values) {
-    recalc(values[0]);
-  });
+  // Slider -> Input + totals (fires for every move)
+  sliderEl.noUiSlider.on("update", (values) => recalc(values[0]));
 
-  // Typing in the input drives the slider (and therefore the calc)
-  function normalizeNumber(raw) {
-    // Allow temporary empty string during typing
-    if (raw === "" || raw === null || raw === undefined) return "";
-    const n = Math.floor(Number(raw));
-    if (isNaN(n)) return 0;
-    return Math.max(0, Math.min(10000, n));
-  }
-
+  // Input -> Slider on every input event (no blur needed)
   if (empInputEl) {
-    // Live update while typing (but keep empty allowed)
     empInputEl.addEventListener("input", () => {
-      const v = normalizeNumber(empInputEl.value);
-      if (v === "") {
-        // Don't force slider when empty; just blank the per-employee and show base fee
-        perEmployeeEl.textContent = "—";
-        if (perEmployeeNoteEl) {
-          const { baseFee } = getFees();
-          perEmployeeNoteEl.style.display = "block";
-          perEmployeeNoteEl.textContent = fmtUSD(baseFee);
-        }
-        grandTotalEl.textContent = fmtUSD(getFees().baseFee);
-        return;
-      }
-      if (Number(sliderEl.noUiSlider.get()) !== v) {
-        sliderEl.noUiSlider.set(v);
-      }
-    });
-
-    // On blur, commit a valid value (default to 0 if empty/invalid)
-    empInputEl.addEventListener("blur", () => {
-      let v = normalizeNumber(empInputEl.value);
-      if (v === "") v = 0;
-      empInputEl.value = String(v);
+      let v = Math.floor(Number(empInputEl.value));
+      if (isNaN(v)) v = 0;
+      v = Math.max(0, Math.min(10000, v));
       if (Number(sliderEl.noUiSlider.get()) !== v) {
         sliderEl.noUiSlider.set(v);
       } else {
-        // ensure UI recalcs if value didn't change
-        recalc(v);
+        recalc(v); // ensure totals refresh even if same number
       }
-    });
-
-    // Enter key commits value
-    empInputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") empInputEl.blur();
     });
   }
 
-  // If fee text changes dynamically, observe and recalc
-  const mo = new MutationObserver(() => recalc(sliderEl.noUiSlider.get()));
-  [baseFeeEl, statementFeeEl, mailingFeeEl].forEach((el) => {
-    if (el) mo.observe(el, { characterData: true, childList: true, subtree: true });
-  });
-
-  // Reset button -> sets employees to 0
+  // Reset button sets to 0
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
