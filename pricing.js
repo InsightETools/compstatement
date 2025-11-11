@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const empInputEl = document.getElementById("empInput");
   const grandTotalEl = document.getElementById("grandTotal");
   const perEmployeeEl = document.getElementById("perEmployee");
-  const perEmployeeNoteEl = document.getElementById("perEmployeeNote");
   const resetBtn = document.getElementById("toZero");
 
   const cbHasInserts = document.getElementById("hasInserts");
@@ -126,11 +125,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (n > 0) {
       perEmployeeEl.textContent = fmtUSD(perStatement + baseFee / n);
-      perEmployeeNoteEl.style.display = "none";
     } else {
       perEmployeeEl.textContent = "—";
-      perEmployeeNoteEl.style.display = "block";
-      perEmployeeNoteEl.textContent = fmtUSD(baseFee);
     }
     grandTotalEl.textContent = fmtUSD(grand);
 
