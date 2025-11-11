@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var slider = document.getElementById("slider");
 
   noUiSlider.create(slider, {
-    step: 1,
+    step: 0.1,
     range: {
       min: 0,
       max: 10,
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
     pips[i].addEventListener("click", clickOnPip);
   }
 
-  pips[pips.length - 1].innerHTML = "21+";
+  pips[pips.length - 1].innerHTML = "10+";
 
   //const directTotal = document.getElementById("directTotal");
   //const providerTotal = document.getElementById("providerTotal");
