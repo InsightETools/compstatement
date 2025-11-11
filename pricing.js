@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function () {
       continue;
     }
 
-    pips[i].innerHTML = (val + 1) + "k";
+    pips[i].innerHTML = (val) + "k";
   }
 
   pips[pips.length - 1].innerHTML = "10+";
