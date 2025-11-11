@@ -40,9 +40,9 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function getInputs() {
-    const statementFee = Number(statementFeeEl.value) || 0;
-    const mailingFee = Number(mailingFeeEl.value) || 0;
-    const baseFee = Number(baseFeeEl.value) || 0;
+    const statementFee = 2.1;
+    const mailingFee = 1.9;
+    const baseFee = 600;
     return { statementFee, mailingFee, baseFee };
   }
 
