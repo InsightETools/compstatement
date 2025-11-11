@@ -72,7 +72,7 @@
   "singleAddressCanadaMailFee": ""4.10,
   "insertCost": "1.00",
   "statementCount": "60",
-  "isSingleMail": false;
+  "isSingleMail": false,
   "isHomeMail": false,
   "hasInserts": false,
   "pricingLocked": false,
