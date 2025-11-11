@@ -1,11 +1,8 @@
-// Pricing Slider — full JavaScript with conditional fees from JSON
-// IDs expected on the page (create any you want to display):
-// #slider, #empInput, #grandTotal, #perEmployee, #perEmployeeNote, #toZero
-// Optional labels (values auto-filled if present, matched by JSON keys):
-// #baseFee, #statementFee, #singleAddressMailFee, #homeAddressMailFee, #singleAddressCanadaMailFee,
-// #insertCost, #statementCount, #isSingleMail, #isHomeMail, #hasInserts, #pricingLocked, #sliderMin, #sliderMax
-//
-// Requires noUiSlider (CSS+JS) loaded.
+// Pricing Slider — full JavaScript with conditional fees + checkboxes
+// Requires checkbox IDs:
+//   #hasInserts, #isSingleMail, #isHomeMail
+// These checkboxes will reflect JSON values on load
+// Then override them when the user changes them.
 
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
@@ -18,22 +15,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perEmployeeNoteEl = document.getElementById("perEmployeeNote");
   const resetBtn = document.getElementById("toZero");
 
-  // Matching-id value labels (populate if they exist)
-  const ids = {
-    baseFee: document.getElementById("baseFee"),
-    statementFee: document.getElementById("statementFee"),
-    singleAddressMailFee: document.getElementById("singleAddressMailFee"),
-    homeAddressMailFee: document.getElementById("homeAddressMailFee"),
-    singleAddressCanadaMailFee: document.getElementById("singleAddressCanadaMailFee"),
-    insertCost: document.getElementById("insertCost"),
-    statementCount: document.getElementById("statementCount"),
-    isSingleMail: document.getElementById("isSingleMail"),
-    isHomeMail: document.getElementById("isHomeMail"),
-    hasInserts: document.getElementById("hasInserts"),
-    pricingLocked: document.getElementById("pricingLocked"),
-    sliderMin: document.getElementById("sliderMin"),
-    sliderMax: document.getElementById("sliderMax"),
-  };
+  // Fee + boolean checkboxes
+  const cbHasInserts = document.getElementById("hasInserts");
+  const cbSingleMail = document.getElementById("isSingleMail");
+  const cbHomeMail = document.getElementById("isHomeMail");
+
+  // Optional labels
+  const labelBaseFee = document.getElementById("baseFee");
+  const labelStatementFee = document.getElementById("statementFee");
+  const labelSingleMailFee = document.getElementById("singleAddressMailFee");
+  const labelHomeMailFee = document.getElementById("homeAddressMailFee");
+  const labelCanadaMailFee = document.getElementById("singleAddressCanadaMailFee");
+  const labelInsertCost = document.getElementById("insertCost");
 
   // ------- Utils -------
   const toNum = (v) => {
@@ -48,22 +41,20 @@ document.addEventListener("DOMContentLoaded", async () => {
       maximumFractionDigits: 2,
     });
   const formatK = (v) => {
-    const abs = Math.abs(v);
-    if (abs >= 1000) {
+    if (Math.abs(v) >= 1000) {
       const k = v / 1000;
-      const label = Number.isInteger(k) ? String(k) : k.toFixed(1).replace(/\.0$/, "");
-      return `${label}k`;
+      return Number.isInteger(k) ? k + "k" : k.toFixed(1).replace(/\.0$/, "") + "k";
     }
     return String(v);
   };
   const makePips = (min, max) => {
-    // 11 evenly spaced pips from min..max
     const steps = 10;
     const span = max - min;
-    if (span <= 0) return [min];
-    return Array.from({ length: steps + 1 }, (_, i) =>
-      Math.round(min + (span * i) / steps)
-    );
+    return span <= 0
+      ? [min]
+      : Array.from({ length: steps + 1 }, (_, i) =>
+          Math.round(min + (span * i) / steps)
+        );
   };
 
   // ------- Load JSON -------
@@ -73,63 +64,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     data = await res.json();
   } catch (err) {
-    console.error("Failed to fetch JSON:", err);
+    console.error("ERROR: JSON FETCH FAILED", err);
     data = {};
   }
 
-  // ------- Map values from JSON -------
-  const baseFee = toNum(data.baseFee);
-  const statementFee = toNum(data.statementFee);
-  const singleAddressMailFee = toNum(data.singleAddressMailFee);
-  const homeAddressMailFee = toNum(data.homeAddressMailFee);
-  const singleAddressCanadaMailFee = toNum(data.singleAddressCanadaMailFee); // not used in math unless you add a flag
-  const insertCost = toNum(data.insertCost);
+  // ------- Extract Values -------
+  let baseFee = toNum(data.baseFee);
+  let statementFee = toNum(data.statementFee);
 
-  const isSingleMail = !!data.isSingleMail;
-  const isHomeMail = !!data.isHomeMail;
-  const hasInserts = !!data.hasInserts;
-  const pricingLocked = !!data.pricingLocked;
+  let singleAddressMailFee = toNum(data.singleAddressMailFee);
+  let homeAddressMailFee = toNum(data.homeAddressMailFee);
+  let insertCost = toNum(data.insertCost);
 
-  // dynamic slider bounds + initial count
+  // these booleans WILL BE UPDATED when checkboxes change
+  let isSingleMail = !!data.isSingleMail;
+  let isHomeMail = !!data.isHomeMail;
+  let hasInserts = !!data.hasInserts;
+
+  // slider range
   let SLIDER_MIN = toNum(data.sliderMin);
   let SLIDER_MAX = toNum(data.sliderMax);
-  if (SLIDER_MAX < SLIDER_MIN) {
-    const t = SLIDER_MIN;
-    SLIDER_MIN = SLIDER_MAX;
-    SLIDER_MAX = t;
-  }
-  const JSON_COUNT = clamp(Math.floor(toNum(data.statementCount)), SLIDER_MIN, SLIDER_MAX);
+  if (SLIDER_MAX < SLIDER_MIN) [SLIDER_MIN, SLIDER_MAX] = [SLIDER_MAX, SLIDER_MIN];
 
-  // ------- Populate matching-id elements (if present) -------
-  if (ids.baseFee) ids.baseFee.textContent = fmtUSD(baseFee);
-  if (ids.statementFee) ids.statementFee.textContent = fmtUSD(statementFee);
-  if (ids.singleAddressMailFee) ids.singleAddressMailFee.textContent = fmtUSD(singleAddressMailFee);
-  if (ids.homeAddressMailFee) ids.homeAddressMailFee.textContent = fmtUSD(homeAddressMailFee);
-  if (ids.singleAddressCanadaMailFee) ids.singleAddressCanadaMailFee.textContent = fmtUSD(singleAddressCanadaMailFee);
-  if (ids.insertCost) ids.insertCost.textContent = fmtUSD(insertCost);
+  // starting employee count
+  let JSON_COUNT = clamp(toNum(data.statementCount), SLIDER_MIN, SLIDER_MAX);
 
-  if (ids.statementCount) ids.statementCount.textContent = String(JSON_COUNT);
-  if (ids.isSingleMail) ids.isSingleMail.textContent = String(isSingleMail);
-  if (ids.isHomeMail) ids.isHomeMail.textContent = String(isHomeMail);
-  if (ids.hasInserts) ids.hasInserts.textContent = String(hasInserts);
-  if (ids.pricingLocked) ids.pricingLocked.textContent = String(pricingLocked);
-  if (ids.sliderMin) ids.sliderMin.textContent = String(SLIDER_MIN);
-  if (ids.sliderMax) ids.sliderMax.textContent = String(SLIDER_MAX);
+  // ------- Populate labels if present -------
+  if (labelBaseFee) labelBaseFee.textContent = fmtUSD(baseFee);
+  if (labelStatementFee) labelStatementFee.textContent = fmtUSD(statementFee);
+  if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(singleAddressMailFee);
+  if (labelHomeMailFee) labelHomeMailFee.textContent = fmtUSD(homeAddressMailFee);
+  if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(data.singleAddressCanadaMailFee));
+  if (labelInsertCost) labelInsertCost.textContent = fmtUSD(insertCost);
 
-  // ------- Determine conditional per-statement fees -------
-  // Mailing fee rule:
-  // - if isHomeMail === true -> use homeAddressMailFee
-  // - else if isSingleMail === true -> use singleAddressMailFee
-  // - else 0
-  const mailingFee =
-    isHomeMail ? homeAddressMailFee :
-    isSingleMail ? singleAddressMailFee : 0;
+  // ------- Set initial checkbox states -------
+  if (cbHasInserts) cbHasInserts.checked = hasInserts;
+  if (cbSingleMail) cbSingleMail.checked = isSingleMail;
+  if (cbHomeMail) cbHomeMail.checked = isHomeMail;
 
-  // Insert cost rule:
-  // - add insertCost if hasInserts === true
-  const perStatement = statementFee + mailingFee + (hasInserts ? insertCost : 0);
-
-  // ------- Slider init (using JSON min/max and count) -------
+  // ------- Slider Init -------
   noUiSlider.create(sliderEl, {
     range: { min: SLIDER_MIN, max: SLIDER_MAX },
     start: JSON_COUNT,
@@ -142,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     },
   });
 
-  // Pip labels + click
+  // Clickable pips + formatting
   sliderEl.querySelectorAll(".noUi-value").forEach((pip) => {
     const v = Number(pip.getAttribute("data-value"));
     pip.textContent = formatK(v);
@@ -150,64 +123,93 @@ document.addEventListener("DOMContentLoaded", async () => {
     pip.addEventListener("click", () => sliderEl.noUiSlider.set(v));
   });
 
-  // Keep input bounds aligned & set starting value
+  // Input sync
   if (empInputEl) {
-    empInputEl.min = String(SLIDER_MIN);
-    empInputEl.max = String(SLIDER_MAX);
-    empInputEl.value = String(JSON_COUNT);
+    empInputEl.min = SLIDER_MIN;
+    empInputEl.max = SLIDER_MAX;
+    empInputEl.value = JSON_COUNT;
   }
 
-  // ------- Calculation -------
+  // ------- Recalculate Pricing -------
   function recalc(rawCount) {
-    const n = clamp(Math.round(toNum(rawCount)), SLIDER_MIN, SLIDER_MAX);
+    const n = clamp(toNum(rawCount), SLIDER_MIN, SLIDER_MAX);
 
-    // Grand total = employees * perStatement + baseFee
+    // Determine mailing fee dynamically
+    let mailingFee = 0;
+    if (isHomeMail) mailingFee = homeAddressMailFee;
+    else if (isSingleMail) mailingFee = singleAddressMailFee;
+
+    // include insert cost if checked
+    const perStatement =
+      statementFee +
+      mailingFee +
+      (hasInserts ? insertCost : 0);
+
     const grandTotal = n * perStatement + baseFee;
 
-    // Per-employee price = perStatement + (baseFee / n) when n > 0, else "—"
+    // Update per employee
     if (n > 0) {
       const perEmployee = perStatement + baseFee / n;
       perEmployeeEl.textContent = fmtUSD(perEmployee);
-      if (perEmployeeNoteEl) perEmployeeNoteEl.style.display = "none";
+      perEmployeeNoteEl.style.display = "none";
     } else {
       perEmployeeEl.textContent = "—";
-      if (perEmployeeNoteEl) {
-        perEmployeeNoteEl.style.display = "block";
-        perEmployeeNoteEl.textContent = fmtUSD(baseFee);
-      }
+      perEmployeeNoteEl.style.display = "block";
+      perEmployeeNoteEl.textContent = fmtUSD(baseFee);
     }
 
     grandTotalEl.textContent = fmtUSD(grandTotal);
 
-    // Keep the input synced
-    if (empInputEl && empInputEl.value !== String(n)) {
-      empInputEl.value = String(n);
-    }
+    // keep input in sync
+    if (empInputEl.value !== String(n)) empInputEl.value = n;
   }
 
-  // Initial paint
+  // Initial render
   recalc(JSON_COUNT);
 
-  // Slider -> totals
+  // Slider → recalc
   sliderEl.noUiSlider.on("update", (vals) => recalc(vals[0]));
 
-  // Input -> slider (live)
-  if (empInputEl) {
-    empInputEl.addEventListener("input", () => {
-      if (empInputEl.value === "") {
-        sliderEl.noUiSlider.set(SLIDER_MIN);
-        return;
-      }
-      const v = clamp(Math.floor(toNum(empInputEl.value)), SLIDER_MIN, SLIDER_MAX);
-      sliderEl.noUiSlider.set(v);
-    });
-  }
+  // Input → slider
+  empInputEl.addEventListener("input", () => {
+    if (empInputEl.value === "") {
+      sliderEl.noUiSlider.set(SLIDER_MIN);
+      return;
+    }
+    sliderEl.noUiSlider.set(clamp(toNum(empInputEl.value), SLIDER_MIN, SLIDER_MAX));
+  });
 
-  // Reset -> JSON statementCount
-  if (resetBtn) {
-    resetBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      sliderEl.noUiSlider.set(JSON_COUNT);
-    });
-  }
+  // Reset
+  resetBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    sliderEl.noUiSlider.set(JSON_COUNT);
+  });
+
+  // --------------- CHECKBOX EVENTS ---------------
+  cbHasInserts.addEventListener("change", () => {
+    hasInserts = cbHasInserts.checked;
+    recalc(sliderEl.noUiSlider.get());
+  });
+
+  cbSingleMail.addEventListener("change", () => {
+    if (cbSingleMail.checked) {
+      isSingleMail = true;
+      isHomeMail = false;
+      cbHomeMail.checked = false;
+    } else {
+      isSingleMail = false;
+    }
+    recalc(sliderEl.noUiSlider.get());
+  });
+
+  cbHomeMail.addEventListener("change", () => {
+    if (cbHomeMail.checked) {
+      isHomeMail = true;
+      isSingleMail = false;
+      cbSingleMail.checked = false;
+    } else {
+      isHomeMail = false;
+    }
+    recalc(sliderEl.noUiSlider.get());
+  });
 });
