@@ -195,33 +195,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // ----- CHECKBOXES -----
-  cbHasInserts.addEventListener("change", () => {
-    hasInserts = cbHasInserts.checked;
-    recalc(sliderEl.noUiSlider.get());
-  });
+// ----- CHECKBOXES -----
+cbHasInserts.addEventListener("change", () => {
+  hasInserts = cbHasInserts.checked;
 
-  cbSingleMail.addEventListener("change", () => {
-    if (cbSingleMail.checked) {
-      isSingleMail = true;
-      isHomeMail = false;
-      cbHomeMail.checked = false;
-    } else {
-      isSingleMail = false;
-    }
-    recalc(sliderEl.noUiSlider.get());
-  });
+  // ✅ If inserts were turned on but single mail is active → turn inserts off
+  if (hasInserts && isSingleMail) {
+    hasInserts = false;
+    cbHasInserts.checked = false;
+  }
 
-  cbHomeMail.addEventListener("change", () => {
-    if (cbHomeMail.checked) {
-      isHomeMail = true;
-      isSingleMail = false;
-      cbSingleMail.checked = false;
-    } else {
-      isHomeMail = false;
-    }
-    recalc(sliderEl.noUiSlider.get());
-  });
+  recalc(sliderEl.noUiSlider.get());
+});
+
+cbSingleMail.addEventListener("change", () => {
+  if (cbSingleMail.checked) {
+    isSingleMail = true;
+    isHomeMail = false;
+    cbHomeMail.checked = false;
+
+    // ✅ If single mail is selected → inserts are not allowed
+    hasInserts = false;
+    cbHasInserts.checked = false;
+  } else {
+    isSingleMail = false;
+  }
+
+  recalc(sliderEl.noUiSlider.get());
+});
+
+cbHomeMail.addEventListener("change", () => {
+  if (cbHomeMail.checked) {
+    isHomeMail = true;
+    isSingleMail = false;
+    cbSingleMail.checked = false;
+
+    // ✅ Home mail does NOT force inserts off
+    // (Only singleAddressMail does)
+  } else {
+    isHomeMail = false;
+  }
+
+  recalc(sliderEl.noUiSlider.get());
+});
 
   // ----- RESET EVERYTHING -----
   resetBtn.addEventListener("click", (e) => {
