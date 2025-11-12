@@ -20,7 +20,7 @@ const Toast = (() => {
         opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;
       }
       .toast.show{opacity:1;transform:translateY(0)}
-      .toast__icon{width:20px;height:20px;margin-top:1px}
+      .toast__icon{width:0px;height:0px;margin-top:0px}
       .toast__close{border:0;background:transparent;color:#fff;opacity:.7;cursor:pointer;font-size:16px}
       .toast--info{background:#14d273}
       .toast--warn{background:#14d273}
