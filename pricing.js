@@ -13,7 +13,7 @@ const Toast = (() => {
         width:auto;max-width:calc(100% - 40px);
       }
       .toast{
-        pointer-events:auto;min-width:240px;max-width:420px;padding:30px 20px;border-radius:10px;
+        pointer-events:auto;min-width:240px;max-width:420px;padding:25px 20px;border-radius:10px;
         box-shadow:0 6px 18px rgba(0,0,0,.18);background:#111;color:#fff;
         font:500 16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
         display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:start;
@@ -37,7 +37,8 @@ const Toast = (() => {
     document.body.appendChild(container);
     return container;
   }
-  const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
+  //const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
+  const iconFor = "⚠️";
   function show(message, { type = "info", duration = 2800, onShow = null } = {}) {
     injectStyles();
     const parent = ensureContainer();
