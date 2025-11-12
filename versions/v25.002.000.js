@@ -1698,4 +1698,4 @@ updateZoom();
     });
   });
 })();
-console.log("Build v25.002.000");
+console.log("Explorer v25.002.000");
