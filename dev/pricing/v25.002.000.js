@@ -74,19 +74,6 @@ const FLAG_BITS = {
   pricingLocked: 1 << 3  // 8
 };
 
-function numTo36(n){ return Math.round(Number(n)).toString(36); }
-function from36(s, def=0){ const n = parseInt(s, 36); return Number.isFinite(n) ? n : def; }
-
-// Base64URL helpers
-function toBase64Url(str){
-  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function fromBase64Url(b64u){
-  const pad = b64u.length % 4 === 2 ? "==" : b64u.length % 4 === 3 ? "=" : "";
-  const b64 = b64u.replace(/-/g,'+').replace(/_/g,'/') + pad;
-  return atob(b64);
-}
-
 function packFlags(s){
   let f = 0;
   if (s.isSingleMail)  f |= FLAG_BITS.isSingleMail;
