@@ -1,614 +1,1765 @@
-const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
+// ===== Build v25.001.009 (Full JS with new URL encoding feature) =================
+let isLoaded = false;
+console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
-/* ============================== Config: Sharing ============================== */
-// Toggle this to fully disable reading/writing the compact ?s= param.
-const ENABLE_SHARE = true;
-// Base64URL for {"v":1} — i.e., "no diffs vs defaults"
-const MINIMAL_S = "eyJ2IjoxfQ";
+/* ------------------ DOM helpers ------------------ */
+const $  = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
 
-/* ============================== Toast (centered) ============================== */
-const Toast = (() => {
-  let container, stylesInjected = false;
-  function injectStyles() {
-    if (stylesInjected) return;
-    stylesInjected = true;
-    const css = `
-      .toast-container{
-        position:fixed;left:50%;bottom:24px;transform:translateX(-50%);
-        z-index:9999;display:flex;flex-direction:column;gap:8px;pointer-events:none;
-        width:auto;max-width:calc(100% - 40px);
-      }
-      .toast{
-        pointer-events:auto;min-width:240px;max-width:420px;padding:25px 20px;border-radius:10px;
-        box-shadow:0 6px 18px rgba(0,0,0,.18);background:#111;color:#fff;
-        font:500 16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-        display:grid;grid-template-columns:20px 1fr auto;gap:0px;align-items:start;
-        opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;
-      }
-      .toast.show{opacity:1;transform:translateY(0)}
-      .toast__icon{width:0px;height:0px;margin-top:0px}
-      .toast__close{border:0;background:transparent;color:#fff;opacity:.7;cursor:pointer;font-size:16px}
-      .toast--info{background:#14d273}
-      .toast--warn{background:#14d273}
-      .toast--error{background:#14d273}
-    `;
-    const style = document.createElement("style");
-    style.textContent = css;
-    document.head.appendChild(style);
-  }
-  function ensureContainer() {
-    if (container) return container;
-    container = document.createElement("div");
-    container.className = "toast-container";
-    document.body.appendChild(container);
-    return container;
-  }
+/* ------------------ URL param helpers ------------------ */
+/**
+ * New encoding feature:
+ * - Encodes keys/values like encodeURIComponent, but uses '+' for spaces.
+ * - Preserves existing `pr=true` preview flag when changing other params.
+ */
+const _enc = (s) => encodeURIComponent(String(s)).replace(/%20/g, "+");
+const _dec = (s) => decodeURIComponent(String(s).replace(/\+/g, "%20"));
 
-  function show(message, { type = "info", duration = 6000, onShow = null } = {}) {
-    const iconFor = () => "";
-    injectStyles();
-    const parent = ensureContainer();
-    const el = document.createElement("div");
-    el.className = `toast toast--${type}`;
-    el.innerHTML = `
-      <div class="toast__icon" aria-hidden="true">${iconFor(type)}</div>
-      <div class="toast__content">${message}</div>
-      <button class="toast__close" aria-label="Dismiss">✕</button>
-    `;
-    const close = () => {
-      el.classList.remove("show");
-      setTimeout(() => el.remove(), 180);
-    };
-    el.querySelector(".toast__close").addEventListener("click", close);
-    parent.appendChild(el);
-    requestAnimationFrame(() => {
-      el.classList.add("show");
-      if (typeof onShow === "function") onShow();
+function getParams() {
+  // Parse current query with + treated as space
+  const raw = window.location.search.slice(1);
+  const p = new URLSearchParams();
+  if (raw) {
+    raw.split("&").forEach(kv => {
+      if (!kv) return;
+      const [k, v = ""] = kv.split("=");
+      p.append(_dec(k), _dec(v));
     });
-    if (duration > 0) setTimeout(close, duration);
-    return { close };
   }
-  return { show };
-})();
+  return p;
+}
 
-/* ===================== JSON -> DOM field binder (protected) =================== */
-/** For protected fields: blank -> "Unknown"; null -> hide wrapper */
-function applyJsonFieldsStrict(json, fields) {
-  const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const isNullishByRule = (v) =>
-    v === null || (typeof v === "string" && v.trim().toLowerCase() === "null");
+function _toEncodedQS(params) {
+  const parts = [];
+  for (const [k, v] of params.entries()) {
+    // Skip undefined/null-like values (URLSearchParams never stores undefined but just in case)
+    if (v === undefined || v === null) continue;
+    parts.push(`${_enc(k)}=${_enc(v)}`);
+  }
+  return parts.join("&");
+}
 
-  const sliderEl = document.getElementById("slider");
+function setParam(key, value) {
+  const p = getParams();
+  const hadPreview = p.get("pr") === "true";
 
-  fields.forEach((key) => {
-    const el = document.getElementById(key);
-    const wrapper = document.getElementById(`${key}Wrapper`);
-    if (!el) return;
+  if (value === null || value === undefined) p.delete(key);
+  else p.set(key, value);
 
-    const val = json?.[key];
+  if (hadPreview && key !== "pr") p.set("pr", "true");
 
-    // Nullish => hide wrapper/element UNLESS it would also hide the slider
-    if (isNullishByRule(val)) {
-      if (wrapper) {
-        if (sliderEl && wrapper.contains(sliderEl)) {
-          // Safety: don't hide the slider's container
-          wrapper.style.display = "";
-          el.style.display = "";
-          el.textContent = "Unknown";
-        } else {
-          wrapper.style.display = "none";
+  const qs = _toEncodedQS(p);
+  const newUrl = `${location.pathname}${qs ? "?" + qs : ""}${location.hash}`;
+  history.replaceState(null, "", newUrl);
+}
+
+const toggleActive = (id, isActive) => $("#" + id)?.classList.toggle("active", !!isActive);
+
+const debounced = (fn, ms = 60) => {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
+};
+
+let currentFetchController = null;
+
+/* ------------------ Data fetching ------------------ */
+function buildFetchUrlFromParams() {
+  const p = getParams();
+  const key    = p.get("key");
+  const cpid   = p.get("cpid");
+  const yr     = p.get("yr");
+  const ck     = p.get("ck");
+  const ek     = p.get("ek") || "EmployeeA";
+  const layout = p.get("layout");
+
+  const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
+
+  if (!key) {
+    return `https://compstatementdemo.netlify.app/data/${_enc(ek)}.json`;
+  }
+
+  const qp = new URLSearchParams({
+    usecors: "1",
+    key, cpid, yr, ck, ek, layout,
+  });
+
+  return `${baseUrl}?${qp.toString()}`; // server side can accept standard encoding
+}
+
+const debouncedReloadFromParams = debounced(() => window.reloadFromParams(), 60);
+
+window.reloadFromParams = async () => {
+  if (currentFetchController) currentFetchController.abort();
+  currentFetchController = new AbortController();
+
+  const fetchUrl = buildFetchUrlFromParams();
+
+  try {
+    const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
+    const data = await res.json();
+
+    await renderAll(data);
+
+    if (typeof window.applyOverflow === "function") window.applyOverflow();
+
+    isLoaded = true;
+    console.log("Finished");
+    setTimeout(() => {
+      $("#loader")?.classList.add("finished");
+    }, 3000);
+    
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      const errorCheck = err.message?.includes?.("Unexpected token");
+      alert(errorCheck ? "No User Found" : err);
+    }
+  } finally {
+    currentFetchController = null;
+  }
+};
+
+/* ------------------ Utilities ------------------ */
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, "");
+  if (hex.length === 3) hex = hex.split("").map((c) => c + c).join("");
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255, g = (bigint >> 8) & 255, b = bigint & 255;
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
+function formatCurrency(value, element = null, decimalFlag = null, isCurrency = true) {
+  if (value == null || isNaN(value)) return isCurrency ? "$0.00" : "0";
+  const isDynamic = element?.getAttribute?.("number") === "dynamic";
+  const isWhole =
+    decimalFlag === false ||
+    (!decimalFlag && isDynamic === false) ||
+    element?.getAttribute?.("number") === "whole";
+  const formatted = parseFloat(value).toLocaleString("en-US", {
+    minimumFractionDigits: isWhole ? 0 : 2,
+    maximumFractionDigits: isWhole ? 0 : 2,
+  });
+  return isCurrency ? `$${formatted}` : formatted;
+}
+
+/* ------------------ Overflow fit ------------------ */
+window.applyOverflow = function () {
+  document.querySelectorAll('[item="page"]').forEach((page) => {
+    const lineEls = page.querySelectorAll(
+      ".standardtablelinelabel, .standardtablevalue, .standardtablesubtotallabel, .standardtablesubtotalvalue"
+    );
+    const blockEls = page.querySelectorAll(
+      ".standardtablesubtotalwrapper, .standardtablecategory"
+    );
+
+    const maxFontSize = 10, minFontSize = 8;
+    const maxLineHeight = 12, minLineHeight = 8;
+    const maxBlockSpacing = 5, minBlockSpacing = 2;
+
+    let fontSize = maxFontSize;
+    let lineHeight = maxLineHeight;
+    let blockSpacing = maxBlockSpacing;
+
+    const applyStyles = () => {
+      lineEls.forEach((el) => {
+        el.style.fontSize = `${fontSize}px`;
+        el.style.lineHeight = `${lineHeight}px`;
+      });
+      blockEls.forEach((el) => {
+        el.style.paddingTop = `${blockSpacing}px`;
+        el.style.paddingBottom = `${blockSpacing}px`;
+      });
+    };
+
+    const isOverflowing = () => {
+      const pageRect = page.getBoundingClientRect();
+      return Array.from(page.children).some((child) => {
+        const r = child.getBoundingClientRect();
+        return r.bottom > pageRect.bottom || r.right > pageRect.right;
+      });
+    };
+
+    applyStyles();
+    while (
+      isOverflowing() &&
+      (fontSize > minFontSize || lineHeight > minLineHeight || blockSpacing > minBlockSpacing)
+    ) {
+      if (fontSize > minFontSize) fontSize -= 1;
+      if (lineHeight > minLineHeight) lineHeight -= 1;
+      if (blockSpacing > minBlockSpacing) blockSpacing -= 1;
+      applyStyles();
+    }
+  });
+};
+
+/* ------------------ Button disable infra ------------------ */
+const _jsonDisabled   = new Map();
+const _designDisabled = new Map();
+const _allKnownButtons = new Set();
+
+function _collectButtons() {
+  document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
+    _allKnownButtons.add(el.id);
+  });
+  [
+    "design1","design2","layout1","layout2","header1","header2",
+    "cover0","cover1","cover2","cover3","noCover","benefitsPage","companyPage"
+  ].forEach(id => { if (document.getElementById(id)) _allKnownButtons.add(id); });
+}
+
+function _setBtnDisabled(id, disabled) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle("disabled", !!disabled);
+  el.toggleAttribute("disabled", !!disabled);
+  el.setAttribute("aria-disabled", String(!!disabled));
+}
+
+function _applyEffectiveButtonStates() {
+  _allKnownButtons.forEach((id) => {
+    const jsonDis = !!_jsonDisabled.get(id);
+    const desDis  = !!_designDisabled.get(id);
+    _setBtnDisabled(id, jsonDis || desDis);
+  });
+}
+
+function computeDesignConstraintsAndApply() {
+  _designDisabled.clear();
+
+  const params = getParams();
+  const design = params.get("design") || "1";
+  const isDesign2 = design === "2";
+
+  const hasKey = params.has("key");
+  const isPreview = params.has("preview");
+
+  if (!hasKey && !isPreview) $("#editButton")?.classList.add("hidden");
+  if (!hasKey) $("#preparedFor")?.classList.add("hidden");
+
+  const forceOffIds = [
+    "layout1","layout2",
+    "cover0","cover1","cover2","cover3","noCover",
+    "header1","header2"
+  ];
+  forceOffIds.forEach(id => { if (isDesign2) _designDisabled.set(id, true); });
+
+  _applyEffectiveButtonStates();
+}
+
+/* ------------------ Pricing helpers ------------------ */
+window.__currentData = null;
+
+function getSelectionsFromParams() {
+  const p = getParams();
+  return {
+    design:   p.get("design") || "1",
+    layout:   p.get("layout") || "1",
+    header:   p.get("header") || "1",
+    cover:   (p.get("cover") ?? "0"),
+    benefits: p.get("benefits") === "true",
+    company:  p.get("company")  === "true",
+  };
+}
+
+function computeStatementTotal(data, sel) {
+  const pricing = data?.pricing ?? {};
+  let total = 0;
+  const add = (val) => total += (Number(val) || 0);
+
+  add(pricing.base);
+
+  if (pricing.design && sel.design in pricing.design) add(pricing.design[sel.design]);
+  if (pricing.layout && sel.layout in pricing.layout) add(pricing.layout[sel.layout]);
+  if (pricing.header && sel.header in pricing.header) add(pricing.header[sel.header]);
+
+  const coverKey = sel.cover === "false" ? "false" : sel.cover;
+  if (pricing.cover && coverKey in pricing.cover) add(pricing.cover[coverKey]);
+
+  if (pricing.toggles) {
+    if (sel.benefits && "benefits" in pricing.toggles) add(pricing.toggles.benefits);
+    if (sel.company  && "company"  in pricing.toggles) add(pricing.toggles.company);
+  }
+
+  return total;
+}
+
+function renderPrice(data) {
+  if (!data) return;
+  const sel = getSelectionsFromParams();
+  const total = computeStatementTotal(data, sel);
+  document.querySelectorAll('[details="price"]').forEach((el) => {
+    el.textContent = formatCurrency(total, el, true, true);
+  });
+}
+
+/* ------------------ Charts ------------------ */
+function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
+  const chartContainer = document.getElementById(chartId);
+  const legendContainer = document.querySelector(containerSelector);
+  if (!chartContainer || !legendContainer || !Array.isArray(categoryGroup)) return;
+
+  legendContainer.innerHTML = "";
+  let start = 0;
+  const gradientParts = [];
+
+  categoryGroup.forEach((category) => {
+    const value = parseFloat(category.value);
+    const color = hexToRgb(category.color);
+    const end = start + value;
+
+    const itemDiv = document.createElement("div");
+    itemDiv.setAttribute("category", "item");
+    itemDiv.classList.add("moduledonutindex");
+
+    const iconDiv = document.createElement("div");
+    iconDiv.setAttribute("category", "icon");
+    iconDiv.classList.add("moduleindexcategorywrapper");
+
+    const chartColorDiv = document.createElement("div");
+    chartColorDiv.classList.add("chart-color");
+    chartColorDiv.style.backgroundColor = color;
+
+    const nameDiv = document.createElement("div");
+    nameDiv.setAttribute("category", "name");
+    nameDiv.classList.add("componentsmalllabel");
+    nameDiv.textContent = category.label;
+
+    const valueDiv = document.createElement("div");
+    valueDiv.setAttribute("category", "value");
+    valueDiv.classList.add("moduledonutindexvalue");
+    valueDiv.textContent = value + "%";
+
+    iconDiv.appendChild(chartColorDiv);
+    iconDiv.appendChild(nameDiv);
+    itemDiv.appendChild(iconDiv);
+    itemDiv.appendChild(valueDiv);
+    legendContainer.appendChild(itemDiv);
+
+    gradientParts.push(`${color} ${start}% ${end}%`);
+    start = end;
+  });
+
+  chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
+}
+
+/* ------------------ Render all content ------------------ */
+async function renderAll(data) {
+  // wipe donut templates within module wrappers
+  document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
+    const template =
+      wrapper.querySelector("#moduleDonutTemplate") ||
+      wrapper.querySelector('[data-template="donut"]');
+    Array.from(wrapper.children).forEach((child) => {
+      if (template && child === template) return;
+      child.remove();
+    });
+    if (template) template.style.display = "none";
+  });
+
+  function applyButtonStatus() {
+    _jsonDisabled.clear();
+    const map = data?.buttonStatus;
+    if (map && typeof map === "object") {
+      Object.entries(map).forEach(([id, enabled]) => {
+        const disabled = !enabled;
+        _jsonDisabled.set(id, !!disabled);
+      });
+    }
+    _applyEffectiveButtonStates();
+  }
+
+  function applyCompanyURL() {
+    const url = data?.companyURL;
+    document.querySelectorAll('[data="companyURL"]').forEach((el) => {
+      if (!url) {
+        if ("href" in el) {
+          el.removeAttribute("href");
+          el.setAttribute("aria-disabled", "true");
+        }
+        return;
+      }
+      if ("href" in el) el.href = url;
+      else el.setAttribute("href", url);
+      el.setAttribute("target", "_blank");
+      el.setAttribute("rel", "noopener noreferrer");
+      el.removeAttribute("aria-disabled");
+    });
+  }
+
+  function applyExplorerURL() {
+    const url = data?.explorerUrl;
+    document.querySelectorAll('[data="explorerUrl"]').forEach((el) => {
+      if (!url) {
+        if ("href" in el) {
+          el.removeAttribute("href");
+          el.setAttribute("aria-disabled", "true");
+        }
+        return;
+      }
+      if ("href" in el) el.href = url;
+      else el.setAttribute("href", url);
+      el.setAttribute("target", "_blank");
+      el.setAttribute("rel", "noopener noreferrer");
+      el.removeAttribute("aria-disabled");
+    });
+  }
+
+  function applyCoverContent() {
+    const arr = Array.isArray(data?.coverContent) ? data.coverContent : null;
+    if (!arr || arr.length === 0) return;
+    const templateImg = document.querySelector('img[data="coverContent"]');
+    if (!templateImg) return;
+    const parent = templateImg.parentElement;
+    if (!parent) return;
+
+    parent.querySelectorAll('img[data="coverContent"]').forEach((n, i) => {
+      if (i > 0) n.remove();
+    });
+
+    templateImg.src = arr[0];
+    for (let i = 1; i < arr.length; i++) {
+      const clone = templateImg.cloneNode(true);
+      clone.src = arr[i];
+      parent.appendChild(clone);
+    }
+  }
+
+  const statementElement = [
+    "companyName","companyRepName","companyRepTitle","companyRepSignature","companySignatureText",
+    "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
+    "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
+    "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
+    "statementDisclaimer","statementDisclaimerContactPage","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
+    "employeeSalary","hireDate","position"
+  ];
+
+  const elementColor = {
+    primaryColor: data.primaryColor,
+    secondaryColor: data.secondaryColor,
+    tableColor: data.tableColor,
+  };
+
+  function staticData() {
+    statementElement.forEach((key) => {
+      document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+        el.innerHTML = data[key] || "";
+      });
+    });
+
+    document.querySelectorAll(".coverletterwrapper").forEach((el) => {
+      el.classList.remove("left", "center", "right");
+      const justify = (data.companyMessageWrapperJustification || "").toLowerCase();
+      if (["left", "center", "right"].includes(justify)) el.classList.add(justify);
+    });  
+    
+    document.querySelectorAll('[data="companyLogoCover"]').forEach((el) => {
+      const wrapper = el.closest(".coverlogowrapper");
+      if (data.companyLogoCover) {
+        el.setAttribute("src", data.companyLogoCover);
+        if (data.companyLogoCoverHeight) el.style.height = data.companyLogoCoverHeight + "px";
+        el.style.display = "";
+
+        if (wrapper) {
+          wrapper.classList.remove("left", "center", "right");
+          const justify = (data.companyLogoCoverJustification || "").toLowerCase();
+          if (["left", "center", "right"].includes(justify)) wrapper.classList.add(justify);
         }
       } else {
-        if (sliderEl && el.contains(sliderEl)) {
-          el.style.display = "";
-          el.textContent = "Unknown";
-        } else {
-          el.style.display = "none";
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
+      if (data.companyLogo) {
+        el.setAttribute("src", data.companyLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    document.querySelectorAll('[data="companyLogoMail"]').forEach((el) => {
+      if (data.companyLogoMail) {
+        el.setAttribute("src", data.companyLogoMail);
+        if (data.companyLogoMailHeight) el.style.height = data.companyLogoMailHeight + "px";
+        el.style.display = "";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
+      if (data.companyLogoSideBar) {
+        el.setAttribute("src", data.companyLogoSideBar);
+        if (data.companyLogoSideBarHeight) el.style.height = data.companyLogoSideBarHeight + "px";
+        el.style.display = "";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    document.querySelectorAll('[data="explorerLogo"]').forEach((el) => {
+      if (data.explorerLogo) {
+        el.setAttribute("src", data.explorerLogo);
+        el.style.display = "flex";
+        el.style.justifyContent = "flex-end";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
+    const signatureElements = document.querySelectorAll('[data="companySignature"]');
+    if (!data.companySignature || !signatureElements.length) {
+      signatureElements.forEach((el) => (el.style.display = "none"));
+    } else {
+      signatureElements.forEach((el) => {
+        el.setAttribute("src", data.companySignature);
+        el.style.display = "";
+      });
+    }
+
+    Object.entries(elementColor).forEach(([attr, color]) => {
+      document.querySelectorAll(`[color="${attr}"]`).forEach((el) => {
+        const elementType = el.getAttribute("element");
+        if (elementType === "text") el.style.color = color;
+        else if (elementType === "block") el.style.backgroundColor = color;
+        else if (elementType === "stroke") el.style.borderColor = elementColor.primaryColor;
+      });
+    });
+  }
+
+  function standardTables() {
+    const categoryEntryTemplate = document.querySelector("#categoryEntry");
+    const baseTableTemplate     = document.querySelector("#tableTemplate");
+    const tableContent = baseTableTemplate?.querySelector(".standardtablewrapper");
+    if (!categoryEntryTemplate || !baseTableTemplate || !tableContent) return;
+
+    (data.standardTables || []).forEach((table) => {
+      const containers = document.querySelectorAll(`#standard${table.id}`);
+      if (!containers.length) return;
+
+      containers.forEach((container) => {
+        container.innerHTML = "";
+
+        const showCol1 = !!table.column1Name;
+        const showCol2 = !!table.column2Name;
+        const showCol3 = !!table.column3Name;
+
+        const tableWrapper = tableContent.cloneNode(true);
+
+        const tableNameEl = tableWrapper.querySelector('[table="name"]');
+        if (tableNameEl) tableNameEl.textContent = table.name || "";
+
+        const headerCol1 = tableWrapper.querySelector('[table="summaryHeaderCol1"]');
+        const headerCol2 = tableWrapper.querySelector('[table="summaryHeaderCol2"]');
+        const headerCol3 = tableWrapper.querySelector('[table="summaryHeaderCol3"]');
+
+        if (!showCol1 && headerCol1) headerCol1.remove();
+        else if (headerCol1) headerCol1.textContent = table.column1Name;
+
+        if (!showCol2 && headerCol2) headerCol2.remove();
+        else if (headerCol2) headerCol2.textContent = table.column2Name;
+
+        if (!showCol3 && headerCol3) headerCol3.remove();
+        else if (headerCol3) headerCol3.textContent = table.column3Name;
+
+        const categoryListContainer = tableWrapper.querySelector(".standardtablelist");
+
+        table.categories.forEach((category) => {
+          const categoryClone = categoryEntryTemplate.cloneNode(true);
+          categoryClone.removeAttribute("id");
+
+          const existingList = categoryClone.querySelector("#categoryList");
+          if (existingList) existingList.remove();
+
+          const existingSubtotal = categoryClone.querySelector('[category="subtotal"]');
+          if (existingSubtotal) existingSubtotal.remove();
+
+          const categoryName = categoryClone.querySelector('[category="name"]');
+          const categoryIcon = categoryClone.querySelector('[category="icon"]');
+          if (categoryIcon) categoryIcon.style.backgroundColor = category.color;
+          if (categoryName) categoryName.textContent = category.label;
+
+          const categoryList = document.createElement("div");
+          categoryList.classList.add("standardtablelinewrapper");
+
+          category.items.forEach((lineitem, index) => {
+            const lineClone = document.createElement("div");
+            lineClone.classList.add("standardtablelineitem");
+            lineClone.setAttribute("element", "text");
+            lineClone.setAttribute("font", "bodyFont");
+            if (index % 2 === 1) lineClone.classList.add("alternate");
+
+            const labelDiv = document.createElement("div");
+            labelDiv.setAttribute("line", "item");
+            labelDiv.setAttribute("element", "text");
+            labelDiv.setAttribute("font", "bodyFont");
+            labelDiv.className = "standardtablelinelabel";
+            labelDiv.textContent = lineitem.label;
+
+            const valueWrapper = document.createElement("div");
+            valueWrapper.className = "standardtablelabels";
+            valueWrapper.setAttribute("element", "text");
+            valueWrapper.setAttribute("font", "bodyFont");
+
+            if (showCol1) {
+              const col1Div = document.createElement("div");
+              col1Div.setAttribute("line", "col1");
+              col1Div.setAttribute("number", "dynamic");
+              col1Div.setAttribute("element", "text");
+              col1Div.setAttribute("font", "bodyFont");
+              col1Div.className = "standardtablevalue";
+              col1Div.textContent = formatCurrency(lineitem.col1_value, col1Div, table.isDecimal);
+              valueWrapper.appendChild(col1Div);
+            }
+            if (showCol2) {
+              const col2Div = document.createElement("div");
+              col2Div.setAttribute("line", "col2");
+              col2Div.setAttribute("number", "dynamic");
+              col2Div.setAttribute("element", "text");
+              col2Div.setAttribute("font", "bodyFont");
+              col2Div.className = "standardtablevalue";
+              col2Div.textContent = formatCurrency(lineitem.col2_value, col2Div, table.isDecimal);
+              valueWrapper.appendChild(col2Div);
+            }
+            if (showCol3) {
+              const col3Div = document.createElement("div");
+              col3Div.setAttribute("line", "col3");
+              col3Div.setAttribute("number", "dynamic");
+              col3Div.setAttribute("element", "text");
+              col3Div.setAttribute("font", "bodyFont");
+              col3Div.className = "standardtablevalue";
+              col3Div.textContent = formatCurrency(lineitem.col3_value, col3Div, table.isDecimal);
+              valueWrapper.appendChild(col3Div);
+            }
+
+            lineClone.appendChild(labelDiv);
+            lineClone.appendChild(valueWrapper);
+            categoryList.appendChild(lineClone);
+          });
+
+          const subtotalClone = document.createElement("div");
+          subtotalClone.classList.add("standardtablesubtotalwrapper");
+          subtotalClone.setAttribute("category", "subtotal");
+          subtotalClone.setAttribute("element", "text");
+          subtotalClone.setAttribute("font", "bodyFont");
+
+          const subLabel = document.createElement("div");
+          subLabel.className = "standardtablesubtotallabel";
+          subLabel.textContent = table.totalLineName || "Subtotal";
+          subLabel.setAttribute("element", "text");
+          subLabel.setAttribute("font", "bodyFont");
+
+          const subWrapper = document.createElement("div");
+          subWrapper.className = "standardtablelabels";
+          subWrapper.setAttribute("element", "text");
+          subWrapper.setAttribute("font", "bodyFont");
+
+          if (showCol1) {
+            const subCol1 = document.createElement("div");
+            subCol1.setAttribute("subtotal", "col1");
+            subCol1.setAttribute("number", "dynamic");
+            subCol1.setAttribute("element", "text");
+            subCol1.setAttribute("font", "bodyFont");
+            subCol1.className = "standardtablesubtotalvalue";
+            subCol1.textContent = formatCurrency(category.col1_subtotal, subCol1, table.isDecimal);
+            subWrapper.appendChild(subCol1);
+          }
+          if (showCol2) {
+            const subCol2 = document.createElement("div");
+            subCol2.setAttribute("subtotal", "col2");
+            subCol2.setAttribute("number", "dynamic");
+            subCol2.setAttribute("element", "text");
+            subCol2.setAttribute("font", "bodyFont");
+            subCol2.className = "standardtablesubtotalvalue";
+            subCol2.textContent = formatCurrency(category.col2_subtotal, subCol2, table.isDecimal);
+            subWrapper.appendChild(subCol2);
+          }
+          if (showCol3) {
+            const subCol3 = document.createElement("div");
+            subCol3.setAttribute("subtotal", "col3");
+            subCol3.setAttribute("number", "dynamic");
+            subCol3.setAttribute("element", "text");
+            subCol3.setAttribute("font", "bodyFont");
+            subCol3.className = "standardtablesubtotalvalue";
+            subCol3.textContent = formatCurrency(category.col3_subtotal, subCol3, table.isDecimal);
+            subWrapper.appendChild(subCol3);
+          }
+
+          subtotalClone.appendChild(subLabel);
+          subtotalClone.appendChild(subWrapper);
+          categoryList.appendChild(subtotalClone);
+
+          categoryClone.appendChild(categoryList);
+          categoryListContainer.appendChild(categoryClone);
+        });
+
+        container.appendChild(tableWrapper);
+      });
+    });
+  }
+
+  function booleanTables() {
+    const tableTemplate = document.querySelector("#booleanTableTemplate");
+    const rowTemplateWrapper = document.querySelector("#booleanCategoryEntry");
+    const rowTemplate = rowTemplateWrapper?.querySelector('[category="line"]');
+    if (!tableTemplate || !rowTemplateWrapper || !rowTemplate) return;
+
+    rowTemplateWrapper.style.display = "none";
+
+    const columnMap = {
+      column0Name: "zero",
+      columnBoolName: "bool",
+      column1Name: "one",
+      column2Name: "two",
+      column3Name: "three",
+    };
+
+    const createBoolSVG = (value, cell) => {
+      const boolTemplate = rowTemplate.querySelector(
+        `[boolvalue="${value ? "true" : "false"}"]`
+      );
+      const clone = boolTemplate?.cloneNode(true);
+      if (clone && cell?.hasAttribute("color")) {
+        const colorAttr = cell.getAttribute("color");
+        const cssColor = elementColor?.[colorAttr];
+        if (cssColor) {
+          clone.querySelectorAll("svg, path, use").forEach((svgEl) => {
+            svgEl.style.fill = cssColor;
+            svgEl.style.color = cssColor;
+          });
         }
       }
+      return clone || document.createTextNode(value ? "\u2713" : "\u2717");
+    };
+
+    (data.booleanTables || []).forEach((tableData) => {
+      const container = document.querySelector(`#${tableData.id}`);
+      if (!container) return;
+
+      container.innerHTML = "";
+      const tableClone = tableTemplate.cloneNode(true);
+      tableClone.removeAttribute("id");
+
+      const hiddenColumns = [];
+
+      for (const [labelKey, columnAttr] of Object.entries(columnMap)) {
+        const labelValue = tableData[labelKey];
+        const isMissing = labelValue == null || String(labelValue).trim() === "";
+        if (isMissing) {
+          hiddenColumns.push(columnAttr);
+          tableClone.querySelectorAll(`[column="${columnAttr}"]`).forEach((el) => el.remove());
+        } else {
+          const totalKey = labelKey.replace("Name", "Total");
+          const totalEl = tableClone.querySelector(`[table="${totalKey}"]`);
+          if (totalEl) {
+            totalEl.setAttribute("number", "dynamic");
+            totalEl.textContent = formatCurrency(tableData[totalKey], totalEl, tableData.isDecimal);
+          }
+        }
+      }
+
+      Object.entries(tableData).forEach(([key, value]) => {
+        const el = tableClone.querySelector(`[table="${key}"]`);
+        if (el) el.textContent = value;
+      });
+
+      const listContainer = tableClone.querySelector('[table="list"]');
+      if (!listContainer) return;
+
+      tableData.categories.forEach((itemData, index) => {
+        const rowClone = rowTemplate.cloneNode(true);
+        if (index % 2 === 1) rowClone.classList.add("alternate");
+
+        Object.entries(itemData).forEach(([key, value]) => {
+          const cell = rowClone.querySelector(`[line="${key}"]`);
+
+          const match = key.match(/^col(\d+|Bool|0)_/i);
+          if (match) {
+            const idx = match[1].toLowerCase();
+            const columnAttr =
+              idx === "0" ? "zero" :
+              idx === "bool" ? "bool" :
+              idx === "1" ? "one" :
+              idx === "2" ? "two" :
+              idx === "3" ? "three" : "";
+            if (hiddenColumns.includes(columnAttr) || value == null) {
+              if (cell) cell.remove();
+              return;
+            }
+          }
+
+          if (value == null && cell) {
+            cell.remove();
+            return;
+          }
+
+          if (key === "colBool_value" && cell) {
+            cell.innerHTML = "";
+            const icon = createBoolSVG(value, cell);
+            if (icon) cell.appendChild(icon);
+          } else if (cell?.hasAttribute("number")) {
+            cell.textContent = formatCurrency(value, cell, tableData.isDecimal);
+          } else if (cell) {
+            cell.textContent = value;
+          }
+        });
+
+        listContainer.appendChild(rowClone);
+      });
+
+      container.appendChild(tableClone);
+
+      container
+        .querySelectorAll('.booleantabletotalvalue[number="dynamic"]')
+        .forEach((el) => {
+          const value = el.textContent?.replace(/[^0-9.-]+/g, "") || "0";
+          el.textContent = formatCurrency(parseFloat(value), el, tableData.isDecimal);
+        });
+    });
+  }
+
+  function modules() {
+    if (!Array.isArray(data.modules) || data.modules.length === 0) {
+      document.querySelectorAll(".moduletemplate").forEach((el) => (el.style.display = "none"));
       return;
     }
 
-    // Not null => ensure visible
-    if (wrapper) wrapper.style.display = "";
-    el.style.display = "";
+    const moduleData = data.modules || [];
+    const validIds = new Set(moduleData.map((mod) => mod.id));
 
-    // Blank => Unknown
-    el.textContent = isBlank(val) ? "Unknown" : String(val);
-  });
-}
-
-/* ======================= Short Share Param Codec (1 param) ====================*/
-const K = {
-  baseFee:               "bf",
-  statementFee:          "sf",
-  singleAddressMailFee:  "sm",
-  homeAddressMailFee:    "hm",
-  insertCost:            "ic",
-  sliderMin:             "mn",
-  sliderMax:             "mx",
-  statementCount:        "n",
-  flags:                 "f",
-  version:               "v"
-};
-
-const FLAG_BITS = {
-  isSingleMail:  1 << 0, // 1
-  isHomeMail:    1 << 1, // 2
-  hasInserts:    1 << 2, // 4
-  pricingLocked: 1 << 3  // 8
-};
-
-function numTo36(n){ return Math.round(Number(n)).toString(36); }
-function from36(s, def=0){ const n = parseInt(s, 36); return Number.isFinite(n) ? n : def; }
-
-// Base64URL helpers
-function toBase64Url(str){
-  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function fromBase64Url(b64u){
-  const pad = b64u.length % 4 === 2 ? "==" : b64u.length % 4 === 3 ? "=" : "";
-  const b64 = b64u.replace(/-/g,'+').replace(/_/g,'/') + pad;
-  return atob(b64);
-}
-
-function packFlags(s){
-  let f = 0;
-  if (s.isSingleMail)  f |= FLAG_BITS.isSingleMail;
-  if (s.isHomeMail)    f |= FLAG_BITS.isHomeMail;
-  if (s.hasInserts)    f |= FLAG_BITS.hasInserts;
-  if (s.pricingLocked) f |= FLAG_BITS.pricingLocked;
-  return f;
-}
-function unpackFlags(f, s){
-  s.isSingleMail  = !!(f & FLAG_BITS.isSingleMail);
-  s.isHomeMail    = !!(f & FLAG_BITS.isHomeMail);
-  s.hasInserts    = !!(f & FLAG_BITS.hasInserts);
-  s.pricingLocked = !!(f & FLAG_BITS.pricingLocked);
-  return s;
-}
-
-/** Encode only differences vs defaults into ?s= */
-function encodeShare(state, defaults){
-  const out = {[K.version]: 1};
-
-  const numFields = [
-    ["baseFee","bf"], ["statementFee","sf"], ["singleAddressMailFee","sm"],
-    ["homeAddressMailFee","hm"], ["insertCost","ic"],
-    ["sliderMin","mn"], ["sliderMax","mx"], ["statementCount","n"]
-  ];
-  for (const [key, sk] of numFields){
-    const v = Number(state[key]);
-    const dv = Number(defaults[key]);
-    if (!Number.isFinite(v) || !Number.isFinite(dv)) continue;
-    if (v !== dv) out[sk] = numTo36(v);
-  }
-
-  const fState = packFlags(state);
-  const fDef   = packFlags(defaults);
-  if (fState !== fDef) out[K.flags] = numTo36(fState);
-
-  return toBase64Url(JSON.stringify(out));
-}
-
-/** Decode ?s= back to state merged with defaults */
-function decodeShare(s, defaults){
-  let obj = {};
-  try {
-    obj = JSON.parse(fromBase64Url(s));
-  } catch(e){
-    console.warn("Bad share payload; using defaults.", e);
-    return {...defaults};
-  }
-  const st = {...defaults};
-
-  const rd = (sk, key) => {
-    if (obj[sk] !== undefined) st[key] = from36(obj[sk], defaults[key]);
-  };
-  rd("bf","baseFee"); rd("sf","statementFee"); rd("sm","singleAddressMailFee");
-  rd("hm","homeAddressMailFee"); rd("ic","insertCost");
-  rd("mn","sliderMin"); rd("mx","sliderMax"); rd("n","statementCount");
-
-  if (obj[K.flags] !== undefined){
-    const f = from36(obj[K.flags], packFlags(defaults));
-    unpackFlags(f, st);
-  }
-
-  // normalize
-  if (st.sliderMax < st.sliderMin){ const t = st.sliderMin; st.sliderMin = st.sliderMax; st.sliderMax = t; }
-  st.statementCount = Math.min(Math.max(st.statementCount, st.sliderMin), st.sliderMax);
-
-  return st;
-}
-
-/* =============================== App Logic ================================== */
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // Basic DOM refs
-  const sliderEl       = document.getElementById("slider");
-  const empInputEl     = document.getElementById("empInput");
-  const grandTotalEl   = document.getElementById("grandTotal");
-  const perEmployeeEl  = document.getElementById("perEmployee");
-  const resetBtn       = document.getElementById("toZero");
-
-  const cbHasInserts   = document.getElementById("hasInserts");
-  const cbSingleMail   = document.getElementById("isSingleMail");
-  const cbHomeMail     = document.getElementById("isHomeMail");
-
-  // Optional labels
-  const labelBaseFee             = document.getElementById("baseFee");
-  const labelStatementFee        = document.getElementById("statementFee");
-  const labelSingleMailFee       = document.getElementById("singleAddressMailFee");
-  const labelHomeMailFee         = document.getElementById("homeAddressMailFee");
-  const labelCanadaMailFee       = document.getElementById("singleAddressCanadaMailFee");
-  const labelInsertCost          = document.getElementById("insertCost");
-
-  // Utils
-  const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
-  const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  const fmtUSD = (n) => Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
-  const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
-  const formatK = (v) => {
-    const abs = Math.abs(v);
-    if (abs >= 1000) {
-      const k = v / 1000;
-      const label = Number.isInteger(k) ? String(k) : k.toFixed(1).replace(/\.0$/, "");
-      return `${label}k`;
-    }
-    return String(v);
-  };
-  const makePips = (min, max) => {
-    const steps = 10;
-    const span = max - min;
-    return span <= 0
-      ? [min]
-      : Array.from({ length: steps + 1 }, (_, i) => Math.round(min + (span * i) / steps));
-  };
-  const renderPips = () => {
-    sliderEl.querySelectorAll(".noUi-value").forEach((pip) => {
-      const v = Number(pip.dataset.value);
-      pip.textContent = formatK(v);
-      pip.style.cursor = "pointer";
-      pip.onclick = () => sliderEl.noUiSlider.set(v);
+    document.querySelectorAll(".moduletemplate").forEach((el) => {
+      const id = el.id?.trim();
+      if (!validIds.has(id)) el.style.display = "none";
     });
-  };
 
-  // Fetch JSON
-  let json = {};
-  try {
-    const res = await fetch(DATA_URL, { cache: "no-store" });
-    json = await res.json();
-  } catch (e) {
-    console.error("Error loading JSON:", e);
-    json = {};
-  }
-
-  // Defaults from JSON
-  const defaults = {
-    baseFee: toNum(json.baseFee),
-    statementFee: toNum(json.statementFee),
-    singleAddressMailFee: toNum(json.singleAddressMailFee),
-    homeAddressMailFee: toNum(json.homeAddressMailFee),
-    insertCost: toNum(json.insertCost),
-    sliderMin: toNum(json.sliderMin),
-    sliderMax: toNum(json.sliderMax),
-    statementCount: toNum(json.statementCount),
-    isSingleMail: !!json.isSingleMail,
-    isHomeMail: !!json.isHomeMail,
-    hasInserts: !!json.hasInserts,
-    pricingLocked: !!json.pricingLocked,
-    // PROTECTED JSON-ONLY fields (for DOM display)
-    payrollSystem: json.payrollSystem ?? "",
-    payrollDataMethod: json.payrollDataMethod ?? "",
-    supplementalCostMethod: json.supplementalCostMethod ?? "",
-    targetDate: json.targetDate ?? ""
-  };
-
-  /* ================== Share-mode detection & URL writer (debounced) ================== */
-  const url = new URL(location.href);
-  const sharePayload = ENABLE_SHARE ? url.searchParams.get("s") : null;
-  const shareMode = ENABLE_SHARE && !!sharePayload;
-
-  // State from share or defaults
-  let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
-
-  // Business rules
-  if (state.hasInserts) {
-    state.isHomeMail = true;
-    state.isSingleMail = false;
-  }
-  if (!state.isSingleMail && !state.isHomeMail) {
-    state.hasInserts = false;
-  }
-
-  // Debounced URL sync
-  let lastEncoded = null;
-  let urlWriteTimer = null;
-  function syncShareParam() {
-    if (!ENABLE_SHARE) return;
-    const encoded = encodeShare(state, defaults);
-    if (encoded === lastEncoded) return; // no change → no write
-    lastEncoded = encoded;
-
-    clearTimeout(urlWriteTimer);
-    urlWriteTimer = setTimeout(() => {
-      const u = new URL(location.href);
-      if (encoded === MINIMAL_S) u.searchParams.delete("s");
-      else u.searchParams.set("s", encoded);
-      history.replaceState(null, "", u);
-    }, 200);
-  }
-
-  // If not share mode, write a compact default s (debounced)
-  if (!shareMode && ENABLE_SHARE) {
-    // initialize lastEncoded to avoid immediate double-write
-    lastEncoded = null;
-    syncShareParam();
-  }
-
-  // Immutable for reset
-  const ORIG = { ...state };
-
-  // Apply protected fields to DOM from JSON (strict rules)
-  applyJsonFieldsStrict(defaults, [
-    "payrollSystem",
-    "payrollDataMethod",
-    "supplementalCostMethod",
-    "targetDate"
-  ]);
-
-  // pricingLocked visuals
-  document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
-    el.style.display = state.pricingLocked ? "none" : "";
-  });
-  if (state.pricingLocked) {
-    const singleW = document.getElementById("isSingleMailWrapper");
-    const homeW   = document.getElementById("isHomeMailWrapper");
-    const insW    = document.getElementById("hasInsertsWrapper");
-    if (singleW && state.isSingleMail === false) singleW.style.display = "none";
-    if (homeW   && state.isHomeMail   === false) homeW.style.display   = "none";
-    if (insW    && state.hasInserts   === false) insW.style.display    = "none";
-  }
-
-  // Optional fees display
-  if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
-  if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(state.statementFee);
-  if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
-  if (labelHomeMailFee)   labelHomeMailFee.textContent = fmtUSD(state.homeAddressMailFee);
-  if (labelInsertCost)    labelInsertCost.textContent = fmtUSD(state.insertCost);
-  if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
-
-  // Initialize checkboxes
-  if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
-  if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
-  if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
-
-  // Create slider
-  noUiSlider.create(sliderEl, {
-    range: { min: state.sliderMin, max: state.sliderMax },
-    start: state.statementCount,
-    step: 1,
-    connect: [true, false],
-    pips: { mode: "values", values: makePips(state.sliderMin, state.sliderMax), density: 10 },
-  });
-  const renderAllPips = () => requestAnimationFrame(renderPips);
-  renderAllPips();
-
-  // Input bounds/value
-  if (empInputEl) {
-    empInputEl.min = state.sliderMin;
-    empInputEl.max = state.sliderMax;
-    empInputEl.value = state.statementCount;
-  }
-
-  // Pricing helpers
-  const currentMailingFee = () =>
-    state.isHomeMail ? state.homeAddressMailFee :
-    state.isSingleMail ? state.singleAddressMailFee : 0;
-
-  const perStatementCost = () =>
-    state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
-
-  function recalc(rawCount) {
-    const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
-    const perEmp = (n > 0) ? (perStatementCost() + state.baseFee / n) : perStatementCost();
-    const grand  = state.baseFee + perStatementCost() * n;
-
-    if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(perEmp);
-    if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grand);
-    if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
-
-    state.statementCount = n;
-    // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
-  }
-
-  function updateSliderRange(min, max, setVal = null) {
-    state.sliderMin = min;
-    state.sliderMax = max;
-    if (empInputEl) {
-      empInputEl.min = String(min);
-      empInputEl.max = String(max);
-    }
-    sliderEl.noUiSlider.updateOptions(
-      {
-        range: { min, max },
-        pips: { mode: "values", values: makePips(min, max), density: 10 },
-      },
-      true
-    );
-    renderAllPips();
-    if (setVal != null) sliderEl.noUiSlider.set(setVal);
-    syncShareParam();
-  }
-
-  // Initial paint
-  recalc(state.statementCount);
-
-  // Slider update (smooth UI) — no URL writes here
-  let maxToastShown = false;
-  sliderEl.noUiSlider.on("update", (vals) => {
-    const val = Number(vals[0]);
-    if (val >= state.sliderMax) {
-      if (!maxToastShown) {
-        Toast.show(
-          `If your employee count is more than ${fmtInt(state.sliderMax)} then type the size in the input.`,
-          {
-            type: "info",
-            duration: 3800,
-            onShow: () => {
-              if (empInputEl) {
-                setTimeout(() => {
-                  empInputEl.focus();
-                  const v = empInputEl.value;
-                  empInputEl.value = "";
-                  empInputEl.value = v;
-                }, 50);
-              }
-            }
-          }
-        );
-        maxToastShown = true;
-      }
-    } else {
-      maxToastShown = false;
-    }
-    recalc(val);
-  });
-
-  // Slider set (user released handle) — write URL here
-  sliderEl.noUiSlider.on("set", () => {
-    syncShareParam();
-  });
-
-  // Input -> expand if above max (typed+10)
-  if (empInputEl) {
-    empInputEl.addEventListener("input", () => {
-      if (empInputEl.value === "") {
-        sliderEl.noUiSlider.set(state.sliderMin);
+    moduleData.forEach((module) => {
+      if (!module || !module.id) return;
+      if (
+        (!module.label && !module.description && !module.disclaimer) &&
+        (!Array.isArray(module.components) || module.components.length === 0)
+      ) {
+        const el = document.getElementById(module.id);
+        if (el) el.style.display = "none";
         return;
       }
-      let v = Math.floor(Number(empInputEl.value));
-      if (!Number.isFinite(v)) return;
 
-      if (v > state.sliderMax) {
-        updateSliderRange(state.sliderMin, v + 10, v); // includes syncShareParam (debounced)
-      } else {
-        v = clamp(v, state.sliderMin, state.sliderMax);
-        sliderEl.noUiSlider.set(v);
-        syncShareParam(); // debounced write for manual input within range
-      }
-    });
-  }
+      const containers = document.querySelectorAll(`#${module.id}`);
+      if (!containers.length) return;
 
-  // Reset (to ORIG)
-  if (resetBtn) {
-    resetBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      state = { ...ORIG };
+      containers.forEach((moduleContainer) => {
+        moduleContainer.style.display = "";
 
-      // pricingLocked visuals
-      document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
-        el.style.display = state.pricingLocked ? "none" : "";
+        const labelEl = moduleContainer.querySelector('[module="label"]');
+        if (labelEl) {
+          const value = module.label || "";
+          labelEl.textContent = value;
+          labelEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const descEl = moduleContainer.querySelector('[module="description"]');
+        if (descEl) {
+          const value = module.description || "";
+          descEl.textContent = value;
+          descEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const disclaimerEl = moduleContainer.querySelector('[module="disclaimer"]');
+        if (disclaimerEl) {
+          const value = module.disclaimer || "";
+          disclaimerEl.textContent = value;
+          disclaimerEl.style.display = value.trim() ? "" : "none";
+        }
+
+        const listEl = moduleContainer.querySelector('[module="list"]');
+        const template = listEl?.querySelector('[module="component"]');
+        if (!listEl || !template) return;
+
+        listEl.querySelectorAll('[module="component"]').forEach((el) => {
+          if (el !== template) el.remove();
+        });
+
+        let hasValidComponent = false;
+
+        (module.components || []).forEach((component) => {
+          const value = component?.value;
+          const isEmpty = value === null || value === undefined || value === "";
+          if (isEmpty) return;
+
+          const componentClone = template.cloneNode(true);
+          componentClone.style.display = "";
+          componentClone.removeAttribute("id");
+
+          const labelComponentEl = componentClone.querySelector('[category="label"]');
+          if (labelComponentEl) {
+            labelComponentEl.textContent = component.label || "";
+            labelComponentEl.style.display = component.label?.trim() ? "" : "none";
+          }
+
+          const valueEl = componentClone.querySelector('[category="value"]');
+          if (valueEl) {
+            const isCurrency = component.type === "currency";
+            const needsFormatting = ["currency", "number"].includes(component.type);
+            const formattedValue = needsFormatting
+              ? formatCurrency(value, valueEl, module.isDecimal, isCurrency)
+              : value;
+            valueEl.textContent = formattedValue;
+          }
+
+          const unitEl = componentClone.querySelector('[category="unit"]');
+          if (unitEl) {
+            unitEl.textContent = component.description || "";
+            unitEl.style.display = component.description?.trim() ? "" : "none";
+          }
+
+          listEl.appendChild(componentClone);
+          hasValidComponent = true;
+        });
+
+        template.style.display = "none";
+
+        const hasTextContent =
+          (module.label && module.label.trim()) ||
+          (module.description && module.description.trim()) ||
+          (module.disclaimer && module.disclaimer.trim());
+        if (!hasValidComponent && !hasTextContent) {
+          moduleContainer.style.display = "none";
+        }
       });
-      if (state.pricingLocked) {
-        const singleW = document.getElementById("isSingleMailWrapper");
-        const homeW   = document.getElementById("isHomeMailWrapper");
-        const insW    = document.getElementById("hasInsertsWrapper");
-        if (singleW) singleW.style.display = state.isSingleMail ? "" : "none";
-        if (homeW)   homeW.style.display   = state.isHomeMail   ? "" : "none";
-        if (insW)    insW.style.display    = state.hasInserts   ? "" : "none";
-      } else {
-        ["isSingleMailWrapper","isHomeMailWrapper","hasInsertsWrapper"]
-          .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
-      }
-
-      // checkboxes
-      if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
-      if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
-      if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
-
-      // slider & input
-      updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
-      if (empInputEl) {
-        empInputEl.min = state.sliderMin;
-        empInputEl.max = state.sliderMax;
-        empInputEl.value = state.statementCount;
-      }
-
-      // repaint & sync URL after reset
-      maxToastShown = false;
-      recalc(state.statementCount);
-      syncShareParam();
     });
   }
 
-  // Checkboxes + rules + share sync
-  const onStateChanged = () => syncShareParam();
+  function donutCharts() {
+    const isVisible = (el) => {
+      if (!el) return false;
+      const style = window.getComputedStyle(el);
+      return style.display !== "none" && style.visibility !== "hidden" && el.offsetParent !== null;
+    };
 
-  if (cbHasInserts) {
-    cbHasInserts.addEventListener("change", () => {
-      state.hasInserts = cbHasInserts.checked;
-      if (state.hasInserts) {
-        if (!state.isHomeMail) {
-          state.isHomeMail = true;
-          if (cbHomeMail) cbHomeMail.checked = true;
+    const wrappers = Array.from(document.querySelectorAll(".modulewrapper")).filter(isVisible);
+    if (!wrappers.length) return;
+
+    const charts = Array.isArray(data.charts) ? data.charts : [];
+    if (!charts.length) return;
+
+    wrappers.forEach((wrapper, wIdx) => {
+      const templateInWrapper =
+        wrapper.querySelector("#moduleDonutTemplate") ||
+        wrapper.querySelector('[data-template="donut"]');
+
+      const globalTemplate =
+        document.getElementById("moduleDonutTemplate") ||
+        document.querySelector('[data-template="donut"]');
+
+      const template = templateInWrapper || globalTemplate;
+      if (!template) return;
+
+      template.style.display = "none";
+
+      charts.forEach((chart, cIdx) => {
+        const clone = template.cloneNode(true);
+        clone.style.display = "";
+        clone.removeAttribute("id");
+
+        const chartId = `chart_${String(chart.id ?? cIdx)}__w${wIdx}`;
+        const chartEl = clone.querySelector(".moduledonutchart");
+        if (chartEl) {
+          chartEl.id = chartId;
+          if (data.chartSize) chartEl.classList.add(data.chartSize);
         }
-        if (state.isSingleMail) {
-          state.isSingleMail = false;
-          if (cbSingleMail) cbSingleMail.checked = false;
+
+        const labelEl = clone.querySelector('[category="label"]');
+        const descEl  = clone.querySelector('[category="description"]');
+        theDiscEl  = clone.querySelector('[category="disclaimer"]');
+        const totalEl = clone.querySelector('[category="totalValue"]');
+
+        if (labelEl) labelEl.textContent = chart.label ?? "";
+        if (descEl)  descEl.textContent  = chart.description ?? "";
+        if (theDiscEl)  theDiscEl.textContent  = chart.disclaimer ?? "";
+        if (totalEl) totalEl.textContent = formatCurrency(chart.totalValue, totalEl, chart.isDecimal);
+
+        const indexWrapper = clone.querySelector(".moduledonutindexwrapper");
+        if (indexWrapper) {
+          indexWrapper.innerHTML = "";
+          (chart.groups || []).forEach((group) => {
+            const item = document.createElement("div");
+            item.classList.add("moduledonutindex");
+            item.setAttribute("category", "item");
+
+            const icon = document.createElement("div");
+            icon.classList.add("moduleindexcategorywrapper");
+            icon.setAttribute("category", "icon");
+
+            const colorBox = document.createElement("div");
+            colorBox.classList.add("chart-color");
+            colorBox.style.backgroundColor = hexToRgb(group.color);
+
+            const label = document.createElement("div");
+            label.classList.add("componentsmalllabel");
+            label.setAttribute("category", "name");
+            label.textContent = group.label;
+
+            icon.appendChild(colorBox);
+            icon.appendChild(label);
+
+            const value = document.createElement("div");
+            value.classList.add("moduledonutindexvalue");
+            value.setAttribute("category", "value");
+            value.textContent = `${group.value}%`;
+
+            item.appendChild(icon);
+            item.appendChild(value);
+            indexWrapper.appendChild(item);
+          });
         }
-      } else {
-        if (!state.isSingleMail && !state.isHomeMail && cbHasInserts.checked) {
-          cbHasInserts.checked = false;
-        }
-      }
-      recalc(sliderEl.noUiSlider.get());
-      onStateChanged();
+
+        wrapper.appendChild(clone);
+
+        renderDonutChart({
+          chartId,
+          categoryGroup: chart.groups,
+          containerSelector: `#${chartId} + .moduledonutindexwrapper`,
+        });
+      });
     });
   }
 
-  if (cbSingleMail) {
-    cbSingleMail.addEventListener("change", () => {
-      if (cbSingleMail.checked) {
-        state.isSingleMail = true;
-        if (state.isHomeMail) {
-          state.isHomeMail = false;
-          if (cbHomeMail) cbHomeMail.checked = false;
-        }
-        if (state.hasInserts) {
-          state.hasInserts = false;
-          if (cbHasInserts) cbHasInserts.checked = false;
-        }
-      } else {
-        state.isSingleMail = false;
-        if (!state.isHomeMail && state.hasInserts) {
-          state.hasInserts = false;
-          if (cbHasInserts) cbHasInserts.checked = false;
-        }
+  function benefitsList() {
+    const listContainer = document.querySelector('[benefit="list"]');
+    const wrapperTemplate = listContainer?.querySelector('[benefit="wrapper"]');
+    if (!listContainer || !wrapperTemplate) return;
+
+    listContainer.innerHTML = "";
+
+    (data.benefits || []).forEach((benefit) => {
+      const wrapperClone = wrapperTemplate.cloneNode(true);
+
+      const nameEl = wrapperClone.querySelector('[benefit="name"]');
+      const descEl = wrapperClone.querySelector('[benefit="description"]');
+
+      if (nameEl) nameEl.textContent = benefit.name || "";
+      if (descEl) {
+        descEl.innerHTML = benefit.description || "";
+
+        const paragraphClass = descEl.className;
+        const listItems = descEl.querySelectorAll("li");
+        listItems.forEach((li) => (li.className = paragraphClass));
       }
-      recalc(sliderEl.noUiSlider.get());
-      onStateChanged();
+
+      listContainer.appendChild(wrapperClone);
     });
   }
 
-  if (cbHomeMail) {
-    cbHomeMail.addEventListener("change", () => {
-      if (cbHomeMail.checked) {
-        if (state.isSingleMail) {
-          state.isSingleMail = false;
-          if (cbSingleMail) cbSingleMail.checked = false;
-        }
-        state.isHomeMail = true;
-      } else {
-        state.isHomeMail = false;
-        if (!state.isSingleMail && state.hasInserts) {
-          state.hasInserts = false;
-          if (cbHasInserts) cbHasInserts.checked = false;
-        }
-      }
-      recalc(sliderEl.noUiSlider.get());
-      onStateChanged();
+  function holidaysList() {
+    const holidayList = document.querySelector(".holidaylist");
+    const holidayTemplate = holidayList?.querySelector(".holidaywrapper");
+    if (!holidayList || !holidayTemplate) return;
+
+    holidayList.innerHTML = "";
+
+    (data.holidays || []).forEach((holiday) => {
+      const wrapperClone = holidayTemplate.cloneNode(true);
+
+      const weekdayEl = wrapperClone.querySelector(".holidayweekday");
+      const dateEl = wrapperClone.querySelector(".holidaydate");
+      const nameEl = wrapperClone.querySelector(".holidayname");
+
+      if (weekdayEl) weekdayEl.textContent = holiday.weekday || "";
+      if (dateEl) dateEl.textContent = holiday.date || "";
+      if (nameEl) nameEl.textContent = holiday.name || "";
+
+      holidayList.appendChild(wrapperClone);
     });
   }
-});
-console.log("Pricing v25.002.000");
+
+  function contactsLists(contactsData, listSelector) {
+    const listContainer = document.querySelector(`${listSelector} [contacts="list"]`);
+    const itemTemplate = listContainer?.querySelector('[contact="wrapper"]');
+    if (!listContainer || !itemTemplate) return;
+
+    listContainer.innerHTML = "";
+    
+    (contactsData || []).forEach((contact, index) => {
+      const itemClone = itemTemplate.cloneNode(true);
+      if (index % 2 === 1) itemClone.classList.add("alternate");
+
+      const nameEl = itemClone.querySelector('[contact="name"]');
+      const descEl = itemClone.querySelector('[contact="description"]');
+      const link1El = itemClone.querySelector('[contact="link1"]');
+      const link2El = itemClone.querySelector('[contact="link2"]');
+
+      if (nameEl) nameEl.textContent = contact.name || "";
+      if (descEl) descEl.textContent = contact.description || "";
+
+      if (link1El) {
+        link1El.textContent = contact.contact || "";
+        link1El.href = contact.url || "#";
+        link1El.target = "_blank";
+      }
+
+      if (link2El) {
+        link2El.textContent = contact.contact2 || "";
+        link2El.href = contact.url2 || "#";
+        link2El.target = "_blank";
+      }
+
+      listContainer.appendChild(itemClone);
+    });
+  }
+
+  function applyCardAlignment(card, header, align) {
+    card.style.removeProperty("text-align");
+    header.style.removeProperty("justify-content");
+
+    if (!align) return;
+
+    const v = String(align).toLowerCase().trim();
+
+    if (["left", "center", "right", "justify"].includes(v)) {
+      card.style.textAlign = v;
+    }
+
+    if (v === "center") header.style.justifyContent = "center";
+    else if (v === "right") header.style.justifyContent = "flex-end";
+    else header.style.justifyContent = "flex-start";
+
+    const lists = card.querySelectorAll("ul, ol");
+    lists.forEach((list) => {
+      if (v === "center" || v === "right") {
+        list.style.listStyleType = "none";
+        list.style.paddingLeft = "0";
+        list.style.marginLeft = "0";
+      } else {
+        list.style.removeProperty("list-style-type");
+        list.style.removeProperty("padding-left");
+        list.style.removeProperty("margin-left");
+      }
+    });
+
+    const moduleLists = card.querySelectorAll('[module="list"]');
+    moduleLists.forEach((mod) => {
+      mod.classList.remove("center", "right");
+      if (v === "center" || v === "right") mod.classList.add(v);
+    });
+  }
+
+  function applyCardHeight(el, h) {
+    el.style.removeProperty("height");
+    el.style.removeProperty("min-height");
+
+    if (h == null || h === "" || h === false) return;
+
+    if (typeof h === "number" && !Number.isNaN(h)) {
+      el.style.minHeight = `${h}px`;
+      return;
+    }
+    if (typeof h === "string") {
+      const trimmed = h.trim().toLowerCase();
+      if (trimmed === "auto" || trimmed === "unset") return;
+      if (/^\d+(\.\d+)?$/.test(trimmed)) {
+        el.style.minHeight = `${trimmed}px`;
+      } else {
+        el.style.minHeight = h;
+      }
+    }
+  }
+
+  function wipeListModules() {
+    document.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((el) => el.remove());
+  }
+
+  function renderListModules(data, elementColor) {
+    wipeListModules();
+
+    const items = Array.isArray(data?.listModules) ? data.listModules : [];
+    const validIds = new Set(items.map((i) => String(i.id)));
+
+    ["#listModule1","#listModule2","#listModule3","#listModule4"].forEach(sel => {
+      document.querySelectorAll(sel).forEach((el) => {
+        el.style.display = validIds.has(el.id) ? "" : "none";
+      });
+    });
+
+    if (!items.length) return;
+
+    const make = (tag, attrs = {}, text = null) => {
+      const n = document.createElement(tag);
+      for (const [k, v] of Object.entries(attrs)) {
+        if (k === "class") n.className = v;
+        else n.setAttribute(k, v);
+      }
+      if (text != null) n.textContent = text;
+      return n;
+    };
+
+    items.forEach((item) => {
+      const target = document.getElementById(String(item.id));
+      if (!target) return;
+
+      target.querySelectorAll(".listmoduletemplate[data-lm='1']").forEach((n) => n.remove());
+
+      const heading  = make("div", { "data": "label", class: "listmoduleheading", element: "text", font: "bodyFont" }, item.label || "Additional Benefits");
+      const header   = make("div", { module: "header", class: "listmoduleheader" });
+      header.appendChild(heading);
+      const headerColor = item.color || elementColor?.tableColor;
+      if (headerColor) header.style.backgroundColor = headerColor;
+
+      const detailsEl = make("div", { "data": "details", class: "listdescription", element: "text", font: "bodyFont" });
+      if (item.details) detailsEl.textContent = item.details; else detailsEl.style.display = "none";
+
+      const ul = make("ul", { "data": "values", role: "list", class: "listitemline" });
+      (item.values || ["[Bullet Point]"]).forEach((val) => {
+        const li = make("li", { "data": "value", class: "listitemtext", element: "text", font: "bodyFont" });
+        li.innerHTML = val;
+        ul.appendChild(li);
+      });
+
+      const listItems   = make("div", { module: "listItems", class: "listitemitems w-richtext" });
+      listItems.appendChild(ul);
+
+      const orientation = item.orientation || "vertical";
+      const listWrapper = make("div", { module: "list", class: `listmodulelist ${orientation}` });
+      listWrapper.appendChild(detailsEl);
+      listWrapper.appendChild(listItems);
+
+      const card = make("div", { module: "template", class: "listmoduletemplate", "data-lm": "1" });
+      card.appendChild(header);
+      card.appendChild(listWrapper);
+
+      applyCardHeight(card, item.height);
+      applyCardAlignment(card, header, item.align);
+      target.appendChild(card);
+    });
+  }
+
+  staticData();
+  standardTables();
+  booleanTables();
+  modules();
+  donutCharts();
+  benefitsList();
+  holidaysList();
+  contactsLists(data.companyContacts, '[contacts="company"]');
+  contactsLists(data.benefitContacts, '[contacts="providers"]');
+  renderListModules(data, elementColor);
+  applyCompanyURL();
+  applyExplorerURL();
+  applyCoverContent();
+  loadDisplay();
+  applyFontsFromData(data);
+  applyCustomFonts(data);
+  computeDesignConstraintsAndApply();
+  applyButtonStatus();
+
+  window.__currentData = data;
+  renderPrice(window.__currentData);
+
+  document.querySelectorAll("span").forEach((span) => {
+    span.style.color = elementColor.primaryColor;
+    span.style.fontWeight = "bold";
+    const dataKey = span.getAttribute("data");
+    if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
+  });
+}
+
+/* ------------------ Fonts & display tweaks ------------------ */
+function loadDisplay() {
+  const renderParam = getParams().get("render");
+  if (renderParam === "true") {
+    const body = document.body;
+    body.classList.remove("design");
+    body.classList.add("render");
+
+    const pageElements = Array.from(document.querySelectorAll('[element="page"]'));
+    pageElements.forEach((el) => body.appendChild(el));
+
+    Array.from(body.children).forEach((child) => {
+      if (!pageElements.includes(child)) body.removeChild(child);
+    });
+
+    Array.from(body.childNodes).forEach((node) => {
+      if (node.nodeType !== Node.ELEMENT_NODE) body.removeChild(node);
+    });
+  }
+
+  const params = getParams();
+  const getCurrentDesign = () => params.get("design") || "1";
+  const coverParam = params.get("cover") ?? "0";
+  const isDesign2 = getCurrentDesign() === "2";
+  const showCover = coverParam !== "false" && !isDesign2;
+
+  const coverEl = document.querySelector("#pageCover");
+  if (coverEl) coverEl.style.display = showCover ? "" : "none";
+
+  const isPreview = params.get("pr") === "true";
+  const editorEl = document.getElementById("editorPanel");
+  const pagesWrapper = document.getElementById("pagesWrapper");
+
+  if (isPreview) sessionStorage.setItem("pr", "true");
+  else sessionStorage.removeItem("pr");
+
+  const showEditor = !isPreview;
+  if (editorEl) editorEl.style.display = showEditor ? "" : "none";
+  if (pagesWrapper) {
+    if (showEditor) pagesWrapper.classList.remove("centered");
+    else pagesWrapper.classList.add("centered");
+  }
+
+  setTimeout(() => $("#loader")?.classList.add("finished"), 500);
+}
+
+function applyFontsFromData(data) {
+  if (!data) return;
+
+  const map = {
+    primaryFont:   data.primaryFont   || "",
+    secondaryFont: data.secondaryFont || "",
+    bodyFont:      data.bodyFont      || ""
+  };
+
+  const loadOnce = (family) => {
+    if (!family) return;
+    const id = "gf-" + family.toLowerCase().replace(/\s+/g, "-");
+    if (document.getElementById(id)) return;
+
+    const link = document.createElement("link");
+    link.id = id;
+    link.rel = "stylesheet";
+    link.href = `https://fonts.googleapis.com/css2?family=${family.trim().replace(/\s+/g, "+")}:wght@300;400;500;600;700&display=swap`;
+    document.head.appendChild(link);
+  };
+
+  Object.values(map).forEach(loadOnce);
+
+  const applyFamilies = () => {
+    for (const [key, family] of Object.entries(map)) {
+      if (!family) continue;
+      document.querySelectorAll(`[element="text"][font="${key}"]`).forEach((el) => {
+        el.style.fontFamily = `"${family}", sans-serif`;
+      });
+    }
+  };
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(applyFamilies).catch(applyFamilies);
+  } else {
+    setTimeout(applyFamilies, 200);
+  }
+}
+
+function applyCustomFonts(data) { 
+  document.querySelectorAll('[px="headerEmployeeNameSize"]').forEach((el) => {
+    el.style.fontSize = data.headerEmployeeNameSize + "px";
+    el.style.lineHeight = data.headerEmployeeNameSize + "px";
+  });
+  document.querySelectorAll('[px="welcomeFontSize"]').forEach((el) => {
+    el.style.fontSize = data.welcomeFontSize + "px";
+    el.style.lineHeight = data.welcomeFontSize + "px";
+  });
+  document.querySelectorAll('[px="headerYearSize"]').forEach((el) => {
+    el.style.fontSize = data.headerYearSize + "px";
+    el.style.lineHeight = data.headerYearSize + "px";
+  });
+  document.querySelectorAll('[px="headerNameSize"]').forEach((el) => {
+    el.style.fontSize = data.headerNameSize + "px";
+    el.style.lineHeight = data.headerNameSize + "px";
+  });
+  document.querySelectorAll('[px="headerEmployeeSize"]').forEach((el) => {
+    el.style.fontSize = data.headerEmployeeSize + "px";
+    el.style.lineHeight = data.headerEmployeeSize + "px";
+  });
+  document.querySelectorAll('[color="primaryColor"]').forEach((el) => {
+    el.style.color = (data.primaryColor || "");
+  });
+  document.querySelectorAll('[color="secondaryColor"]').forEach((el) => {
+    el.style.color = (data.secondaryColor || "");
+  });
+}
+
+/* ------------------ MODE TOGGLE (Explore / Pricing) ------------------ */
+function setMode(mode, { updateParam = true } = {}) {
+  const m = mode === "pricing" ? "pricing" : "explore";
+
+  document.querySelectorAll('[mode="explore"]').forEach(el => {
+    el.style.display = (m === "explore") ? "" : "none";
+  });
+  document.querySelectorAll('[mode="pricing"]').forEach(el => {
+    el.style.display = (m === "pricing") ? "" : "none";
+  });
+
+  const exploreToggle = document.getElementById("toggleExplore");
+  const pricingToggle = document.getElementById("togglePricing");
+  if (exploreToggle && pricingToggle) {
+    exploreToggle.checked = (m === "explore");
+    pricingToggle.checked = (m === "pricing");
+  }
+
+  if (updateParam) setParam("mode", m);
+}
+
+function applyModeFromParams() {
+  const p = getParams();
+  const urlMode = p.get("mode");
+  setMode(urlMode === "pricing" ? "pricing" : "explore", { updateParam: false });
+}
+
+/* ------------------ Controls / UI wiring ------------------ */
+(function controls() {
+  const isDisabledBtn = (el) =>
+    !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
+
+  const safeBind = (el, handler) => {
+    if (!el) return;
+    el.addEventListener("click", (e) => {
+      if (isDisabledBtn(el)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return;
+      }
+      handler(e);
+    });
+  };
+
+  const getCurrentDesign = () => getParams().get("design") || "1";
+  const getCurrentLayout = () => getParams().get("layout") || "1";
+  const getCurrentHeader = () => getParams().get("header") || "1";
+  const getCurrentCover  = () => getParams().get("cover") ?? "0";
+
+  const applyLayout = (val, { reload = true } = {}) => {
+    if (getCurrentDesign() === "2") return;
+
+    const isTwo = val === "2";
+    $$('[layout="dynamic"]').forEach((el) => {
+      if (isTwo) el.classList.add("layout2");
+      else el.classList.remove("layout2");
+    });
+
+    $("#layout1")?.classList.toggle("active", !isTwo);
+    $("#layout2")?.classList.toggle("active", isTwo);
+
+    setParam("layout", val);
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
+    if (typeof window.applyOverflow === "function") window.applyOverflow();
+    try { donutCharts(); } catch {}
+
+    renderPrice(window.__currentData);
+
+    if (reload) debouncedReloadFromParams();
+  };
+
+  const applyHeader = (val) => {
+    const headerOneEl = document.getElementById("headerOne");
+    const headerTwoEl = document.getElementById("headerTwo");
+
+    if (val === "1") {
+      if (headerOneEl) headerOneEl.style.display = "";
+      if (headerTwoEl) headerTwoEl.style.display = "none";
+    } else {
+      if (headerOneEl) headerOneEl.style.display = "none";
+      if (headerTwoEl) headerTwoEl.style.display = "";
+    }
+
+    $("#header1")?.classList.toggle("active", val === "1");
+    $("#header2")?.classList.toggle("active", val === "2");
+
+    setParam("header", val);
+
+    if (typeof window.applyOverflow === "function") window.applyOverflow();
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
+  };
+
+  const applyCover = (val) => {
+    if (getCurrentDesign() === "2") return;
+
+    const targetClass = `cover${val}`;
+    const allCoverClasses = ["cover0", "cover1", "cover2","cover3"];
+
+    $$('[cover="dynamic"]').forEach((el) => {
+      allCoverClasses.forEach((c) => el.classList.remove(c));
+      el.classList.add(targetClass);
+    });
+
+    ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.toggle("active", k === val));
+    $("#noCover")?.classList.remove("active");
+
+    setParam("cover", val);
+    updateExtras();
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
+  };
+
+  const applyDesignSwitch = (val, { reload = true } = {}) => {
+    ["1", "2"].forEach((d) => {
+      const show = d === val;
+      $$(`[design="${d}"]`).forEach((el) => (el.style.display = show ? "" : "none"));
+    });
+
+    toggleActive("design1", val === "1");
+    toggleActive("design2", val === "2");
+
+    if (val === "2") setParam("cover", "false");
+
+    setParam("design", val);
+    updateExtras();
+
+    if (val === "2") {
+      const p = getParams();
+      p.delete("layout");
+      const qs = _toEncodedQS(p);
+      history.replaceState(null, "", `${location.pathname}${qs ? "?" + qs : ""}${location.hash}`);
+      $$('[layout="dynamic"]').forEach((el) => el.classList.remove("layout2"));
+      $("#layout1")?.classList.remove("active");
+      $("#layout2")?.classList.remove("active");
+    } else {
+      if (!getParams().has("layout")) setParam("layout", "1");
+      applyLayout(getCurrentLayout(), { reload: false });
+    }
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
+    renderPrice(window.__currentData);
+
+    if (reload) debouncedReloadFromParams();
+  };
+
+  const updateExtras = () => {
+    const design = getCurrentDesign();
+    const isDesign2 = design === "2";
+
+    ["0", "1", "2"].forEach((k) => {
+      $("#cover" + k)?.classList.toggle("disabled", isDesign2);
+      $("#cover" + k)?.toggleAttribute("disabled", isDesign2);
+      $("#cover" + k)?.setAttribute("aria-disabled", String(isDesign2));
+    });
+    $("#noCover")?.classList.toggle("disabled", isDesign2);
+    $("#noCover")?.toggleAttribute("disabled", isDesign2);
+    $("#noCover")?.setAttribute("aria-disabled", String(isDesign2));
+
+    ["benefits", "company"].forEach((key) => {
+      const enabled = getParams().get(key) === "true";
+      toggleActive(`${key}Page`, enabled);
+      $$(`[design="${key}"]`).forEach((el) => {
+        const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+        el.style.display = enabled && match ? "" : "none";
+      });
+    });
+
+    const coverParam = getCurrentCover();
+    const showCover = coverParam !== "false" && !isDesign2;
+
+    ["0", "1", "2"].forEach((k) => toggleActive("cover" + k, showCover && coverParam === k));
+    toggleActive("noCover", !showCover);
+
+    $$('[component="cover"]').forEach((el) => {
+      const match = !el.getAttribute("designgroup") || el.getAttribute("designgroup") === design;
+      el.style.display = showCover && match ? "" : "none";
+    });
+  };
+
+  const toggleExtra = (key) => {
+    const current = getParams().get(key) === "true";
+    setParam(key, (!current).toString());
+    updateExtras();
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+    renderPrice(window.__currentData);
+  };
+
+  const applyStateFromParams = () => {
+    const design = getCurrentDesign();
+    applyDesignSwitch(design, { reload: false });
+
+    const header = getCurrentHeader();
+    applyHeader(header);
+
+    if (design !== "2") {
+      const layout = getCurrentLayout();
+      applyLayout(layout, { reload: false });
+
+      const cover = getCurrentCover();
+      if (cover !== "false") applyCover(cover);
+      else updateExtras();
+    } else {
+      updateExtras();
+    }
+
+    computeDesignConstraintsAndApply();
+    _applyEffectiveButtonStates();
+
+    debouncedReloadFromParams();
+
+    renderPrice(window.__currentData);
+  };
+
+  // --- Employee switcher (full page reload) ---
+  function selectEmployee(ekId) {
+    setParam("ek", ekId);
+    window.location.reload();
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    _collectButtons();
+    computeDesignConstraintsAndApply();
+
+    const designBtns = document.querySelectorAll('[id^="design-"]');
+    if (designBtns.length) {
+      designBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const idNum = btn.id.split("-")[1];
+          const params = getParams();
+          const qs = _toEncodedQS(params);
+          history.replaceState(null, "", `/design/design-${_enc(idNum)}?${qs}${location.hash}`);
+          setParam("design", idNum);
+          applyStateFromParams();
+        });
+      });
+
+      const pathMatch = window.location.pathname.match(/design-(\d+)$/);
+      if (pathMatch) {
+        const activeDesign = document.getElementById(`design-${pathMatch[1]}`);
+        if (activeDesign) {
+          designBtns.forEach((b) => b.classList.toggle("active", b === activeDesign));
+        }
+      }
+    }
+
+    const demoEl = document.getElementById("demo");
+    if (demoEl) demoEl.style.display = getParams().get("demo") === "true" ? "" : "none";
+
+    const params = getParams();
+    const isPreview = params.get("pr") === "true";
+
+    let scale = isPreview ? 1.0 : 0.7;
+
+    const zoomLevelEl = $("#zoomLevel");
+    const updateZoom = () => {
+      $$('[item="page"]').forEach((el) => (el.style.zoom = scale));
+      if (zoomLevelEl) zoomLevelEl.textContent = `${Math.round(scale * 100)}%`;
+    };
+
+    $("#fullScreen")?.addEventListener("click", () =>
+      $("#editorPanel")?.classList.toggle("hidden")
+    );
+    $("#zoomOut")?.addEventListener("click", () => {
+      scale = Math.max(0.1, scale - 0.1);
+      updateZoom();
+    });
+    $("#zoomIn")?.addEventListener("click", () => {
+      scale = Math.min(2, scale + 0.1);
+      updateZoom();
+    });
+
+    updateZoom();
+
+    const empBtns = $$('[id^="Employee"]');
+    let ek = getParams().get("ek");
+    if (window.location.hostname !== "etools.secure-solutions.biz") {
+      if (!ek || !document.getElementById(ek)) {
+        ek = "EmployeeA";
+        setParam("ek", ek);
+      }
+    } else {
+      if (!ek) {
+        ek = "EmployeeA";
+        setParam("ek", ek);
+      }
+    }
+    empBtns.forEach((btn) => btn.classList.toggle("active", btn.id === ek));
+    empBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.classList.contains("active")) return;
+        selectEmployee(btn.id);
+      });
+    });
+
+    const scrollToComponent = (btnId, key) => {
+      $("#" + btnId)?.addEventListener("click", () => {
+        const target = $(`[design="${key}"]`);
+        if (target) {
+          const offset = target.offsetTop - ($("#pagesWrapper")?.offsetTop || 0);
+          $("#pagesWrapper")?.scrollTo({ top: offset, behavior: "smooth" });
+        }
+      });
+    };
+    scrollToComponent("benefitsPage", "benefits");
+    scrollToComponent("companyPage", "company");
+
+    const safeBindClick = (id, fn) => safeBind($("#" + id), fn);
+
+    safeBindClick("design1", () => applyDesignSwitch("1"));
+    safeBindClick("design2", () => applyDesignSwitch("2"));
+
+    safeBindClick("cover0", () => applyCover("0"));
+    safeBindClick("cover1", () => applyCover("1"));
+    safeBindClick("cover2", () => applyCover("2"));
+    safeBindClick("cover3", () => applyCover("3"));
+    safeBindClick("noCover", () => {
+      setParam("cover", "false");
+      ["0", "1", "2", "3"].forEach((k) => $("#cover" + k)?.classList.remove("active"));
+      $("#noCover")?.classList.add("active");
+      $$('[cover="dynamic"]').forEach((el) => el.classList.remove("cover0", "cover1", "cover2","cover3"));
+      updateExtras();
+      computeDesignConstraintsAndApply();
+      _applyEffectiveButtonStates();
+      renderPrice(window.__currentData);
+    });
+
+    safeBindClick("benefitsPage", () => toggleExtra("benefits"));
+    safeBindClick("companyPage",  () => toggleExtra("company"));
+
+    safeBindClick("layout1", () => applyLayout("1"));
+    safeBindClick("layout2", () => applyLayout("2"));
+
+    safeBindClick("header1", () => applyHeader("1"));
+    safeBindClick("header2", () => applyHeader("2"));
+
+    if (!getParams().has("layout")) setParam("layout", "1");
+    if (!getParams().has("header")) setParam("header", "1");
+    if (!getParams().has("cover"))  setParam("cover",  "0");
+    if (!getParams().has("ek"))     setParam("ek",     "EmployeeA");
+
+    // --- Initialize Mode from URL and bind toggles
+    applyModeFromParams();
+    const exploreToggle = document.getElementById("toggleExplore");
+    const pricingToggle = document.getElementById("togglePricing");
+    if (exploreToggle) {
+      exploreToggle.addEventListener("change", (e) => {
+        if (e.target.checked) setMode("explore"); // sets ?mode=explore via encoded setParam
+      });
+    }
+    if (pricingToggle) {
+      pricingToggle.addEventListener("change", (e) => {
+        if (e.target.checked) setMode("pricing"); // sets ?mode=pricing via encoded setParam
+      });
+    }
+
+    applyStateFromParams();
+
+    window.addEventListener("popstate", () => {
+      applyStateFromParams();
+      renderPrice(window.__currentData);
+      applyModeFromParams(); // keep mode in sync on back/forward
+    });
+  });
+})();
+
+console.log("Build v25.002.000");
+// ===================================================================
