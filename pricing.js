@@ -76,58 +76,6 @@ const Toast = (() => {
   return { show };
 })();
 
-// ---------------------- JSON -> DOM field binder ------------------------------
-function applyJsonFields(json, fields) {
-  const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const isNullish = (v) =>
-    v === null ||
-    v === undefined ||
-    (typeof v === "string" && v.trim().toLowerCase() === "null") ||
-    (typeof v === "number" && !Number.isFinite(v));
-
-  const hide = (el) => { if (el) el.style.display = "none"; };
-  const show = (el) => { if (el) el.style.display = ""; };
-
-  fields.forEach((key) => {
-    const val = json?.[key];
-    const el = document.getElementById(key);
-    const wrapper = document.getElementById(`${key}Wrapper`);
-
-    if (isNullish(val)) {
-      hide(wrapper || el);
-      return;
-    }
-    if (!el) return;
-
-    show(wrapper);
-    show(el);
-
-    const out = isBlank(val) ? "Unknown" : String(val);
-    const tag = el.tagName?.toLowerCase?.() || "";
-
-    if (tag === "img") {
-      if (isBlank(val)) {
-        el.removeAttribute("src");
-        el.alt = "Unknown";
-      } else {
-        el.src = out;
-        if (!el.alt) el.alt = key;
-      }
-    } else if (tag === "a") {
-      el.textContent = out;
-      if (isBlank(val)) {
-        el.removeAttribute("href");
-      } else if (/^https?:\/\//i.test(out) || out.startsWith("mailto:") || out.startsWith("tel:")) {
-        el.href = out;
-      }
-    } else if (tag === "input" || tag === "textarea") {
-      el.value = out;
-    } else {
-      el.textContent = out;
-    }
-  });
-}
-
 // -------------------------- URL params helpers -------------------------------
 const PROTECTED_JSON_ONLY = new Set([
   "payrollSystem",
@@ -208,6 +156,58 @@ function paramsFromState(s) {
     hasInserts: s.hasInserts,
     pricingLocked: s.pricingLocked
   };
+}
+
+// ---------------------- JSON -> DOM field binder ------------------------------
+function applyJsonFields(json, fields) {
+  const isBlank = (v) => typeof v === "string" && v.trim() === "";
+  const isNullish = (v) =>
+    v === null ||
+    v === undefined ||
+    (typeof v === "string" && v.trim().toLowerCase() === "null") ||
+    (typeof v === "number" && !Number.isFinite(v));
+
+  const hide = (el) => { if (el) el.style.display = "none"; };
+  const show = (el) => { if (el) el.style.display = ""; };
+
+  fields.forEach((key) => {
+    const val = json?.[key];
+    const el = document.getElementById(key);
+    const wrapper = document.getElementById(`${key}Wrapper`);
+
+    if (isNullish(val)) {
+      hide(wrapper || el);
+      return;
+    }
+    if (!el) return;
+
+    show(wrapper);
+    show(el);
+
+    const out = isBlank(val) ? "Unknown" : String(val);
+    const tag = el.tagName?.toLowerCase?.() || "";
+
+    if (tag === "img") {
+      if (isBlank(val)) {
+        el.removeAttribute("src");
+        el.alt = "Unknown";
+      } else {
+        el.src = out;
+        if (!el.alt) el.alt = key;
+      }
+    } else if (tag === "a") {
+      el.textContent = out;
+      if (isBlank(val)) {
+        el.removeAttribute("href");
+      } else if (/^https?:\/\//i.test(out) || out.startsWith("mailto:") || out.startsWith("tel:")) {
+        el.href = out;
+      }
+    } else if (tag === "input" || tag === "textarea") {
+      el.value = out;
+    } else {
+      el.textContent = out;
+    }
+  });
 }
 
 // --------------------------------- App ---------------------------------------
