@@ -26,29 +26,6 @@ const debounced = (fn, ms = 60) => {
 
 let currentFetchController = null;
 
-function buildFetchUrlFromParams() {
-  const p = getParams();
-  const key    = p.get("key");
-  const cpid   = p.get("cpid");
-  const yr     = p.get("yr");
-  const ck     = p.get("ck");
-  const ek     = p.get("ek") || "EmployeeA";
-  const layout = p.get("layout");
-
-  const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
-
-  if (!key) {
-    return `https://compstatementdemo.netlify.app/data/${ek}.json`;
-  }
-
-  const qp = new URLSearchParams({
-    usecors: "1",
-    key, cpid, yr, ck, ek, layout,
-  });
-
-  return `${baseUrl}?${qp.toString()}`;
-}
-
 window.applyOverflow = function () {
   document.querySelectorAll('[item="page"]').forEach((page) => {
     const lineEls = page.querySelectorAll(
@@ -101,32 +78,6 @@ window.applyOverflow = function () {
 const _jsonDisabled = new Map();
 const _designDisabled = new Map();
 const _allKnownButtons = new Set();
-
-function _collectButtons() {
-  document.querySelectorAll('button[id], [role="button"][id], a.button[id], .btn[id]').forEach(el => {
-    _allKnownButtons.add(el.id);
-  });
-  [
-    "design1","design2","layout1","layout2","header1","header2",
-    "cover0","cover1","cover2","cover3","noCover","benefitsPage","companyPage"
-  ].forEach(id => { if (document.getElementById(id)) _allKnownButtons.add(id); });
-}
-
-function _setBtnDisabled(id, disabled) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.classList.toggle("disabled", !!disabled);
-  el.toggleAttribute("disabled", !!disabled);
-  el.setAttribute("aria-disabled", String(!!disabled));
-}
-
-function _applyEffectiveButtonStates() {
-  _allKnownButtons.forEach((id) => {
-    const jsonDis = !!_jsonDisabled.get(id);
-    const desDis  = !!_designDisabled.get(id);
-    _setBtnDisabled(id, jsonDis || desDis);
-  });
-}
 
 function computeDesignConstraintsAndApply() {
   _designDisabled.clear();
