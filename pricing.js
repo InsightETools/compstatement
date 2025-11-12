@@ -1,34 +1,3 @@
-/** ===========================================================================
- * Full JavaScript — compact share param + full pricing slider logic
- *
- * Key features:
- * • Fetch JSON config (DATA_URL)
- * • PROTECTED JSON-ONLY FIELDS (never from URL): payrollSystem, payrollDataMethod,
- *   supplementalCostMethod, targetDate — with rules:
- *    - if value is "" -> show "Unknown" in #<key>
- *    - if value is null -> hide #<key>Wrapper (or the element if wrapper missing)
- * • Centered toast module (for messages & slider-at-max hint)
- * • noUiSlider with k-labeled pips, clickable pips, step=1
- * • Pricing:
- *    grand = baseFee + n * (statementFee + mailingFee + (hasInserts?insertCost:0))
- *    per-employee = (grand / n) but implemented as statementFee+mail+insert + baseFee/n
- * • Checkbox rules:
- *    - Inserts require Home Mail; disables Single Mail
- *    - Single Mail disables Home Mail and Inserts
- *    - If both mails off, Inserts off
- * • pricingLocked:
- *    - Hide elements with [lock="pricingLock"]
- *    - If locked, and any toggle is false, hide its wrapper (#isSingleMailWrapper, etc.)
- * • URL Short Param Codec:
- *    - Single param ?s=... contains compact state (numbers base36, booleans bit-packed)
- *    - If s exists => SHARE MODE, load state from s (but keep protected fields from JSON)
- *    - If s missing => NORMAL MODE, use JSON defaults and write a compact s into URL
- *    - On any change (slider/input/checkbox), rewrite ?s=... with current state
- * • Input can exceed sliderMax -> expands sliderMax to typed+10 and sets value
- * • Slider hitting max -> does NOT expand; shows toast & autofocuses input
- * ===========================================================================
- */
-
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
 /* ============================== Toast (centered) ============================== */
@@ -44,7 +13,7 @@ const Toast = (() => {
         width:auto;max-width:calc(100% - 40px);
       }
       .toast{
-        pointer-events:auto;min-width:240px;max-width:420px;padding:12px 14px;border-radius:10px;
+        pointer-events:auto;min-width:350px;max-width:550px;padding:12px 14px;border-radius:10px;
         box-shadow:0 6px 18px rgba(0,0,0,.18);background:#111;color:#fff;
         font:500 14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
         display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:start;
@@ -142,15 +111,7 @@ function applyJsonFieldsStrict(json, fields) {
   });
 }
 
-/* ======================= Short Share Param Codec (1 param) ====================
-
-   State fields included in compact share param:
-   - baseFee, statementFee, singleAddressMailFee, homeAddressMailFee, insertCost
-   - sliderMin, sliderMax, statementCount
-   - isSingleMail, isHomeMail, hasInserts, pricingLocked (bit-packed)
-   PROTECTED FIELDS are JSON-only and are NOT included in s-param.
-
-============================================================================= */
+/* ======================= Short Share Param Codec (1 param) ====================*/
 
 const K = {
   baseFee:               "bf",
