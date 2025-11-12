@@ -527,12 +527,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!state.isHomeMail) {
           state.isHomeMail = true;
           if (cbHomeMail) cbHomeMail.checked = true;
-          Toast.show("Inserts require Home Address mailing, so Home Address Mail was enabled.", { type: "info" });
+          Toast.show("Inserts can only be included with statements mailed to homes.", { type: "info" });
         }
         if (state.isSingleMail) {
           state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          Toast.show("Inserts can’t be used with Single Address Mail, so Single Address Mail was turned off.", { type: "warn" });
+          Toast.show("Inserts cannot be included with single address mail.", { type: "warn" });
         }
       } else {
         if (!state.isSingleMail && !state.isHomeMail && cbHasInserts.checked) {
@@ -551,19 +551,19 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (state.isHomeMail) {
           state.isHomeMail = false;
           if (cbHomeMail) cbHomeMail.checked = false;
-          Toast.show("Single Address Mail is exclusive, so Home Address Mail was turned off.", { type: "info" });
+          //Toast.show("Single Address Mail is exclusive, so Home Address Mail was turned off.", { type: "info" });
         }
         if (state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show("Inserts aren’t supported with Single Address Mail, so Inserts were turned off.", { type: "warn" });
+          Toast.show("Inserts cannot be included with single address mail.", { type: "warn" });
         }
       } else {
         state.isSingleMail = false;
         if (!state.isHomeMail && state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
+          Toast.show("Inserts can only be included with mailed statements.", { type: "info" });
         }
       }
       recalc(sliderEl.noUiSlider.get());
@@ -577,7 +577,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (state.isSingleMail) {
           state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          Toast.show("Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.", { type: "info" });
+          //Toast.show("Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.", { type: "info" });
         }
         state.isHomeMail = true;
       } else {
@@ -585,7 +585,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!state.isSingleMail && state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          Toast.show("No mailing method is selected, so Inserts were turned off.", { type: "info" });
+          Toast.show("Inserts can only be included with mailed statements.", { type: "info" });
         }
       }
       recalc(sliderEl.noUiSlider.get());
