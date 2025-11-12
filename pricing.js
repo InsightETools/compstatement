@@ -79,54 +79,35 @@ const Toast = (() => {
 // ---------------------- JSON -> DOM field binder ------------------------------
 function applyJsonFields(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const isNullish = (v) =>
-    v === null ||
-    v === undefined ||
-    (typeof v === "string" && v.trim().toLowerCase() === "null") ||
-    (typeof v === "number" && !Number.isFinite(v));
-
-  const hide = (el) => { if (el) el.style.display = "none"; };
-  const show = (el) => { if (el) el.style.display = ""; };
 
   fields.forEach((key) => {
-    const val = json?.[key];
     const el = document.getElementById(key);
     const wrapper = document.getElementById(`${key}Wrapper`);
 
-    if (isNullish(val)) {
-      hide(wrapper || el);
-      return;
-    }
+    // Missing element → skip
     if (!el) return;
 
-    show(wrapper);
-    show(el);
+    const val = json[key];
 
-    const out = isBlank(val) ? "Unknown" : String(val);
-    const tag = el.tagName?.toLowerCase?.() || "";
-
-    if (tag === "img") {
-      if (isBlank(val)) {
-        el.removeAttribute("src");
-        el.alt = "Unknown";
-      } else {
-        el.src = out;
-        if (!el.alt) el.alt = key;
-      }
-    } else if (tag === "a") {
-      el.textContent = out;
-      if (isBlank(val)) {
-        el.removeAttribute("href");
-      } else if (/^https?:\/\//i.test(out) || out.startsWith("mailto:") || out.startsWith("tel:")) {
-        el.href = out;
-      }
-    } else if (tag === "input" || tag === "textarea") {
-      el.value = out;
-    } else {
-      el.textContent = out;
+    // ✅ If null → hide wrapper (preferred) or element
+    if (val === null) {
+      if (wrapper) wrapper.style.display = "none";
+      else el.style.display = "none";
+      return;
     }
+
+    // ✅ Value exists → ensure wrapper is visible
+    if (wrapper) wrapper.style.display = "";
+    el.style.display = "";
+
+    // ✅ Blank string → "Unknown"
+    const output = isBlank(val) ? "Unknown" : String(val);
+
+    // ✅ Write text (these 4 fields are always text)
+    el.textContent = output;
   });
 }
+
 
 // -------------------------- URL params helpers -------------------------------
 const PROTECTED_JSON_ONLY = new Set([
