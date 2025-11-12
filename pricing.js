@@ -56,30 +56,48 @@ function applyJsonFieldsStrict(json, fields) {
   const isNullishByRule = (v) =>
     v === null || (typeof v === "string" && v.trim().toLowerCase() === "null");
 
+  const sliderEl = document.getElementById("slider");
+
   fields.forEach((key) => {
     const el = document.getElementById(key);
     const wrapper = document.getElementById(`${key}Wrapper`);
-
-    if (!el) {
-      // Element not found — nothing to do (but helpfully log once)
-      // console.warn(`[applyJsonFields] Missing element #${key}`);
-      return;
-    }
+    if (!el) return;
 
     const val = json?.[key];
 
-    // Null rule: hide wrapper (or element)
+    // If nullish -> hide wrapper (unless it would also hide the slider)
     if (isNullishByRule(val)) {
-      if (wrapper) wrapper.style.display = "none";
-      else el.style.display = "none";
+      if (wrapper) {
+        if (sliderEl && wrapper.contains(sliderEl)) {
+          // Safety: don't nuke the slider; show "Unknown" instead.
+          console.warn(`[applyJsonFieldsStrict] ${key} is null but ${key}Wrapper contains #slider; not hiding.`);
+          wrapper.style.display = "";     // keep shown
+          el.style.display = "";          // keep shown
+          el.textContent = "Unknown";
+        } else {
+          wrapper.style.display = "none";
+          console.debug(`[applyJsonFieldsStrict] Hid wrapper #${key}Wrapper because value is null.`);
+        }
+      } else {
+        // No wrapper; avoid hiding if this element is (or contains) the slider
+        if (sliderEl && el.contains(sliderEl)) {
+          console.warn(`[applyJsonFieldsStrict] ${key} is null but #${key} contains #slider; not hiding element.`);
+          el.style.display = "";
+          el.textContent = "Unknown";
+        } else {
+          el.style.display = "none";
+          console.debug(`[applyJsonFieldsStrict] Hid element #${key} because value is null.`);
+        }
+      }
       return;
     }
 
-    // Ensure visible if not null
+    // Non-nullish: ensure visible
     if (wrapper) wrapper.style.display = "";
     el.style.display = "";
 
-    // Blank => "Unknown"; otherwise actual value
+    // Blank -> "Unknown"; otherwise actual value
     el.textContent = isBlank(val) ? "Unknown" : String(val);
   });
 }
+
