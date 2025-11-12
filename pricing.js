@@ -1,5 +1,11 @@
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
+/* ============================== Config: Sharing ============================== */
+// Toggle this to fully disable reading/writing the compact ?s= param.
+const ENABLE_SHARE = true;
+// Base64URL for {"v":1} — i.e., "no diffs vs defaults"
+const MINIMAL_S = "eyJ2IjoxfQ";
+
 /* ============================== Toast (centered) ============================== */
 const Toast = (() => {
   let container, stylesInjected = false;
@@ -39,8 +45,7 @@ const Toast = (() => {
   }
 
   function show(message, { type = "info", duration = 6000, onShow = null } = {}) {
-    //const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
-    const iconFor = (type) => (type === "warn" ? "" : type === "error" ? "" : "");
+    const iconFor = () => "";
     injectStyles();
     const parent = ensureContainer();
     const el = document.createElement("div");
@@ -114,7 +119,6 @@ function applyJsonFieldsStrict(json, fields) {
 }
 
 /* ======================= Short Share Param Codec (1 param) ====================*/
-
 const K = {
   baseFee:               "bf",
   statementFee:          "sf",
@@ -300,10 +304,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     targetDate: json.targetDate ?? ""
   };
 
-  // SHARE MODE detection (if ?s exists, use it)
+  /* ================== Share-mode detection & URL writer (debounced) ================== */
   const url = new URL(location.href);
-  const sharePayload = url.searchParams.get("s");
-  const shareMode = !!sharePayload;
+  const sharePayload = ENABLE_SHARE ? url.searchParams.get("s") : null;
+  const shareMode = ENABLE_SHARE && !!sharePayload;
 
   // State from share or defaults
   let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
@@ -317,11 +321,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     state.hasInserts = false;
   }
 
-  // If not share mode, write a compact default s
-  if (!shareMode) {
-    url.searchParams.delete("s");
-    url.searchParams.set("s", encodeShare(state, defaults));
-    history.replaceState(null, "", url);
+  // Debounced URL sync
+  let lastEncoded = null;
+  let urlWriteTimer = null;
+  function syncShareParam() {
+    if (!ENABLE_SHARE) return;
+    const encoded = encodeShare(state, defaults);
+    if (encoded === lastEncoded) return; // no change → no write
+    lastEncoded = encoded;
+
+    clearTimeout(urlWriteTimer);
+    urlWriteTimer = setTimeout(() => {
+      const u = new URL(location.href);
+      if (encoded === MINIMAL_S) u.searchParams.delete("s");
+      else u.searchParams.set("s", encoded);
+      history.replaceState(null, "", u);
+    }, 200);
+  }
+
+  // If not share mode, write a compact default s (debounced)
+  if (!shareMode && ENABLE_SHARE) {
+    // initialize lastEncoded to avoid immediate double-write
+    lastEncoded = null;
+    syncShareParam();
   }
 
   // Immutable for reset
@@ -369,7 +391,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     connect: [true, false],
     pips: { mode: "values", values: makePips(state.sliderMin, state.sliderMax), density: 10 },
   });
-  renderPips();
+  const renderAllPips = () => requestAnimationFrame(renderPips);
+  renderAllPips();
 
   // Input bounds/value
   if (empInputEl) {
@@ -386,12 +409,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perStatementCost = () =>
     state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
-  function syncShareParam() {
-    const u = new URL(location.href);
-    u.searchParams.set("s", encodeShare(state, defaults));
-    history.replaceState(null, "", u);
-  }
-
   function recalc(rawCount) {
     const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
     const perEmp = (n > 0) ? (perStatementCost() + state.baseFee / n) : perStatementCost();
@@ -402,7 +419,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
     state.statementCount = n;
-    syncShareParam();
+    // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
   }
 
   function updateSliderRange(min, max, setVal = null) {
@@ -419,7 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       },
       true
     );
-    renderPips();
+    renderAllPips();
     if (setVal != null) sliderEl.noUiSlider.set(setVal);
     syncShareParam();
   }
@@ -427,7 +444,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initial paint
   recalc(state.statementCount);
 
-  // Slider update (no expand; show toast at max & autofocus input)
+  // Slider update (smooth UI) — no URL writes here
   let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = Number(vals[0]);
@@ -458,6 +475,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     recalc(val);
   });
 
+  // Slider set (user released handle) — write URL here
+  sliderEl.noUiSlider.on("set", () => {
+    syncShareParam();
+  });
+
   // Input -> expand if above max (typed+10)
   if (empInputEl) {
     empInputEl.addEventListener("input", () => {
@@ -469,10 +491,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!Number.isFinite(v)) return;
 
       if (v > state.sliderMax) {
-        updateSliderRange(state.sliderMin, v + 10, v);
+        updateSliderRange(state.sliderMin, v + 10, v); // includes syncShareParam (debounced)
       } else {
         v = clamp(v, state.sliderMin, state.sliderMax);
         sliderEl.noUiSlider.set(v);
+        syncShareParam(); // debounced write for manual input within range
       }
     });
   }
@@ -512,8 +535,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         empInputEl.value = state.statementCount;
       }
 
+      // repaint & sync URL after reset
       maxToastShown = false;
       recalc(state.statementCount);
+      syncShareParam();
     });
   }
 
@@ -527,12 +552,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!state.isHomeMail) {
           state.isHomeMail = true;
           if (cbHomeMail) cbHomeMail.checked = true;
-          //Toast.show("Inserts can only be included with statements mailed to homes.", { type: "info" });
         }
         if (state.isSingleMail) {
           state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          //Toast.show("Inserts cannot be included with single address mail.", { type: "warn" });
         }
       } else {
         if (!state.isSingleMail && !state.isHomeMail && cbHasInserts.checked) {
@@ -551,19 +574,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (state.isHomeMail) {
           state.isHomeMail = false;
           if (cbHomeMail) cbHomeMail.checked = false;
-          //Toast.show("Single Address Mail is exclusive, so Home Address Mail was turned off.", { type: "info" });
         }
         if (state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          //Toast.show("Inserts cannot be included with single address mail.", { type: "warn" });
         }
       } else {
         state.isSingleMail = false;
         if (!state.isHomeMail && state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          //Toast.show("Inserts can only be included with mailed statements.", { type: "info" });
         }
       }
       recalc(sliderEl.noUiSlider.get());
@@ -577,7 +597,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (state.isSingleMail) {
           state.isSingleMail = false;
           if (cbSingleMail) cbSingleMail.checked = false;
-          //Toast.show("Home Address Mail is exclusive with Single Address Mail, so Single Address Mail was turned off.", { type: "info" });
         }
         state.isHomeMail = true;
       } else {
@@ -585,7 +604,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!state.isSingleMail && state.hasInserts) {
           state.hasInserts = false;
           if (cbHasInserts) cbHasInserts.checked = false;
-          //Toast.show("Inserts can only be included with mailed statements.", { type: "info" });
         }
       }
       recalc(sliderEl.noUiSlider.get());
