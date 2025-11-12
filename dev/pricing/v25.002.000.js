@@ -14,51 +14,27 @@ const K = {
   version:               "v"
 };
 const FLAG_BITS = {
-  isSingleMail:  1 << 0, // 1
-  isHomeMail:    1 << 1, // 2
-  hasInserts:    1 << 2, // 4
-  pricingLocked: 1 << 3  // 8
+  isSingleMail:  1 << 0,
+  isHomeMail:    1 << 1,
+  hasInserts:    1 << 2,
+  pricingLocked: 1 << 3 
 };
 
-function packFlags(s){
-  let f = 0;
-  if (s.isSingleMail)  f |= FLAG_BITS.isSingleMail;
-  if (s.isHomeMail)    f |= FLAG_BITS.isHomeMail;
-  if (s.hasInserts)    f |= FLAG_BITS.hasInserts;
-  if (s.pricingLocked) f |= FLAG_BITS.pricingLocked;
-  return f;
-}
-function unpackFlags(f, s){
-  s.isSingleMail  = !!(f & FLAG_BITS.isSingleMail);
-  s.isHomeMail    = !!(f & FLAG_BITS.isHomeMail);
-  s.hasInserts    = !!(f & FLAG_BITS.hasInserts);
-  s.pricingLocked = !!(f & FLAG_BITS.pricingLocked);
-  return s;
-}
-
-/* =============================== App Logic ================================== */
-
 document.addEventListener("DOMContentLoaded", async () => {
-  // Basic DOM refs
   const sliderEl       = document.getElementById("slider");
   const empInputEl     = document.getElementById("empInput");
   const grandTotalEl   = document.getElementById("grandTotal");
   const perEmployeeEl  = document.getElementById("perEmployee");
   const resetBtn       = document.getElementById("toZero");
-
   const cbHasInserts   = document.getElementById("hasInserts");
   const cbSingleMail   = document.getElementById("isSingleMail");
   const cbHomeMail     = document.getElementById("isHomeMail");
-
-  // Optional labels
   const labelBaseFee             = document.getElementById("baseFee");
   const labelStatementFee        = document.getElementById("statementFee");
   const labelSingleMailFee       = document.getElementById("singleAddressMailFee");
   const labelHomeMailFee         = document.getElementById("homeAddressMailFee");
   const labelCanadaMailFee       = document.getElementById("singleAddressCanadaMailFee");
-  const labelInsertCost          = document.getElementById("insertCost");
-
-  // Utils
+  const labelInsertCost          = document.getElementById("insertCost");  
   const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) => Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
