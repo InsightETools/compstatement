@@ -1,18 +1,37 @@
-// Full JavaScript — pricing slider, checkbox rules, centered toasts with autofocus,
-// JSON->DOM mapping (with "Unknown" and wrapper-hide on null), URL param sync + share mode,
-// and with these FINAL rules:
-//   • The fields payrollSystem, payrollDataMethod, supplementalCostMethod, targetDate
-//     ALWAYS come from JSON (no URL parameter support).
-//   • If ?share=true: use ONLY URL params as data EXCEPT the 4 protected fields above.
-//   • If ?share is missing or false: use JSON and reset URL params to mirror JSON (share=false).
-//   • When slider hits max, DO NOT expand automatically. Show toast & focus input.
-//   • When input > max, expand max to typed+10 and set the value.
-//   • pricingLocked: hide [lock="pricingLock"]; if locked and a toggle is false, hide its wrapper.
+/** ===========================================================================
+ * Full JavaScript — compact share param + full pricing slider logic
+ *
+ * Key features:
+ * • Fetch JSON config (DATA_URL)
+ * • PROTECTED JSON-ONLY FIELDS (never from URL): payrollSystem, payrollDataMethod,
+ *   supplementalCostMethod, targetDate — with rules:
+ *    - if value is "" -> show "Unknown" in #<key>
+ *    - if value is null -> hide #<key>Wrapper (or the element if wrapper missing)
+ * • Centered toast module (for messages & slider-at-max hint)
+ * • noUiSlider with k-labeled pips, clickable pips, step=1
+ * • Pricing:
+ *    grand = baseFee + n * (statementFee + mailingFee + (hasInserts?insertCost:0))
+ *    per-employee = (grand / n) but implemented as statementFee+mail+insert + baseFee/n
+ * • Checkbox rules:
+ *    - Inserts require Home Mail; disables Single Mail
+ *    - Single Mail disables Home Mail and Inserts
+ *    - If both mails off, Inserts off
+ * • pricingLocked:
+ *    - Hide elements with [lock="pricingLock"]
+ *    - If locked, and any toggle is false, hide its wrapper (#isSingleMailWrapper, etc.)
+ * • URL Short Param Codec:
+ *    - Single param ?s=... contains compact state (numbers base36, booleans bit-packed)
+ *    - If s exists => SHARE MODE, load state from s (but keep protected fields from JSON)
+ *    - If s missing => NORMAL MODE, use JSON defaults and write a compact s into URL
+ *    - On any change (slider/input/checkbox), rewrite ?s=... with current state
+ * • Input can exceed sliderMax -> expands sliderMax to typed+10 and sets value
+ * • Slider hitting max -> does NOT expand; shows toast & autofocuses input
+ * ===========================================================================
+ */
 
-// ----------------------------- Config -----------------------------------------
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 
-// ----------------------------- Toast (centered) -------------------------------
+/* ============================== Toast (centered) ============================== */
 const Toast = (() => {
   let container, stylesInjected = false;
   function injectStyles() {
@@ -76,153 +95,180 @@ const Toast = (() => {
   return { show };
 })();
 
-// -------------------------- URL params helpers -------------------------------
-const PROTECTED_JSON_ONLY = new Set([
-  "payrollSystem",
-  "payrollDataMethod",
-  "supplementalCostMethod",
-  "targetDate"
-]);
-
-// All keys we sync in URL (EXCLUDING protected fields)
-const PARAM_KEYS = [
-  "share",
-  "baseFee", "statementFee", "singleAddressMailFee", "homeAddressMailFee", "insertCost",
-  "sliderMin", "sliderMax", "statementCount",
-  "isSingleMail", "isHomeMail", "hasInserts", "pricingLocked"
-];
-
-const qs = () => new URLSearchParams(window.location.search);
-
-function setParamsBulk(obj) {
-  const p = qs();
-  for (const k of PARAM_KEYS) {
-    if (obj[k] === undefined) continue;
-    const v = obj[k];
-    if (v === null || v === undefined) p.delete(k);
-    else p.set(k, String(v));
-  }
-  history.replaceState(null, "", `${location.pathname}?${p.toString()}${location.hash}`);
-}
-
-function getParamBool(name, def = false) {
-  const v = qs().get(name);
-  if (v === null) return def;
-  return v === "true" || v === "1";
-}
-function getParamNum(name, def = 0) {
-  const v = Number(qs().get(name));
-  return Number.isFinite(v) ? v : def;
-}
-
-// Build state from URL params (for share=true), with defaults fallback
-function stateFromParams(defaults = {}) {
-  return {
-    share: getParamBool("share", false),
-    baseFee: getParamNum("baseFee", defaults.baseFee ?? 0),
-    statementFee: getParamNum("statementFee", defaults.statementFee ?? 0),
-    singleAddressMailFee: getParamNum("singleAddressMailFee", defaults.singleAddressMailFee ?? 0),
-    homeAddressMailFee: getParamNum("homeAddressMailFee", defaults.homeAddressMailFee ?? 0),
-    insertCost: getParamNum("insertCost", defaults.insertCost ?? 0),
-    sliderMin: getParamNum("sliderMin", defaults.sliderMin ?? 0),
-    sliderMax: getParamNum("sliderMax", defaults.sliderMax ?? 100),
-    statementCount: getParamNum("statementCount", defaults.statementCount ?? 0),
-    isSingleMail: getParamBool("isSingleMail", !!defaults.isSingleMail),
-    isHomeMail: getParamBool("isHomeMail", !!defaults.isHomeMail),
-    hasInserts: getParamBool("hasInserts", !!defaults.hasInserts),
-    pricingLocked: getParamBool("pricingLocked", !!defaults.pricingLocked),
-    // PROTECTED FIELDS ARE NOT READ FROM PARAMS
-    payrollSystem: defaults.payrollSystem ?? "",
-    payrollDataMethod: defaults.payrollDataMethod ?? "",
-    supplementalCostMethod: defaults.supplementalCostMethod ?? "",
-    targetDate: defaults.targetDate ?? ""
-  };
-}
-
-function paramsFromState(s) {
-  // Only include PARAM_KEYS
-  return {
-    share: s.share,
-    baseFee: s.baseFee,
-    statementFee: s.statementFee,
-    singleAddressMailFee: s.singleAddressMailFee,
-    homeAddressMailFee: s.homeAddressMailFee,
-    insertCost: s.insertCost,
-    sliderMin: s.sliderMin,
-    sliderMax: s.sliderMax,
-    statementCount: s.statementCount,
-    isSingleMail: s.isSingleMail,
-    isHomeMail: s.isHomeMail,
-    hasInserts: s.hasInserts,
-    pricingLocked: s.pricingLocked
-  };
-}
-
-// ---------------------- JSON -> DOM field binder ------------------------------
-function applyJsonFields(json, fields) {
+/* ===================== JSON -> DOM field binder (protected) =================== */
+/** For protected fields: blank -> "Unknown"; null -> hide wrapper */
+function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const isNullish = (v) =>
-    v === null ||
-    v === undefined ||
-    (typeof v === "string" && v.trim().toLowerCase() === "null") ||
-    (typeof v === "number" && !Number.isFinite(v));
+  const isNullishByRule = (v) =>
+    v === null || (typeof v === "string" && v.trim().toLowerCase() === "null");
 
-  const hide = (el) => { if (el) el.style.display = "none"; };
-  const show = (el) => { if (el) el.style.display = ""; };
+  const sliderEl = document.getElementById("slider");
 
   fields.forEach((key) => {
-    const val = json?.[key];
     const el = document.getElementById(key);
     const wrapper = document.getElementById(`${key}Wrapper`);
-
-    if (isNullish(val)) {
-      hide(wrapper || el);
-      return;
-    }
     if (!el) return;
 
-    show(wrapper);
-    show(el);
+    const val = json?.[key];
 
-    const out = isBlank(val) ? "Unknown" : String(val);
-    const tag = el.tagName?.toLowerCase?.() || "";
-
-    if (tag === "img") {
-      if (isBlank(val)) {
-        el.removeAttribute("src");
-        el.alt = "Unknown";
+    // Nullish => hide wrapper/element UNLESS it would also hide the slider
+    if (isNullishByRule(val)) {
+      if (wrapper) {
+        if (sliderEl && wrapper.contains(sliderEl)) {
+          // Safety: don't hide the slider's container
+          wrapper.style.display = "";
+          el.style.display = "";
+          el.textContent = "Unknown";
+        } else {
+          wrapper.style.display = "none";
+        }
       } else {
-        el.src = out;
-        if (!el.alt) el.alt = key;
+        if (sliderEl && el.contains(sliderEl)) {
+          el.style.display = "";
+          el.textContent = "Unknown";
+        } else {
+          el.style.display = "none";
+        }
       }
-    } else if (tag === "a") {
-      el.textContent = out;
-      if (isBlank(val)) {
-        el.removeAttribute("href");
-      } else if (/^https?:\/\//i.test(out) || out.startsWith("mailto:") || out.startsWith("tel:")) {
-        el.href = out;
-      }
-    } else if (tag === "input" || tag === "textarea") {
-      el.value = out;
-    } else {
-      el.textContent = out;
+      return;
     }
+
+    // Not null => ensure visible
+    if (wrapper) wrapper.style.display = "";
+    el.style.display = "";
+
+    // Blank => Unknown
+    el.textContent = isBlank(val) ? "Unknown" : String(val);
   });
 }
 
-// --------------------------------- App ---------------------------------------
+/* ======================= Short Share Param Codec (1 param) ====================
+
+   State fields included in compact share param:
+   - baseFee, statementFee, singleAddressMailFee, homeAddressMailFee, insertCost
+   - sliderMin, sliderMax, statementCount
+   - isSingleMail, isHomeMail, hasInserts, pricingLocked (bit-packed)
+   PROTECTED FIELDS are JSON-only and are NOT included in s-param.
+
+============================================================================= */
+
+const K = {
+  baseFee:               "bf",
+  statementFee:          "sf",
+  singleAddressMailFee:  "sm",
+  homeAddressMailFee:    "hm",
+  insertCost:            "ic",
+  sliderMin:             "mn",
+  sliderMax:             "mx",
+  statementCount:        "n",
+  flags:                 "f",
+  version:               "v"
+};
+
+const FLAG_BITS = {
+  isSingleMail:  1 << 0, // 1
+  isHomeMail:    1 << 1, // 2
+  hasInserts:    1 << 2, // 4
+  pricingLocked: 1 << 3  // 8
+};
+
+function numTo36(n){ return Math.round(Number(n)).toString(36); }
+function from36(s, def=0){ const n = parseInt(s, 36); return Number.isFinite(n) ? n : def; }
+
+// Base64URL helpers
+function toBase64Url(str){
+  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function fromBase64Url(b64u){
+  const pad = b64u.length % 4 === 2 ? "==" : b64u.length % 4 === 3 ? "=" : "";
+  const b64 = b64u.replace(/-/g,'+').replace(/_/g,'/') + pad;
+  return atob(b64);
+}
+
+function packFlags(s){
+  let f = 0;
+  if (s.isSingleMail)  f |= FLAG_BITS.isSingleMail;
+  if (s.isHomeMail)    f |= FLAG_BITS.isHomeMail;
+  if (s.hasInserts)    f |= FLAG_BITS.hasInserts;
+  if (s.pricingLocked) f |= FLAG_BITS.pricingLocked;
+  return f;
+}
+function unpackFlags(f, s){
+  s.isSingleMail  = !!(f & FLAG_BITS.isSingleMail);
+  s.isHomeMail    = !!(f & FLAG_BITS.isHomeMail);
+  s.hasInserts    = !!(f & FLAG_BITS.hasInserts);
+  s.pricingLocked = !!(f & FLAG_BITS.pricingLocked);
+  return s;
+}
+
+/** Encode only differences vs defaults into ?s= */
+function encodeShare(state, defaults){
+  const out = {[K.version]: 1};
+
+  const numFields = [
+    ["baseFee","bf"], ["statementFee","sf"], ["singleAddressMailFee","sm"],
+    ["homeAddressMailFee","hm"], ["insertCost","ic"],
+    ["sliderMin","mn"], ["sliderMax","mx"], ["statementCount","n"]
+  ];
+  for (const [key, sk] of numFields){
+    const v = Number(state[key]);
+    const dv = Number(defaults[key]);
+    if (!Number.isFinite(v) || !Number.isFinite(dv)) continue;
+    if (v !== dv) out[sk] = numTo36(v);
+  }
+
+  const fState = packFlags(state);
+  const fDef   = packFlags(defaults);
+  if (fState !== fDef) out[K.flags] = numTo36(fState);
+
+  return toBase64Url(JSON.stringify(out));
+}
+
+/** Decode ?s= back to state merged with defaults */
+function decodeShare(s, defaults){
+  let obj = {};
+  try {
+    obj = JSON.parse(fromBase64Url(s));
+  } catch(e){
+    console.warn("Bad share payload; using defaults.", e);
+    return {...defaults};
+  }
+  const st = {...defaults};
+
+  const rd = (sk, key) => {
+    if (obj[sk] !== undefined) st[key] = from36(obj[sk], defaults[key]);
+  };
+  rd("bf","baseFee"); rd("sf","statementFee"); rd("sm","singleAddressMailFee");
+  rd("hm","homeAddressMailFee"); rd("ic","insertCost");
+  rd("mn","sliderMin"); rd("mx","sliderMax"); rd("n","statementCount");
+
+  if (obj[K.flags] !== undefined){
+    const f = from36(obj[K.flags], packFlags(defaults));
+    unpackFlags(f, st);
+  }
+
+  // normalize
+  if (st.sliderMax < st.sliderMin){ const t = st.sliderMin; st.sliderMin = st.sliderMax; st.sliderMax = t; }
+  st.statementCount = Math.min(Math.max(st.statementCount, st.sliderMin), st.sliderMax);
+
+  return st;
+}
+
+/* =============================== App Logic ================================== */
+
 document.addEventListener("DOMContentLoaded", async () => {
-  // DOM refs
+  // Basic DOM refs
   const sliderEl       = document.getElementById("slider");
   const empInputEl     = document.getElementById("empInput");
   const grandTotalEl   = document.getElementById("grandTotal");
   const perEmployeeEl  = document.getElementById("perEmployee");
   const resetBtn       = document.getElementById("toZero");
+
   const cbHasInserts   = document.getElementById("hasInserts");
   const cbSingleMail   = document.getElementById("isSingleMail");
   const cbHomeMail     = document.getElementById("isHomeMail");
 
-  // Optional display labels
+  // Optional labels
   const labelBaseFee             = document.getElementById("baseFee");
   const labelStatementFee        = document.getElementById("statementFee");
   const labelSingleMailFee       = document.getElementById("singleAddressMailFee");
@@ -284,26 +330,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     isHomeMail: !!json.isHomeMail,
     hasInserts: !!json.hasInserts,
     pricingLocked: !!json.pricingLocked,
-    // Protected: ALWAYS from JSON
+    // PROTECTED JSON-ONLY fields (for DOM display)
     payrollSystem: json.payrollSystem ?? "",
     payrollDataMethod: json.payrollDataMethod ?? "",
     supplementalCostMethod: json.supplementalCostMethod ?? "",
     targetDate: json.targetDate ?? ""
   };
 
-  // share logic
-  const urlShare = getParamBool("share", false);
-  // If share=true: use params (with defaults fallback) but keep protected fields from JSON.
-  // If share missing/false: use JSON defaults and reset params to match JSON (share=false).
-  let state = urlShare ? stateFromParams(defaults) : { ...defaults, share: false };
+  // SHARE MODE detection (if ?s exists, use it)
+  const url = new URL(location.href);
+  const sharePayload = url.searchParams.get("s");
+  const shareMode = !!sharePayload;
 
-  // Normalize slider range and count
-  if (state.sliderMax < state.sliderMin) {
-    const t = state.sliderMin;
-    state.sliderMin = state.sliderMax;
-    state.sliderMax = t;
-  }
-  state.statementCount = clamp(state.statementCount, state.sliderMin, state.sliderMax);
+  // State from share or defaults
+  let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
 
   // Business rules
   if (state.hasInserts) {
@@ -314,25 +354,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     state.hasInserts = false;
   }
 
-  // Sync URL to initial state (respecting protected fields exclusion)
-  setParamsBulk(paramsFromState(state));
+  // If not share mode, write a compact default s
+  if (!shareMode) {
+    url.searchParams.delete("s");
+    url.searchParams.set("s", encodeShare(state, defaults));
+    history.replaceState(null, "", url);
+  }
 
   // Immutable for reset
   const ORIG = { ...state };
 
-  // Apply protected JSON-only fields to DOM (never from params)
-  applyJsonFields(defaults, [
+  // Apply protected fields to DOM from JSON (strict rules)
+  applyJsonFieldsStrict(defaults, [
     "payrollSystem",
     "payrollDataMethod",
     "supplementalCostMethod",
     "targetDate"
   ]);
 
-  // pricingLocked visibility via lock attribute
+  // pricingLocked visuals
   document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
     el.style.display = state.pricingLocked ? "none" : "";
   });
-  // When locked, hide wrappers for false toggles
   if (state.pricingLocked) {
     const singleW = document.getElementById("isSingleMailWrapper");
     const homeW   = document.getElementById("isHomeMailWrapper");
@@ -342,7 +385,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (insW    && state.hasInserts   === false) insW.style.display    = "none";
   }
 
-  // Optional labels
+  // Optional fees display
   if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
   if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(state.statementFee);
   if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
@@ -350,7 +393,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (labelInsertCost)    labelInsertCost.textContent = fmtUSD(state.insertCost);
   if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
 
-  // Init checkboxes
+  // Initialize checkboxes
   if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
   if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
   if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
@@ -380,6 +423,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perStatementCost = () =>
     state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
+  function syncShareParam() {
+    const u = new URL(location.href);
+    u.searchParams.set("s", encodeShare(state, defaults));
+    history.replaceState(null, "", u);
+  }
+
   function recalc(rawCount) {
     const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
     const perEmp = (n > 0) ? (perStatementCost() + state.baseFee / n) : perStatementCost();
@@ -390,7 +439,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
     state.statementCount = n;
-    setParamsBulk(paramsFromState(state));
+    syncShareParam();
   }
 
   function updateSliderRange(min, max, setVal = null) {
@@ -409,14 +458,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     );
     renderPips();
     if (setVal != null) sliderEl.noUiSlider.set(setVal);
-
-    setParamsBulk(paramsFromState(state));
+    syncShareParam();
   }
 
   // Initial paint
   recalc(state.statementCount);
 
-  // Slider update (no expand; show toast at max)
+  // Slider update (no expand; show toast at max & autofocus input)
   let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = Number(vals[0]);
@@ -447,7 +495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     recalc(val);
   });
 
-  // Input change -> expand if above max
+  // Input -> expand if above max (typed+10)
   if (empInputEl) {
     empInputEl.addEventListener("input", () => {
       if (empInputEl.value === "") {
@@ -466,7 +514,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Reset to initial state (from JSON or params per share at load time)
+  // Reset (to ORIG)
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
@@ -493,10 +541,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
       if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
 
-      // slider range & value
+      // slider & input
       updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
-
-      // input reflect
       if (empInputEl) {
         empInputEl.min = state.sliderMin;
         empInputEl.max = state.sliderMax;
@@ -508,8 +554,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Checkbox interactions + URL sync
-  const onStateChanged = () => setParamsBulk(paramsFromState(state));
+  // Checkboxes + rules + share sync
+  const onStateChanged = () => syncShareParam();
 
   if (cbHasInserts) {
     cbHasInserts.addEventListener("change", () => {
