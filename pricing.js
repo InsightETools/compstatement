@@ -22,9 +22,9 @@ const Toast = (() => {
       .toast.show{opacity:1;transform:translateY(0)}
       .toast__icon{width:20px;height:20px;margin-top:1px}
       .toast__close{border:0;background:transparent;color:#fff;opacity:.7;cursor:pointer;font-size:16px}
-      .toast--info{background:#111}
-      .toast--warn{background:#6b3a00}
-      .toast--error{background:#6b0000}
+      .toast--info{background:#14d273}
+      .toast--warn{background:#14d273}
+      .toast--error{background:#14d273}
     `;
     const style = document.createElement("style");
     style.textContent = css;
