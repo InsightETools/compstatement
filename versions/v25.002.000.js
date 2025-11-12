@@ -1359,34 +1359,6 @@ async function renderAll(data) {
 });
 }
 
-// ======== MODE TOGGLE (Explore / Pricing) ========
-function setMode(mode, { updateParam = true } = {}) {
-  const m = mode === "pricing" ? "pricing" : "explore";
-
-  document.querySelectorAll('[mode="explore"]').forEach(el => {
-    el.style.display = (m === "explore") ? "" : "none";
-  });
-  document.querySelectorAll('[mode="pricing"]').forEach(el => {
-    el.style.display = (m === "pricing") ? "" : "none";
-  });
-
-  const exploreToggle = document.getElementById("toggleExplore");
-  const pricingToggle = document.getElementById("togglePricing");
-  if (exploreToggle && pricingToggle) {
-    exploreToggle.checked = (m === "explore");
-    pricingToggle.checked = (m === "pricing");
-  }
-
-  if (updateParam) setParam("mode", m);
-}
-
-function applyModeFromParams() {
-  const p = getParams();
-  const urlMode = p.get("mode");
-  setMode(urlMode === "pricing" ? "pricing" : "explore", { updateParam: false });
-}
-// ==================================================
-
 (function controls() {
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
@@ -1641,7 +1613,7 @@ function applyModeFromParams() {
       updateZoom();
     });
 
-    updateZoom();
+updateZoom();
 
     const empBtns = $$('[id^="Employee"]');
     let ek = getParams().get("ek");
@@ -1718,28 +1690,12 @@ function applyModeFromParams() {
     if (!getParams().has("cover"))  setParam("cover", "0");
     if (!getParams().has("ek"))     setParam("ek", "EmployeeA");
 
-    // --- Initialize Mode from URL and bind toggles
-    applyModeFromParams();
-    const exploreToggle = document.getElementById("toggleExplore");
-    const pricingToggle = document.getElementById("togglePricing");
-    if (exploreToggle) {
-      exploreToggle.addEventListener("change", (e) => {
-        if (e.target.checked) setMode("explore"); // sets ?mode=explore via setParam
-      });
-    }
-    if (pricingToggle) {
-      pricingToggle.addEventListener("change", (e) => {
-        if (e.target.checked) setMode("pricing"); // sets ?mode=pricing via setParam
-      });
-    }
-
     applyStateFromParams();
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
       renderPrice(window.__currentData);
-      applyModeFromParams(); // keep mode in sync on back/forward
     });
   });
 })();
-console.log("Explorer Build v25.002.000");
+console.log("Build v25.002.000");
