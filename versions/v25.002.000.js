@@ -174,7 +174,7 @@ window.reloadFromParams = async () => {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
-    console.log("Explorer Built");
+    console.log("Build Complete");
     setTimeout(() => {
       $("#loader")?.classList.add("finished");
     }, 3000);
