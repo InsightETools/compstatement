@@ -94,24 +94,37 @@ const Toast = (() => {
 // ====== JSON → DOM FIELD BINDER ======
 function applyJsonFields(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const hideEl = (el) => { if (el) el.style.display = "none"; };
+  const isNullish = (v) => (
+    v === null ||
+    v === undefined ||
+    (typeof v === "string" && v.trim().toLowerCase() === "null") ||
+    (typeof v === "number" && !Number.isFinite(v))
+  );
+
+  const hide = (el) => { if (el) el.style.display = "none"; };
+  const show = (el) => { if (el) el.style.display = ""; };
 
   fields.forEach((key) => {
-    const val = json?.[key] ?? null;
+    const val = json?.[key];
     const el = document.getElementById(key);
     const wrapper = document.getElementById(`${key}Wrapper`);
 
-    if (val === null) {
-      hideEl(wrapper || el);
+    // If truly nullish → hide wrapper (preferred) or the element itself
+    if (isNullish(val)) {
+      hide(wrapper || el);
       return;
     }
+
+    // If the value element doesn't exist, just skip (but don't force show)
     if (!el) return;
 
-    if (wrapper) wrapper.style.display = "";
-    el.style.display = "";
+    // We have a non-nullish value → ensure visible
+    show(wrapper);
+    show(el);
 
+    // Blank string → "Unknown"
     const out = isBlank(val) ? "Unknown" : String(val);
-    const tag = el.tagName.toLowerCase();
+    const tag = el.tagName?.toLowerCase?.() || "";
 
     if (tag === "img") {
       if (isBlank(val)) {
