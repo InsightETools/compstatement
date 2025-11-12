@@ -37,15 +37,13 @@ const Toast = (() => {
     document.body.appendChild(container);
     return container;
   }
-  //const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⛔" : "ℹ️");
-  const iconFor = (type) => (type === "warn" ? "⚠️" : type === "error" ? "⚠️" : "⚠️");
+
   function show(message, { type = "info", duration = 2800, onShow = null } = {}) {
     injectStyles();
     const parent = ensureContainer();
     const el = document.createElement("div");
     el.className = `toast toast--${type}`;
     el.innerHTML = `
-      <div class="toast__icon" aria-hidden="true">${iconFor(type)}</div>
       <div class="toast__content">${message}</div>
       <button class="toast__close" aria-label="Dismiss">✕</button>
     `;
