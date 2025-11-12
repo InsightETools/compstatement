@@ -1,59 +1,6 @@
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
-
-/* ============================== Config: Sharing ============================== */
-// Toggle this to fully disable reading/writing the compact ?s= param.
 const ENABLE_SHARE = true;
-// Base64URL for {"v":1} — i.e., "no diffs vs defaults"
 const MINIMAL_S = "eyJ2IjoxfQ";
-
-/* ===================== JSON -> DOM field binder (protected) =================== */
-/** For protected fields: blank -> "Unknown"; null -> hide wrapper */
-function applyJsonFieldsStrict(json, fields) {
-  const isBlank = (v) => typeof v === "string" && v.trim() === "";
-  const isNullishByRule = (v) =>
-    v === null || (typeof v === "string" && v.trim().toLowerCase() === "null");
-
-  const sliderEl = document.getElementById("slider");
-
-  fields.forEach((key) => {
-    const el = document.getElementById(key);
-    const wrapper = document.getElementById(`${key}Wrapper`);
-    if (!el) return;
-
-    const val = json?.[key];
-
-    // Nullish => hide wrapper/element UNLESS it would also hide the slider
-    if (isNullishByRule(val)) {
-      if (wrapper) {
-        if (sliderEl && wrapper.contains(sliderEl)) {
-          // Safety: don't hide the slider's container
-          wrapper.style.display = "";
-          el.style.display = "";
-          el.textContent = "Unknown";
-        } else {
-          wrapper.style.display = "none";
-        }
-      } else {
-        if (sliderEl && el.contains(sliderEl)) {
-          el.style.display = "";
-          el.textContent = "Unknown";
-        } else {
-          el.style.display = "none";
-        }
-      }
-      return;
-    }
-
-    // Not null => ensure visible
-    if (wrapper) wrapper.style.display = "";
-    el.style.display = "";
-
-    // Blank => Unknown
-    el.textContent = isBlank(val) ? "Unknown" : String(val);
-  });
-}
-
-/* ======================= Short Share Param Codec (1 param) ====================*/
 const K = {
   baseFee:               "bf",
   statementFee:          "sf",
@@ -66,7 +13,6 @@ const K = {
   flags:                 "f",
   version:               "v"
 };
-
 const FLAG_BITS = {
   isSingleMail:  1 << 0, // 1
   isHomeMail:    1 << 1, // 2
