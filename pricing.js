@@ -16,7 +16,7 @@ const Toast = (() => {
         pointer-events:auto;min-width:240px;max-width:420px;padding:25px 20px;border-radius:10px;
         box-shadow:0 6px 18px rgba(0,0,0,.18);background:#111;color:#fff;
         font:500 16px/1.35 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-        display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:start;
+        display:grid;grid-template-columns:20px 1fr auto;gap:0px;align-items:start;
         opacity:0;transform:translateY(8px);transition:opacity .2s ease,transform .2s ease;
       }
       .toast.show{opacity:1;transform:translateY(0)}
