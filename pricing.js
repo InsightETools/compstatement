@@ -611,4 +611,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
-console.log("Pricing Build v25.002.000");
+console.log("Pricing v25.002.000");
