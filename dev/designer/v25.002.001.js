@@ -31,10 +31,7 @@ const debouncedReloadFromParams = debounced(() => window.reloadFromParams(), 60)
 
 window.__currentData = null;
 
-console.log("Designer App: Core utilities initialized");
-
 async function renderAll(data) {
-  console.log("Designer App: Starting renderAll with data...");
   
   document.querySelectorAll(".modulewrapper").forEach((wrapper) => {
     const template =
@@ -1058,31 +1055,20 @@ async function renderAll(data) {
     });
   }
 
-  console.log("Designer App: Rendering static data...");
   staticData();
-  console.log("Designer App: Rendering standard tables...");
   standardTables();
-  console.log("Designer App: Rendering boolean tables...");
   booleanTables();
-  console.log("Designer App: Rendering modules...");
   modules();
-  console.log("Designer App: Rendering donut charts...");
   donutCharts();
-  console.log("Designer App: Rendering benefits list...");
   benefitsList();
-  console.log("Designer App: Rendering holidays list...");
   holidaysList();
-  console.log("Designer App: Rendering contacts lists...");
   contactsLists(data.companyContacts, '[contacts="company"]');
   contactsLists(data.benefitContacts, '[contacts="providers"]');
-  console.log("Designer App: Rendering list modules...");
   renderListModules(data, elementColor);
   applyCompanyURL();
   applyExplorerURL();
   applyCoverContent();
-  console.log("Designer App: Applying display settings...");
   loadDisplay();
-  console.log("Designer App: Applying fonts...");
   applyFontsFromData(data);
   applyCustomFonts(data);
   computeDesignConstraintsAndApply();
@@ -1098,11 +1084,9 @@ async function renderAll(data) {
   if (dataKey && data[dataKey] !== undefined) span.textContent = data[dataKey];
 });
 
-  console.log("Designer App: All rendering complete");
 }
 
 (function controls() {
-  console.log("Designer App: Initializing controls...");
   
   const isDisabledBtn = (el) =>
     !el || el.classList.contains("disabled") || el.hasAttribute("disabled");
@@ -1307,7 +1291,6 @@ async function renderAll(data) {
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    console.log("Designer App: DOM ready, initializing UI controls...");
     
     _collectButtons();
     computeDesignConstraintsAndApply();
@@ -1436,18 +1419,13 @@ updateZoom();
     if (!getParams().has("cover"))  setParam("cover", "0");
     if (!getParams().has("ek"))     setParam("ek", "EmployeeA");
 
-    console.log("Designer App: Applying initial state from URL parameters...");
     applyStateFromParams();
 
     window.addEventListener("popstate", () => {
       applyStateFromParams();
       renderPrice(window.__currentData);
-    });
-    
-    console.log("Designer App: Controls initialization complete");
+    });    
   });
   
-  console.log("Designer App: Controls configured");
 })();
-
-console.log("Designer App: Module loaded and ready");
+console.log("Designer App: Build Complete");
