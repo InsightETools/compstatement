@@ -1,6 +1,6 @@
 //------LIBRARY------//
 
-console.log("Library v25.002.001");
+console.log("Library v25.002.002");
 
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
@@ -128,6 +128,66 @@ function fromBase64Url(b64u){
   const pad = b64u.length % 4 === 2 ? "==" : b64u.length % 4 === 3 ? "=" : "";
   const b64 = b64u.replace(/-/g,'+').replace(/_/g,'/') + pad;
   return atob(b64);
+}
+
+// SharedDataFetcher: Simplified data fetching
+window.SharedDataFetcher = (() => {
+  const getParams = () => new URLSearchParams(window.location.search);
+
+  function buildFetchUrl() {
+    const params = getParams();
+    const key = params.get("key");
+    const cpid = params.get("cpid");
+    const yr = params.get("yr");
+    const ck = params.get("ck");
+    const ek = params.get("ek") || "EmployeeA";
+    const layout = params.get("layout");
+
+    const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
+
+    if (!key) {
+      return `https://compstatementdemo.netlify.app/data/${ek}.json`;
+    }
+
+    const queryParams = new URLSearchParams({
+      usecors: "0",
+      key, cpid, yr, ck, ek, layout,
+    });
+
+    return `${baseUrl}?${queryParams.toString()}`;
+  }
+
+  async function fetchData(options = {}) {
+    const { signal = null } = options;
+    const url = buildFetchUrl();
+
+    const fetchOptions = { method: "GET" };
+    if (signal) fetchOptions.signal = signal;
+
+    const response = await fetch(url, fetchOptions);
+    const data = await response.json();
+    return data;
+  }
+
+  return { buildFetchUrl, fetchData };
+})();
+
+function buildFetchUrlFromParams() {
+  const p = getParams();
+  const key = p.get("key");
+  const cpid = p.get("cpid");
+  const yr = p.get("yr");
+  const ck = p.get("ck");
+  const ek = p.get("ek") || "EmployeeA";
+  const layout = p.get("layout");
+
+  const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
+
+  if (!key) {
+    return `https://compstatementdemo.netlify.app/data/${ek}.json`;
+  }
+
+  return `${baseUrl}?usecors=0&key=${key}&cpid=${cpid}&yr=${yr}&ck=${ck}&ek=${ek}&layout=${layout}`;
 }
 
 function packFlags(s){
@@ -292,21 +352,9 @@ window.reloadFromParams = async () => {
   currentFetchController = new AbortController();
 
   try {
-    let data;
-    
-    // Use SharedDataFetcher if available
-    if (window.SharedDataFetcher) {
-      console.log("Library: Using SharedDataFetcher");
-      data = await window.SharedDataFetcher.fetchData({ 
-        signal: currentFetchController.signal 
-      });
-    } else {
-      // Fallback to legacy fetch
-      console.log("Library: Using legacy fetch (SharedDataFetcher not available)");
-      const fetchUrl = buildFetchUrlFromParams();
-      const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
-      data = await res.json();
-    }
+    const data = await window.SharedDataFetcher.fetchData({ 
+      signal: currentFetchController.signal 
+    });
 
     await renderAll(data);
 
