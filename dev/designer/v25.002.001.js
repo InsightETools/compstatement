@@ -1428,4 +1428,3 @@ updateZoom();
   });
   
 })();
-console.log("Designer App: Build Complete");
