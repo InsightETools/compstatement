@@ -124,10 +124,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
 
   // Business rules
-  if (state.hasInserts) {
-    state.isHomeMail = true;
-    state.isSingleMail = false;
-  }
+  // Inserts are allowed with either mailing option, but not with neither
   if (!state.isSingleMail && !state.isHomeMail) {
     state.hasInserts = false;
   }
@@ -385,50 +382,43 @@ document.addEventListener("DOMContentLoaded", async () => {
   const onStateChanged = () => syncShareParam();
 
   if (cbHasInserts) {
-    cbHasInserts.addEventListener("change", () => {
-      state.hasInserts = cbHasInserts.checked;
-      if (state.hasInserts) {
-        if (!state.isHomeMail) {
-          state.isHomeMail = true;
-          if (cbHomeMail) cbHomeMail.checked = true;
-        }
-        if (state.isSingleMail) {
-          state.isSingleMail = false;
-          if (cbSingleMail) cbSingleMail.checked = false;
-        }
-      } else {
-        if (!state.isSingleMail && !state.isHomeMail && cbHasInserts.checked) {
-          cbHasInserts.checked = false;
-        }
-      }
-      recalc(sliderEl.noUiSlider.get());
-      onStateChanged();
-    });
-  }
+  cbHasInserts.addEventListener("change", () => {
+    state.hasInserts = cbHasInserts.checked;
+
+    // If inserts are turned on but no mailing method is selected, revert inserts
+    if (state.hasInserts && !state.isSingleMail && !state.isHomeMail) {
+      state.hasInserts = false;
+      cbHasInserts.checked = false;
+    }
+
+    recalc(sliderEl.noUiSlider.get());
+    onStateChanged();
+  });
+}
+
 
   if (cbSingleMail) {
-    cbSingleMail.addEventListener("change", () => {
-      if (cbSingleMail.checked) {
-        state.isSingleMail = true;
-        if (state.isHomeMail) {
-          state.isHomeMail = false;
-          if (cbHomeMail) cbHomeMail.checked = false;
-        }
-        if (state.hasInserts) {
-          state.hasInserts = false;
-          if (cbHasInserts) cbHasInserts.checked = false;
-        }
-      } else {
-        state.isSingleMail = false;
-        if (!state.isHomeMail && state.hasInserts) {
-          state.hasInserts = false;
-          if (cbHasInserts) cbHasInserts.checked = false;
-        }
+  cbSingleMail.addEventListener("change", () => {
+    if (cbSingleMail.checked) {
+      state.isSingleMail = true;
+      // Still keep single vs home mutually exclusive
+      if (state.isHomeMail) {
+        state.isHomeMail = false;
+        if (cbHomeMail) cbHomeMail.checked = false;
       }
-      recalc(sliderEl.noUiSlider.get());
-      onStateChanged();
-    });
-  }
+    } else {
+      state.isSingleMail = false;
+      // If no mailing method is selected, inserts can't stay enabled
+      if (!state.isHomeMail && state.hasInserts) {
+        state.hasInserts = false;
+        if (cbHasInserts) cbHasInserts.checked = false;
+      }
+    }
+    recalc(sliderEl.noUiSlider.get());
+    onStateChanged();
+  });
+}
+
 
   if (cbHomeMail) {
     cbHomeMail.addEventListener("change", () => {
