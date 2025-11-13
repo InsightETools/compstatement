@@ -1,3 +1,5 @@
+//Pricing App
+
 const DATA_URL = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
