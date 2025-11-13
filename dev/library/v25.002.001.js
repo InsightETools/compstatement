@@ -1,6 +1,6 @@
 //------LIBRARY------//
 
-console.log("Library v25.002.002");
+console.log("Library v25.002.001");
 
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
