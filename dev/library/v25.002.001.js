@@ -346,7 +346,7 @@ window.reloadFromParams = async () => {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
-    console.log("Library: All components rendered successfully");
+    console.log("Finished");
     setTimeout(() => {
       $("#loader")?.classList.add("finished");
     }, 3000);
