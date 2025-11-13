@@ -20,7 +20,7 @@ const FLAG_BITS = {
   isSingleMail:  1 << 0,
   isHomeMail:    1 << 1,
   hasInserts:    1 << 2,
-  pricingLocked: 1 << 3 
+  pricingLock: 1 << 3 
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     isSingleMail: !!json.isSingleMail,
     isHomeMail: !!json.isHomeMail,
     hasInserts: !!json.hasInserts,
-    pricingLocked: !!json.pricingLocked,
+    pricingLock: !!json.pricingLock,
     // PROTECTED JSON-ONLY fields (for DOM display)
     payrollSystem: json.payrollSystem ?? "",
     payrollDataMethod: json.payrollDataMethod ?? "",
@@ -150,13 +150,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     "targetDate"
   ]);
 
-  // SIMPLIFIED: pricingLocked visibility logic
-  // If pricingLocked is TRUE → HIDE elements with lock="pricingLocked"
-  // If pricingLocked is FALSE or missing → SHOW elements with lock="pricingLocked"
-  function applyPricingLockedVisibility() {
-    const isLocked = state.pricingLocked === true;
+  // SIMPLIFIED: pricingLock visibility logic
+  // If pricingLock is TRUE → HIDE elements with lock="pricingLock"
+  // If pricingLock is FALSE or missing → SHOW elements with lock="pricingLock"
+  function applypricingLockVisibility() {
+    const isLocked = state.pricingLock === true;
     
-    document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
+    document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
       if (isLocked) {
         el.style.display = "none";
       } else {
@@ -165,8 +165,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Apply initial pricingLocked state
-  applyPricingLockedVisibility();
+  // Apply initial pricingLock state
+  applypricingLockVisibility();
 
   // Optional fees display
   if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
@@ -304,8 +304,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       state = { ...ORIG };
 
-      // Reapply pricingLocked visibility
-      applyPricingLockedVisibility();
+      // Reapply pricingLock visibility
+      applypricingLockVisibility();
 
       // checkboxes
       if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
