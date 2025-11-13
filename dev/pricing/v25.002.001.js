@@ -70,15 +70,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let json = {};
   try {
     if (window.SharedDataFetcher) {
-      // Use shared fetcher (with caching)
       json = await window.SharedDataFetcher.fetchData();
-    } /*else {
-      // Fallback to direct fetch if SharedDataFetcher not available
-      const fallbackUrl = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
-      const res = await fetch(fallbackUrl, { cache: "no-store" });
-      json = await res.json();
-      console.warn("SharedDataFetcher not found, using fallback URL");
-    }*/
+    }
   } catch (e) {
     console.error("Pricing App: Error loading JSON:", e);
     json = {};
