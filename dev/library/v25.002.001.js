@@ -155,7 +155,7 @@ window.SharedDataFetcher = (() => {
     }
 
     const queryParams = new URLSearchParams({
-      usecors: "1",
+      usecors: "0",
       key, cpid, yr, ck, ek, layout,
     });
 
@@ -268,7 +268,7 @@ function buildFetchUrlLegacy() {
   }
 
   const qp = new URLSearchParams({
-    usecors: "1",
+    usecors: "0",
     key, cpid, yr, ck, ek, layout,
   });
 
