@@ -1,6 +1,3 @@
-let isLoaded = false;
-console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
-
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const getParams = () => new URLSearchParams(window.location.search);
