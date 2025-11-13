@@ -130,12 +130,127 @@ function fromBase64Url(b64u){
   return atob(b64);
 }
 
+// SharedDataFetcher: Integrated data fetching module
+window.SharedDataFetcher = (() => {
+  let cachedData = null;
+  let cachedUrl = null;
+  let cacheTimestamp = null;
+  const CACHE_DURATION = 5 * 60 * 1000;
+
+  const getParams = () => new URLSearchParams(window.location.search);
+
+  function buildFetchUrl() {
+    const params = getParams();
+    const key = params.get("key");
+    const cpid = params.get("cpid");
+    const yr = params.get("yr");
+    const ck = params.get("ck");
+    const ek = params.get("ek") || "EmployeeA";
+    const layout = params.get("layout");
+
+    const baseUrl = "https://etools.secure-solutions.biz/totalcompadmin/design/ClientParamsExplorer.aspx";
+
+    if (!key) {
+      return `https://compstatementdemo.netlify.app/data/${ek}.json`;
+    }
+
+    const queryParams = new URLSearchParams({
+      usecors: "1",
+      key, cpid, yr, ck, ek, layout,
+    });
+
+    return `${baseUrl}?${queryParams.toString()}`;
+  }
+
+  function isCacheValid(url) {
+    if (!cachedData || !cachedUrl || !cacheTimestamp) return false;
+    if (cachedUrl !== url) return false;
+    const now = Date.now();
+    if (now - cacheTimestamp > CACHE_DURATION) return false;
+    return true;
+  }
+
+  async function fetchData(options = {}) {
+    const { signal = null, forceRefresh = false } = options;
+    const url = buildFetchUrl();
+
+    if (!forceRefresh && isCacheValid(url)) {
+      console.log("SharedDataFetcher: Returning cached data");
+      return cachedData;
+    }
+
+    console.log("SharedDataFetcher: Fetching data from", url);
+
+    try {
+      const fetchOptions = {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      };
+
+      if (signal) fetchOptions.signal = signal;
+
+      const response = await fetch(url, fetchOptions);
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+      const data = await response.json();
+      cachedData = data;
+      cachedUrl = url;
+      cacheTimestamp = Date.now();
+
+      console.log("SharedDataFetcher: Data fetched and cached successfully");
+      return data;
+
+    } catch (error) {
+      if (error.name === "AbortError") {
+        console.log("SharedDataFetcher: Fetch aborted");
+        throw error;
+      }
+
+      console.error("SharedDataFetcher: Error fetching data:", error);
+      
+      if (cachedData) {
+        console.warn("SharedDataFetcher: Using stale cached data due to fetch error");
+        return cachedData;
+      }
+
+      throw error;
+    }
+  }
+
+  function clearCache() {
+    cachedData = null;
+    cachedUrl = null;
+    cacheTimestamp = null;
+    console.log("SharedDataFetcher: Cache cleared");
+  }
+
+  function getCacheStatus() {
+    return {
+      hasCachedData: !!cachedData,
+      cachedUrl,
+      cacheAge: cacheTimestamp ? Date.now() - cacheTimestamp : null,
+      isValid: isCacheValid(cachedUrl),
+    };
+  }
+
+  async function preload() {
+    try {
+      await fetchData();
+      console.log("SharedDataFetcher: Data preloaded successfully");
+      return true;
+    } catch (error) {
+      console.warn("SharedDataFetcher: Preload failed:", error);
+      return false;
+    }
+  }
+
+  return { buildFetchUrl, fetchData, clearCache, getCacheStatus, preload };
+})();
+
 function buildFetchUrlFromParams() {
-  // Delegate to SharedDataFetcher for consistency
   return window.SharedDataFetcher?.buildFetchUrl() || buildFetchUrlLegacy();
 }
 
-// Legacy fallback if SharedDataFetcher not loaded
 function buildFetchUrlLegacy() {
   const p = getParams();
   const key    = p.get("key");
@@ -323,15 +438,13 @@ window.reloadFromParams = async () => {
   try {
     let data;
     
-    // Use SharedDataFetcher if available
     if (window.SharedDataFetcher) {
       console.log("Library: Using SharedDataFetcher");
       data = await window.SharedDataFetcher.fetchData({ 
         signal: currentFetchController.signal 
       });
     } else {
-      // Fallback to legacy fetch
-      console.log("Library: Using legacy fetch (SharedDataFetcher not available)");
+      console.log("Library: Using legacy fetch");
       const fetchUrl = buildFetchUrlFromParams();
       const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
       data = await res.json();
