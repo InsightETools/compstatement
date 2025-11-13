@@ -1,4 +1,4 @@
-console.log("Pricing App v25.002.001: Initializing...");
+console.log("Pricing App v25.002.001");
 
 // UPDATED: Remove hard-coded DATA_URL, will use SharedDataFetcher
 const ENABLE_SHARE = true;
