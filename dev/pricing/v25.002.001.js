@@ -1,4 +1,4 @@
-//------PRICING APP ------//
+//------PRICING APP (FIXED)------//
 
 console.log("Pricing App v25.002.001");
 
@@ -20,7 +20,7 @@ const FLAG_BITS = {
   isSingleMail:  1 << 0,
   isHomeMail:    1 << 1,
   hasInserts:    1 << 2,
-  pricingLock: 1 << 3 
+  pricingLock:   1 << 3 
 };
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -38,10 +38,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const labelHomeMailFee         = document.getElementById("homeAddressMailFee");
   const labelCanadaMailFee       = document.getElementById("singleAddressCanadaMailFee");
   const labelInsertCost          = document.getElementById("insertCost");  
+
   const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
-  const fmtUSD = (n) => Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
-  const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const fmtUSD = (n) =>
+    Number(n).toLocaleString(undefined, {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 2
+    });
+  const fmtInt = (n) =>
+    Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+  // NEW: generic helper to push values into [data="..."] elements
   const applyDataValue = (name, value, formatter) => {
     const formatted = formatter ? formatter(value) : value;
     document.querySelectorAll(`[data="${name}"]`).forEach((el) => {
@@ -58,6 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     return String(v);
   };
+
   const makePips = (min, max) => {
     const steps = 10;
     const span = max - min;
@@ -65,6 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? [min]
       : Array.from({ length: steps + 1 }, (_, i) => Math.round(min + (span * i) / steps));
   };
+
   const renderPips = () => {
     sliderEl.querySelectorAll(".noUi-value").forEach((pip) => {
       const v = Number(pip.dataset.value);
@@ -175,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Apply initial pricingLock state
   applypricingLockVisibility();
 
-  // Optional fees display
+  // Optional fees display (ID targets if present elsewhere in DOM)
   if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
   if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(state.statementFee);
   if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
@@ -211,36 +222,56 @@ document.addEventListener("DOMContentLoaded", async () => {
     state.isHomeMail ? state.homeAddressMailFee :
     state.isSingleMail ? state.singleAddressMailFee : 0;
 
+  // Kept for compatibility, though recalc now does full math
   const perStatementCost = () =>
     state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
-    function recalc(rawCount) {
+  // UPDATED: full pricing + data-binding logic
+  function recalc(rawCount) {
     const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
+
     const baseFee        = state.baseFee;
     const statementFee   = state.statementFee;
     const insertFee      = state.hasInserts ? state.insertCost : 0;
     const mailingPerStmt = currentMailingFee();
+
     const statementTotal = n * statementFee;
     const insertTotal    = n * insertFee;
     const deliveryTotal  = n * mailingPerStmt;
+
+    // grandTotal = baseFee + statementTotal + insertTotal + deliveryTotal
     const grandTotal     = baseFee + statementTotal + insertTotal + deliveryTotal;
+
+    // pricePerStatement = grandTotal / statementCount (if > 0)
     const pricePerStatement = n > 0 ? grandTotal / n : 0;
 
+    // Primary UI totals (if you have separate hero numbers by ID)
     if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
     if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grandTotal);
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
     state.statementCount = n;
+
+    // Push raw values into [data="..."] elements
+
+    // Direct/store values
     applyDataValue("baseFee",              baseFee,              fmtUSD);
     applyDataValue("statementFee",         statementFee,         fmtUSD);
     applyDataValue("insertCost",           insertFee,            fmtUSD);
     applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
     applyDataValue("homeAddressMailFee",   state.homeAddressMailFee,   fmtUSD);
+
+    // Count (non-dollar, but formatted nicely)
+    applyDataValue("statementCount",       n,                    fmtInt);
+
+    // Calculated totals
     applyDataValue("statementTotal",       statementTotal,       fmtUSD);
     applyDataValue("insertTotal",          insertTotal,          fmtUSD);
     applyDataValue("deliveryTotal",        deliveryTotal,        fmtUSD);
     applyDataValue("pricePerStatement",    pricePerStatement,    fmtUSD);
     applyDataValue("grandTotal",           grandTotal,           fmtUSD);
+
+    // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
   }
 
   function updateSliderRange(min, max, setVal = null) {
@@ -262,7 +293,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     syncShareParam();
   }
 
-  // Initial paint
+  // Initial paint (formats all dollar values + statementCount on load)
   recalc(state.statementCount);
 
   // Slider update (smooth UI) — no URL writes here
