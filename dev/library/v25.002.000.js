@@ -87,7 +87,6 @@ function encodeShare(state, defaults){
   return toBase64Url(JSON.stringify(out));
 }
 
-/** Decode ?s= back to state merged with defaults */
 function decodeShare(s, defaults){
   let obj = {};
   try {
@@ -110,7 +109,6 @@ function decodeShare(s, defaults){
     unpackFlags(f, st);
   }
 
-  // normalize
   if (st.sliderMax < st.sliderMin){ const t = st.sliderMin; st.sliderMin = st.sliderMax; st.sliderMax = t; }
   st.statementCount = Math.min(Math.max(st.statementCount, st.sliderMin), st.sliderMax);
 
@@ -120,7 +118,6 @@ function decodeShare(s, defaults){
 function numTo36(n){ return Math.round(Number(n)).toString(36); }
 function from36(s, def=0){ const n = parseInt(s, 36); return Number.isFinite(n) ? n : def; }
 
-// Base64URL helpers
 function toBase64Url(str){
   return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 }
@@ -455,5 +452,48 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 
   chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
+
+function updateModeDisplay(mode) {
+  const exploreEls = document.querySelectorAll('[mode="explore"]');
+  const pricingEls = document.querySelectorAll('[mode="pricing"]');
+
+  if (mode === "explore") {
+    exploreEls.forEach(el => el.style.display = "");
+    pricingEls.forEach(el => el.style.display = "none");
+  } else if (mode === "pricing") {
+    exploreEls.forEach(el => el.style.display = "none");
+    pricingEls.forEach(el => el.style.display = "");
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  params.set("mode", mode);
+  const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+  history.replaceState(null, "", newUrl);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const exploreToggle = document.getElementById("toggleExplore");
+  const pricingToggle = document.getElementById("togglePricing");
+
+  const params = new URLSearchParams(window.location.search);
+  const urlMode = params.get("mode");
+  const initialMode = urlMode === "pricing" ? "pricing" : "explore";
+
+  if (initialMode === "pricing") {
+    pricingToggle.checked = true;
+  } else {
+    exploreToggle.checked = true;
+  }
+  updateModeDisplay(initialMode);
+
+  [exploreToggle, pricingToggle].forEach(toggle => {
+    toggle.addEventListener("change", (e) => {
+      if (e.target.checked) {
+        const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
+        updateModeDisplay(newMode);
+      }
+    });
+  });
+});
 
 console.log("Library v25.002.000");
