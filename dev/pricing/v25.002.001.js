@@ -383,19 +383,35 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbHasInserts) {
   cbHasInserts.addEventListener("change", () => {
-    state.hasInserts = cbHasInserts.checked;
+    // Attempting to turn inserts on
+    if (cbHasInserts.checked) {
+      // BUT no mailing option selected
+      if (!state.isSingleMail && !state.isHomeMail) {
+        // Revert toggle
+        cbHasInserts.checked = false;
+        state.hasInserts = false;
 
-    // If inserts are turned on but no mailing method is selected, revert inserts
-    if (state.hasInserts && !state.isSingleMail && !state.isHomeMail) {
+        // Show toast message
+        Toast.show(
+          "Please choose a mailing option (Single Address or Home Address) before enabling inserts.",
+          { type: "warning", duration: 3500 }
+        );
+
+        return; // Prevent recalc
+      }
+
+      // Allowed: mailing option exists
+      state.hasInserts = true;
+    } 
+    else {
+      // Inserts turned off
       state.hasInserts = false;
-      cbHasInserts.checked = false;
     }
 
     recalc(sliderEl.noUiSlider.get());
     onStateChanged();
   });
 }
-
 
   if (cbSingleMail) {
   cbSingleMail.addEventListener("change", () => {
