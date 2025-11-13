@@ -1,3 +1,5 @@
+//Library of Functions
+
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
   const isNullishByRule = (v) =>
