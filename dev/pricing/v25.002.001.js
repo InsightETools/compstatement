@@ -1,4 +1,4 @@
-//------PRICING APP (FIXED)------//
+//------PRICING APP ------//
 
 console.log("Pricing App v25.002.001");
 
@@ -42,6 +42,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) => Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
   const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
+  const applyDataValue = (name, value, formatter) => {
+    const formatted = formatter ? formatter(value) : value;
+    document.querySelectorAll(`[data="${name}"]`).forEach((el) => {
+      el.textContent = formatted;
+    });
+  };
+
   const formatK = (v) => {
     const abs = Math.abs(v);
     if (abs >= 1000) {
@@ -207,17 +214,33 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perStatementCost = () =>
     state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
-  function recalc(rawCount) {
+    function recalc(rawCount) {
     const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
-    const perEmp = (n > 0) ? (perStatementCost() + state.baseFee / n) : perStatementCost();
-    const grand  = state.baseFee + perStatementCost() * n;
+    const baseFee        = state.baseFee;
+    const statementFee   = state.statementFee;
+    const insertFee      = state.hasInserts ? state.insertCost : 0;
+    const mailingPerStmt = currentMailingFee();
+    const statementTotal = n * statementFee;
+    const insertTotal    = n * insertFee;
+    const deliveryTotal  = n * mailingPerStmt;
+    const grandTotal     = baseFee + statementTotal + insertTotal + deliveryTotal;
+    const pricePerStatement = n > 0 ? grandTotal / n : 0;
 
-    if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(perEmp);
-    if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grand);
+    if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
+    if (grandTotalEl)  grandTotalEl.textContent  = fmtUSD(grandTotal);
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
     state.statementCount = n;
-    // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
+    applyDataValue("baseFee",              baseFee,              fmtUSD);
+    applyDataValue("statementFee",         statementFee,         fmtUSD);
+    applyDataValue("insertCost",           insertFee,            fmtUSD);
+    applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
+    applyDataValue("homeAddressMailFee",   state.homeAddressMailFee,   fmtUSD);
+    applyDataValue("statementTotal",       statementTotal,       fmtUSD);
+    applyDataValue("insertTotal",          insertTotal,          fmtUSD);
+    applyDataValue("deliveryTotal",        deliveryTotal,        fmtUSD);
+    applyDataValue("pricePerStatement",    pricePerStatement,    fmtUSD);
+    applyDataValue("grandTotal",           grandTotal,           fmtUSD);
   }
 
   function updateSliderRange(min, max, setVal = null) {
