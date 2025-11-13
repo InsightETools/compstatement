@@ -1,6 +1,6 @@
 //------PRICING APP (FIXED)------//
 
-console.log("Pricing App v25.002.002");
+console.log("Pricing App v25.002.001");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
@@ -150,37 +150,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     "targetDate"
   ]);
 
-  // NEW: Function to apply pricingLocked visibility logic
+  // SIMPLIFIED: pricingLocked visibility logic
+  // If pricingLocked is TRUE → HIDE elements with lock="pricingLocked"
+  // If pricingLocked is FALSE or missing → SHOW elements with lock="pricingLocked"
   function applyPricingLockedVisibility() {
-    // Hide all elements with lock="pricingLocked" attribute if pricingLocked is true
+    const isLocked = state.pricingLocked === true;
+    
     document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
-      el.style.display = state.pricingLocked ? "none" : "";
+      if (isLocked) {
+        el.style.display = "none";
+      } else {
+        el.style.display = "";
+      }
     });
-    
-    // Additionally, hide individual checkbox wrappers if their value is false AND pricingLocked is true
-    if (state.pricingLocked) {
-      const singleW = document.getElementById("isSingleMailWrapper");
-      const homeW   = document.getElementById("isHomeMailWrapper");
-      const insW    = document.getElementById("hasInsertsWrapper");
-      
-      if (singleW) singleW.style.display = state.isSingleMail ? "" : "none";
-      if (homeW)   homeW.style.display   = state.isHomeMail   ? "" : "none";
-      if (insW)    insW.style.display    = state.hasInserts   ? "" : "none";
-    } else {
-      // If not locked, show all wrappers (unless they have lock="pricingLocked" which is handled above)
-      const singleW = document.getElementById("isSingleMailWrapper");
-      const homeW   = document.getElementById("isHomeMailWrapper");
-      const insW    = document.getElementById("hasInsertsWrapper");
-      
-      if (singleW && !singleW.hasAttribute('lock')) singleW.style.display = "";
-      if (homeW && !homeW.hasAttribute('lock'))     homeW.style.display = "";
-      if (insW && !insW.hasAttribute('lock'))       insW.style.display = "";
-    }
-    
-    // Disable checkboxes when locked
-    if (cbHasInserts) cbHasInserts.disabled = state.pricingLocked;
-    if (cbSingleMail) cbSingleMail.disabled = state.pricingLocked;
-    if (cbHomeMail)   cbHomeMail.disabled = state.pricingLocked;
   }
 
   // Apply initial pricingLocked state
@@ -350,12 +332,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbHasInserts) {
     cbHasInserts.addEventListener("change", () => {
-      // Don't allow changes when locked
-      if (state.pricingLocked) {
-        cbHasInserts.checked = state.hasInserts;
-        return;
-      }
-      
       state.hasInserts = cbHasInserts.checked;
       if (state.hasInserts) {
         if (!state.isHomeMail) {
@@ -378,12 +354,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbSingleMail) {
     cbSingleMail.addEventListener("change", () => {
-      // Don't allow changes when locked
-      if (state.pricingLocked) {
-        cbSingleMail.checked = state.isSingleMail;
-        return;
-      }
-      
       if (cbSingleMail.checked) {
         state.isSingleMail = true;
         if (state.isHomeMail) {
@@ -408,12 +378,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbHomeMail) {
     cbHomeMail.addEventListener("change", () => {
-      // Don't allow changes when locked
-      if (state.pricingLocked) {
-        cbHomeMail.checked = state.isHomeMail;
-        return;
-      }
-      
       if (cbHomeMail.checked) {
         if (state.isSingleMail) {
           state.isSingleMail = false;
