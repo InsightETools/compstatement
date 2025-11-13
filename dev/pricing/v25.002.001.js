@@ -1,3 +1,5 @@
+//------PRICING APP------//
+
 console.log("Pricing App v25.002.001");
 
 // UPDATED: Remove hard-coded DATA_URL, will use SharedDataFetcher
