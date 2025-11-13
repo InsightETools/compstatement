@@ -12,7 +12,8 @@
     "cover1": true,
     "cover2": true,
     "benefitsPage": true,
-    "companyPage": true
+    "companyPage": true,
+    "costPage": true
   },
   "primaryFont": "Roboto",
   "headerEmployeeSize": 35,
