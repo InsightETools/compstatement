@@ -1,6 +1,6 @@
 //------PRICING APP------//
 
-console.log("Pricing App v25.002.002");
+console.log("Pricing App v25.002.001");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
