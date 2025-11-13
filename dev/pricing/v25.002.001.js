@@ -1,6 +1,3 @@
-//Pricing App (Updated to use SharedDataFetcher)
-
-// UPDATED: Remove hard-coded DATA_URL, will use SharedDataFetcher
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
 const K = {
@@ -412,4 +409,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
-console.log("Pricing v25.003.000 (SharedDataFetcher integration)");
+console.log("Pricing v25.002.001");
