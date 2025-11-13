@@ -1,5 +1,3 @@
-//Explorer App
-
 let isLoaded = false;
 console.log(isLoaded === false ? "Initializing" : "Initialize Failed");
 
@@ -1426,4 +1424,4 @@ updateZoom();
     });
   });
 })();
-console.log("Build v25.002.000");
+console.log("Designer v25.002.000");
