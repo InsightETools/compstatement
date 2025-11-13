@@ -150,7 +150,7 @@ window.SharedDataFetcher = (() => {
     }
 
     const queryParams = new URLSearchParams({
-      usecors: "0",
+      usecors: "1",
       key, cpid, yr, ck, ek, layout,
     });
 
@@ -187,7 +187,7 @@ function buildFetchUrlFromParams() {
     return `https://compstatementdemo.netlify.app/data/${ek}.json`;
   }
 
-  return `${baseUrl}?usecors=0&key=${key}&cpid=${cpid}&yr=${yr}&ck=${ck}&ek=${ek}&layout=${layout}`;
+  return `${baseUrl}?usecors=1&key=${key}&cpid=${cpid}&yr=${yr}&ck=${ck}&ek=${ek}&layout=${layout}`;
 }
 
 function packFlags(s){
