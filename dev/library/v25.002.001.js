@@ -510,4 +510,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-console.log("Library v25.002.001)");
+console.log("Library v25.002.001");
