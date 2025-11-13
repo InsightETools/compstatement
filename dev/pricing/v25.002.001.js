@@ -67,40 +67,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
-  // Fetch JSON using SharedDataFetcher
-  let json = {};
-  try {
-    if (window.SharedDataFetcher) {
-      console.log("Pricing App: Using SharedDataFetcher");
-      json = await window.SharedDataFetcher.fetchData();
-    } else {
-      console.warn("Pricing App: SharedDataFetcher not available, using empty defaults");
-      json = {};
-    }
-  } catch (e) {
-    console.error("Pricing App: Error loading JSON:", e);
-    json = {};
-  }
-
-  // Defaults from JSON
   const defaults = {
-    baseFee: toNum(json.baseFee),
-    statementFee: toNum(json.statementFee),
-    singleAddressMailFee: toNum(json.singleAddressMailFee),
-    homeAddressMailFee: toNum(json.homeAddressMailFee),
-    insertCost: toNum(json.insertCost),
-    sliderMin: toNum(json.sliderMin),
-    sliderMax: toNum(json.sliderMax),
-    statementCount: toNum(json.statementCount),
-    isSingleMail: !!json.isSingleMail,
-    isHomeMail: !!json.isHomeMail,
-    hasInserts: !!json.hasInserts,
-    pricingLocked: !!json.pricingLocked,
-    // PROTECTED JSON-ONLY fields (for DOM display)
-    payrollSystem: json.payrollSystem ?? "",
-    payrollDataMethod: json.payrollDataMethod ?? "",
-    supplementalCostMethod: json.supplementalCostMethod ?? "",
-    targetDate: json.targetDate ?? ""
+    baseFee: toNum(data.baseFee),
+    statementFee: toNum(data.statementFee),
+    singleAddressMailFee: toNum(data.singleAddressMailFee),
+    homeAddressMailFee: toNum(data.homeAddressMailFee),
+    insertCost: toNum(data.insertCost),
+    sliderMin: toNum(data.sliderMin),
+    sliderMax: toNum(data.sliderMax),
+    statementCount: toNum(data.statementCount),
+    isSingleMail: !!data.isSingleMail,
+    isHomeMail: !!data.isHomeMail,
+    hasInserts: !!data.hasInserts,
+    pricingLocked: !!data.pricingLocked,
+    payrollSystem: data.payrollSystem ?? "",
+    payrollDataMethod: data.payrollDataMethod ?? "",
+    supplementalCostMethod: data.supplementalCostMethod ?? "",
+    targetDate: data.targetDate ?? ""
   };
 
   /* ================== Share-mode detection & URL writer (debounced) ================== */
