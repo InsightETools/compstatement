@@ -47,16 +47,29 @@ async function renderAll(data) {
   });
 
   function applyButtonStatus() {
-    _jsonDisabled.clear();
-    const map = data?.buttonStatus;
-    if (map && typeof map === "object") {
-      Object.entries(map).forEach(([id, enabled]) => {
-        const disabled = !enabled;
-        _jsonDisabled.set(id, !!disabled);
-      });
-    }
-    _applyEffectiveButtonStates();
+  _jsonDisabled.clear();
+  const map = data?.buttonStatus;
+  if (map && typeof map === "object") {
+    Object.entries(map).forEach(([id, enabled]) => {
+      const disabled = !enabled;
+      _jsonDisabled.set(id, !!disabled);
+    });
   }
+  _applyEffectiveButtonStates();  
+  applyCostPageVisibility();
+}
+
+function applyCostPageVisibility() {
+  const costPageEnabled = data?.buttonStatus?.costPage === true;
+  
+  document.querySelectorAll('[lock="costPage"]').forEach((el) => {
+    if (costPageEnabled) {
+      el.style.display = "";
+    } else {
+      el.style.display = "none";
+    }
+  });
+}
 
   function applyCompanyURL() {
     const url = data?.companyURL;
