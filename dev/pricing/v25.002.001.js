@@ -1,6 +1,4 @@
-//Pricing App
-
-console.log("Pricing App: Initializing...");
+console.log("Pricing App v25.002.001: Initializing...");
 
 // UPDATED: Remove hard-coded DATA_URL, will use SharedDataFetcher
 const ENABLE_SHARE = true;
@@ -427,4 +425,3 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 console.log("Pricing App: Module loaded and ready");
-console.log("Pricing v25.002.001");
