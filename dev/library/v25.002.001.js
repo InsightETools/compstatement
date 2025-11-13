@@ -251,6 +251,7 @@ function buildFetchUrlFromParams() {
   return window.SharedDataFetcher?.buildFetchUrl() || buildFetchUrlLegacy();
 }
 
+// Legacy fallback if SharedDataFetcher not loaded
 function buildFetchUrlLegacy() {
   const p = getParams();
   const key    = p.get("key");
@@ -438,13 +439,15 @@ window.reloadFromParams = async () => {
   try {
     let data;
     
+    // Use SharedDataFetcher if available
     if (window.SharedDataFetcher) {
       console.log("Library: Using SharedDataFetcher");
       data = await window.SharedDataFetcher.fetchData({ 
         signal: currentFetchController.signal 
       });
     } else {
-      console.log("Library: Using legacy fetch");
+      // Fallback to legacy fetch
+      console.log("Library: Using legacy fetch (SharedDataFetcher not available)");
       const fetchUrl = buildFetchUrlFromParams();
       const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
       data = await res.json();
