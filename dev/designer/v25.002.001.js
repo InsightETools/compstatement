@@ -1,6 +1,6 @@
 //------DESIGNER APP------//
 
-console.log("Designer App v25.002.001");
+console.log("Designer App v25.002.002");
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
@@ -1284,7 +1284,7 @@ async function renderAll(data) {
   };
 
   function selectEmployee(ekId) {
-    setParam("ek", ekId);         
+    setParam("ek", ekId);
     window.location.reload();
   }
 
