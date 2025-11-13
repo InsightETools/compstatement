@@ -1,6 +1,6 @@
 //Library of Functions (Updated to use SharedDataFetcher)
 
-console.log("Library: Initializing...");
+console.log("Library v25.002.001: Initializing...");
 
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
@@ -524,4 +524,3 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 console.log("Library: Module loaded and ready");
-console.log("Library v25.002.001");
