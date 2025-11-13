@@ -1,3 +1,7 @@
+//Library of Functions (Updated to use SharedDataFetcher)
+
+console.log("Library: Initializing...");
+
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
   const isNullishByRule = (v) =>
@@ -322,21 +326,27 @@ window.reloadFromParams = async () => {
     // Use SharedDataFetcher if available
     let data;
     if (window.SharedDataFetcher) {
+      console.log("Library: Fetching data using SharedDataFetcher...");
       data = await window.SharedDataFetcher.fetchData({ 
         signal: currentFetchController.signal 
       });
+      console.log("Library: Data received from SharedDataFetcher");
     } else {
       // Fallback to legacy fetch
+      console.log("Library: SharedDataFetcher not found, using fallback fetch...");
       const fetchUrl = buildFetchUrlFromParams();
       const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
       data = await res.json();
+      console.log("Library: Data fetched successfully (fallback method)");
     }
 
+    console.log("Library: Rendering all components...");
     await renderAll(data);
 
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
+    console.log("Library: All components rendered successfully");
     console.log("Finished");
     setTimeout(() => {
       $("#loader")?.classList.add("finished");
@@ -345,7 +355,10 @@ window.reloadFromParams = async () => {
   } catch (err) {
     if (err.name !== "AbortError") {
       const errorCheck = err.message?.includes?.("Unexpected token");
+      console.error("❌ Library: Error loading data:", err);
       alert(errorCheck ? "No User Found" : err);
+    } else {
+      console.log("Library: Fetch request aborted");
     }
   } finally {
     currentFetchController = null;
@@ -510,4 +523,5 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
+console.log("Library: Module loaded and ready");
 console.log("Library v25.002.001");
