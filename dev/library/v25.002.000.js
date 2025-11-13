@@ -455,3 +455,5 @@ function renderDonutChart({ chartId, categoryGroup, containerSelector }) {
 
   chartContainer.style.background = `conic-gradient(${gradientParts.join(", ")})`;
 }
+
+console.log("Library v25.002.000");
