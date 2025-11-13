@@ -1,3 +1,5 @@
+//------DESIGNER APP------//
+
 console.log("Designer App v25.002.001");
 
 const $ = (sel) => document.querySelector(sel);
