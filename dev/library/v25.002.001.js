@@ -1,5 +1,3 @@
-//Library of Functions (Updated to use SharedDataFetcher)
-
 console.log("Library v25.002.001: Initializing...");
 
 function applyJsonFieldsStrict(json, fields) {
@@ -326,21 +324,16 @@ window.reloadFromParams = async () => {
     // Use SharedDataFetcher if available
     let data;
     if (window.SharedDataFetcher) {
-      console.log("Library: Fetching data using SharedDataFetcher...");
       data = await window.SharedDataFetcher.fetchData({ 
         signal: currentFetchController.signal 
       });
-      console.log("Library: Data received from SharedDataFetcher");
     } else {
       // Fallback to legacy fetch
-      console.log("Library: SharedDataFetcher not found, using fallback fetch...");
       const fetchUrl = buildFetchUrlFromParams();
       const res = await fetch(fetchUrl, { signal: currentFetchController.signal });
       data = await res.json();
-      console.log("Library: Data fetched successfully (fallback method)");
     }
 
-    console.log("Library: Rendering all components...");
     await renderAll(data);
 
     if (typeof window.applyOverflow === "function") window.applyOverflow();
@@ -521,5 +514,3 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
-
-console.log("Library: Module loaded and ready");
