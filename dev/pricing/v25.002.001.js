@@ -1,6 +1,6 @@
-//------PRICING APP------//
+//------PRICING APP (FIXED)------//
 
-console.log("Pricing App v25.002.001");
+console.log("Pricing App v25.002.002");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
@@ -150,18 +150,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     "targetDate"
   ]);
 
-  // pricingLocked visuals
-  document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
-    el.style.display = state.pricingLocked ? "none" : "";
-  });
-  if (state.pricingLocked) {
-    const singleW = document.getElementById("isSingleMailWrapper");
-    const homeW   = document.getElementById("isHomeMailWrapper");
-    const insW    = document.getElementById("hasInsertsWrapper");
-    if (singleW && state.isSingleMail === false) singleW.style.display = "none";
-    if (homeW   && state.isHomeMail   === false) homeW.style.display   = "none";
-    if (insW    && state.hasInserts   === false) insW.style.display    = "none";
+  // NEW: Function to apply pricingLocked visibility logic
+  function applyPricingLockedVisibility() {
+    // Hide all elements with lock="pricingLocked" attribute if pricingLocked is true
+    document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
+      el.style.display = state.pricingLocked ? "none" : "";
+    });
+    
+    // Additionally, hide individual checkbox wrappers if their value is false AND pricingLocked is true
+    if (state.pricingLocked) {
+      const singleW = document.getElementById("isSingleMailWrapper");
+      const homeW   = document.getElementById("isHomeMailWrapper");
+      const insW    = document.getElementById("hasInsertsWrapper");
+      
+      if (singleW) singleW.style.display = state.isSingleMail ? "" : "none";
+      if (homeW)   homeW.style.display   = state.isHomeMail   ? "" : "none";
+      if (insW)    insW.style.display    = state.hasInserts   ? "" : "none";
+    } else {
+      // If not locked, show all wrappers (unless they have lock="pricingLocked" which is handled above)
+      const singleW = document.getElementById("isSingleMailWrapper");
+      const homeW   = document.getElementById("isHomeMailWrapper");
+      const insW    = document.getElementById("hasInsertsWrapper");
+      
+      if (singleW && !singleW.hasAttribute('lock')) singleW.style.display = "";
+      if (homeW && !homeW.hasAttribute('lock'))     homeW.style.display = "";
+      if (insW && !insW.hasAttribute('lock'))       insW.style.display = "";
+    }
+    
+    // Disable checkboxes when locked
+    if (cbHasInserts) cbHasInserts.disabled = state.pricingLocked;
+    if (cbSingleMail) cbSingleMail.disabled = state.pricingLocked;
+    if (cbHomeMail)   cbHomeMail.disabled = state.pricingLocked;
   }
+
+  // Apply initial pricingLocked state
+  applyPricingLockedVisibility();
 
   // Optional fees display
   if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
@@ -299,21 +322,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       e.preventDefault();
       state = { ...ORIG };
 
-      // pricingLocked visuals
-      document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
-        el.style.display = state.pricingLocked ? "none" : "";
-      });
-      if (state.pricingLocked) {
-        const singleW = document.getElementById("isSingleMailWrapper");
-        const homeW   = document.getElementById("isHomeMailWrapper");
-        const insW    = document.getElementById("hasInsertsWrapper");
-        if (singleW) singleW.style.display = state.isSingleMail ? "" : "none";
-        if (homeW)   homeW.style.display   = state.isHomeMail   ? "" : "none";
-        if (insW)    insW.style.display    = state.hasInserts   ? "" : "none";
-      } else {
-        ["isSingleMailWrapper","isHomeMailWrapper","hasInsertsWrapper"]
-          .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
-      }
+      // Reapply pricingLocked visibility
+      applyPricingLockedVisibility();
 
       // checkboxes
       if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
@@ -340,6 +350,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbHasInserts) {
     cbHasInserts.addEventListener("change", () => {
+      // Don't allow changes when locked
+      if (state.pricingLocked) {
+        cbHasInserts.checked = state.hasInserts;
+        return;
+      }
+      
       state.hasInserts = cbHasInserts.checked;
       if (state.hasInserts) {
         if (!state.isHomeMail) {
@@ -362,6 +378,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbSingleMail) {
     cbSingleMail.addEventListener("change", () => {
+      // Don't allow changes when locked
+      if (state.pricingLocked) {
+        cbSingleMail.checked = state.isSingleMail;
+        return;
+      }
+      
       if (cbSingleMail.checked) {
         state.isSingleMail = true;
         if (state.isHomeMail) {
@@ -386,6 +408,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (cbHomeMail) {
     cbHomeMail.addEventListener("change", () => {
+      // Don't allow changes when locked
+      if (state.pricingLocked) {
+        cbHomeMail.checked = state.isHomeMail;
+        return;
+      }
+      
       if (cbHomeMail.checked) {
         if (state.isSingleMail) {
           state.isSingleMail = false;
