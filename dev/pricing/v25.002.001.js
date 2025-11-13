@@ -412,5 +412,3 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
-
-console.log("Pricing App: Build Complete");
