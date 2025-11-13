@@ -1,6 +1,6 @@
 //------PRICING APP (FIXED)------//
 
-console.log("Pricing App v25.002.001");
+console.log("Pricing App v25.002.002");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const fmtInt = (n) =>
     Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-  // NEW: generic helper to push values into [data="..."] elements
+  // Generic helper to push values into [data="..."] elements
   const applyDataValue = (name, value, formatter) => {
     const formatted = formatter ? formatter(value) : value;
     document.querySelectorAll(`[data="${name}"]`).forEach((el) => {
@@ -152,7 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // If not share mode, write a compact default s (debounced)
   if (!shareMode && ENABLE_SHARE) {
-    // initialize lastEncoded to avoid immediate double-write
     lastEncoded = null;
     syncShareParam();
   }
@@ -168,9 +167,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     "targetDate"
   ]);
 
-  // SIMPLIFIED: pricingLock visibility logic
-  // If pricingLock is TRUE → HIDE elements with lock="pricingLock"
-  // If pricingLock is FALSE or missing → SHOW elements with lock="pricingLock"
+  // pricingLock visibility logic
   function applypricingLockVisibility() {
     const isLocked = state.pricingLock === true;
     
@@ -186,7 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Apply initial pricingLock state
   applypricingLockVisibility();
 
-  // Optional fees display (ID targets if present elsewhere in DOM)
+  // Optional fees display (ID targets)
   if (labelBaseFee)       labelBaseFee.textContent = fmtUSD(state.baseFee);
   if (labelStatementFee)  labelStatementFee.textContent = fmtUSD(state.statementFee);
   if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
@@ -226,7 +223,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const perStatementCost = () =>
     state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
-  // UPDATED: full pricing + data-binding logic
+  // Full pricing + data-binding logic
   function recalc(rawCount) {
     const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
 
@@ -255,21 +252,24 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Push raw values into [data="..."] elements
 
     // Direct/store values
-    applyDataValue("baseFee",              baseFee,              fmtUSD);
-    applyDataValue("statementFee",         statementFee,         fmtUSD);
-    applyDataValue("insertCost",           insertFee,            fmtUSD);
+    applyDataValue("baseFee",              baseFee,                    fmtUSD);
+    applyDataValue("statementFee",         statementFee,               fmtUSD);
+    applyDataValue("insertCost",           insertFee,                  fmtUSD);
     applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
     applyDataValue("homeAddressMailFee",   state.homeAddressMailFee,   fmtUSD);
 
-    // Count (non-dollar, but formatted nicely)
-    applyDataValue("statementCount",       n,                    fmtInt);
+    // Per-statement delivery fee (for data="deliveryFee")
+    applyDataValue("deliveryFee",          mailingPerStmt,             fmtUSD);
+
+    // Count (non-dollar)
+    applyDataValue("statementCount",       n,                          fmtInt);
 
     // Calculated totals
-    applyDataValue("statementTotal",       statementTotal,       fmtUSD);
-    applyDataValue("insertTotal",          insertTotal,          fmtUSD);
-    applyDataValue("deliveryTotal",        deliveryTotal,        fmtUSD);
-    applyDataValue("pricePerStatement",    pricePerStatement,    fmtUSD);
-    applyDataValue("grandTotal",           grandTotal,           fmtUSD);
+    applyDataValue("statementTotal",       statementTotal,             fmtUSD);
+    applyDataValue("insertTotal",          insertTotal,                fmtUSD);
+    applyDataValue("deliveryTotal",        deliveryTotal,              fmtUSD);
+    applyDataValue("pricePerStatement",    pricePerStatement,          fmtUSD);
+    applyDataValue("grandTotal",           grandTotal,                 fmtUSD);
 
     // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
   }
