@@ -1,4 +1,4 @@
-console.log("Designer App: Initializing...");
+console.log("Designer App v25.002.001: Initializing...");
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
@@ -1451,4 +1451,3 @@ updateZoom();
 })();
 
 console.log("Designer App: Module loaded and ready");
-console.log("Designer v25.002.001");
