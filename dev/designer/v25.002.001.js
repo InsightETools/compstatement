@@ -1284,14 +1284,7 @@ async function renderAll(data) {
   };
 
   function selectEmployee(ekId) {
-    setParam("ek", ekId);
-    
-    // Clear SharedDataFetcher cache to force fresh data fetch
-    if (window.SharedDataFetcher) {
-      console.log("Designer App: Clearing SharedDataFetcher cache for employee switch");
-      window.SharedDataFetcher.clearCache();
-    }
-    
+    setParam("ek", ekId);         
     window.location.reload();
   }
 
