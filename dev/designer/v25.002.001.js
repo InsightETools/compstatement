@@ -1,6 +1,6 @@
 //------DESIGNER APP------//
 
-console.log("Designer App v25.002.002");
+console.log("Designer App v25.002.001");
 
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
