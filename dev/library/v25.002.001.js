@@ -166,9 +166,8 @@ window.SharedDataFetcher = (() => {
 
     const response = await fetch(url, fetchOptions);
     const data = await response.json();
-    return data;
-
     console.log(data);
+    return data;
   }
 
   return { buildFetchUrl, fetchData };
