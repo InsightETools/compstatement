@@ -1,3 +1,8 @@
+//Pricing App
+
+console.log("Pricing App: Initializing...");
+
+// UPDATED: Remove hard-coded DATA_URL, will use SharedDataFetcher
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
 const K = {
@@ -68,16 +73,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   try {
     if (window.SharedDataFetcher) {
       // Use shared fetcher (with caching)
+      console.log("Pricing App: Fetching data using SharedDataFetcher...");
       json = await window.SharedDataFetcher.fetchData();
+      console.log("Pricing App: Data received from SharedDataFetcher");
     } else {
       // Fallback to direct fetch if SharedDataFetcher not available
+      console.log("Pricing App: SharedDataFetcher not found, using fallback fetch...");
       const fallbackUrl = "https://compstatementdemo.netlify.app/data/EmployeeA.json";
       const res = await fetch(fallbackUrl, { cache: "no-store" });
       json = await res.json();
+      console.log("Pricing App: Data fetched successfully (fallback method)");
       console.warn("SharedDataFetcher not found, using fallback URL");
     }
   } catch (e) {
-    console.error("Error loading JSON:", e);
+    console.error("❌ Pricing App: Error loading JSON:", e);
     json = {};
   }
 
@@ -101,6 +110,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     supplementalCostMethod: json.supplementalCostMethod ?? "",
     targetDate: json.targetDate ?? ""
   };
+
+  console.log("Pricing App: Defaults loaded successfully");
 
   /* ================== Share-mode detection & URL writer (debounced) ================== */
   const url = new URL(location.href);
@@ -192,6 +203,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const renderAllPips = () => requestAnimationFrame(renderPips);
   renderAllPips();
 
+  console.log("Pricing App: Slider initialized");
+
   // Input bounds/value
   if (empInputEl) {
     empInputEl.min = state.sliderMin;
@@ -241,6 +254,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Initial paint
   recalc(state.statementCount);
+
+  console.log("Pricing App: Initial calculations complete");
+  console.log("Pricing App: Fully initialized and ready");
 
   // Slider update (smooth UI) — no URL writes here
   let maxToastShown = false;
@@ -409,4 +425,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 });
+
+console.log("Pricing App: Module loaded and ready");
 console.log("Pricing v25.002.001");
