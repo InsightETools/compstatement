@@ -361,7 +361,7 @@ window.reloadFromParams = async () => {
     if (typeof window.applyOverflow === "function") window.applyOverflow();
 
     isLoaded = true;
-    console.log("Library: Finished loading data");
+    console.log("Finished");
     setTimeout(() => {
       $("#loader")?.classList.add("finished");
     }, 3000);
@@ -369,7 +369,7 @@ window.reloadFromParams = async () => {
   } catch (err) {
     if (err.name !== "AbortError") {
       const errorCheck = err.message?.includes?.("Unexpected token");
-      console.error("❌ Library: Error loading data:", err);
+      console.error("Library: Error loading data:", err);
       alert(errorCheck ? "No User Found" : err);
     } else {
       console.log("Library: Fetch request aborted");
