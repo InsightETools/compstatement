@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   ]);
 
   // pricingLocked visuals
-  document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
+  document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
     el.style.display = state.pricingLocked ? "none" : "";
   });
   if (state.pricingLocked) {
@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       state = { ...ORIG };
 
       // pricingLocked visuals
-      document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
+      document.querySelectorAll('[lock="pricingLocked"]').forEach(el => {
         el.style.display = state.pricingLocked ? "none" : "";
       });
       if (state.pricingLocked) {
