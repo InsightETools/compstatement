@@ -1,5 +1,3 @@
-//Library of Functions (Updated to use SharedDataFetcher)
-
 function applyJsonFieldsStrict(json, fields) {
   const isBlank = (v) => typeof v === "string" && v.trim() === "";
   const isNullishByRule = (v) =>
@@ -512,4 +510,4 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-console.log("Library v25.003.000 (SharedDataFetcher integration)");
+console.log("Library v25.002.001)");
