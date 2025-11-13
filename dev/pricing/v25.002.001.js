@@ -38,12 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const labelHomeMailFee         = document.getElementById("homeAddressMailFee");
   const labelCanadaMailFee       = document.getElementById("singleAddressCanadaMailFee");
   const labelInsertCost          = document.getElementById("insertCost");  
-  
   const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
   const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
   const fmtUSD = (n) => Number(n).toLocaleString(undefined, { style: "currency", currency: "USD", maximumFractionDigits: 2 });
   const fmtInt = (n) => Number(n).toLocaleString(undefined, { maximumFractionDigits: 0 });
-  
   const formatK = (v) => {
     const abs = Math.abs(v);
     if (abs >= 1000) {
@@ -53,7 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     return String(v);
   };
-  
   const makePips = (min, max) => {
     const steps = 10;
     const span = max - min;
@@ -61,7 +58,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       ? [min]
       : Array.from({ length: steps + 1 }, (_, i) => Math.round(min + (span * i) / steps));
   };
-  
   const renderPips = () => {
     sliderEl.querySelectorAll(".noUi-value").forEach((pip) => {
       const v = Number(pip.dataset.value);
@@ -100,17 +96,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     isHomeMail: !!json.isHomeMail,
     hasInserts: !!json.hasInserts,
     pricingLocked: !!json.pricingLocked,
+    // PROTECTED JSON-ONLY fields (for DOM display)
     payrollSystem: json.payrollSystem ?? "",
     payrollDataMethod: json.payrollDataMethod ?? "",
     supplementalCostMethod: json.supplementalCostMethod ?? "",
     targetDate: json.targetDate ?? ""
   };
 
-  // Share-mode detection & URL writer
+  /* ================== Share-mode detection & URL writer (debounced) ================== */
   const url = new URL(location.href);
   const sharePayload = ENABLE_SHARE ? url.searchParams.get("s") : null;
   const shareMode = ENABLE_SHARE && !!sharePayload;
 
+  // State from share or defaults
   let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
 
   // Business rules
@@ -125,11 +123,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Debounced URL sync
   let lastEncoded = null;
   let urlWriteTimer = null;
-  
   function syncShareParam() {
     if (!ENABLE_SHARE) return;
     const encoded = encodeShare(state, defaults);
-    if (encoded === lastEncoded) return;
+    if (encoded === lastEncoded) return; // no change → no write
     lastEncoded = encoded;
 
     clearTimeout(urlWriteTimer);
@@ -141,14 +138,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     }, 200);
   }
 
+  // If not share mode, write a compact default s (debounced)
   if (!shareMode && ENABLE_SHARE) {
+    // initialize lastEncoded to avoid immediate double-write
     lastEncoded = null;
     syncShareParam();
   }
 
+  // Immutable for reset
   const ORIG = { ...state };
 
-  // Apply protected fields to DOM
+  // Apply protected fields to DOM from JSON (strict rules)
   applyJsonFieldsStrict(defaults, [
     "payrollSystem",
     "payrollDataMethod",
@@ -160,7 +160,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
     el.style.display = state.pricingLocked ? "none" : "";
   });
-  
   if (state.pricingLocked) {
     const singleW = document.getElementById("isSingleMailWrapper");
     const homeW   = document.getElementById("isHomeMailWrapper");
@@ -191,7 +190,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     connect: [true, false],
     pips: { mode: "values", values: makePips(state.sliderMin, state.sliderMax), density: 10 },
   });
-  
   const renderAllPips = () => requestAnimationFrame(renderPips);
   renderAllPips();
 
@@ -220,6 +218,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
     state.statementCount = n;
+    // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
   }
 
   function updateSliderRange(min, max, setVal = null) {
@@ -244,7 +243,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initial paint
   recalc(state.statementCount);
 
-  // Slider update
+  // Slider update (smooth UI) — no URL writes here
   let maxToastShown = false;
   sliderEl.noUiSlider.on("update", (vals) => {
     const val = Number(vals[0]);
@@ -275,12 +274,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     recalc(val);
   });
 
-  // Slider set
+  // Slider set (user released handle) — write URL here
   sliderEl.noUiSlider.on("set", () => {
     syncShareParam();
   });
 
-  // Input handler
+  // Input -> expand if above max (typed+10)
   if (empInputEl) {
     empInputEl.addEventListener("input", () => {
       if (empInputEl.value === "") {
@@ -291,25 +290,25 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!Number.isFinite(v)) return;
 
       if (v > state.sliderMax) {
-        updateSliderRange(state.sliderMin, v + 10, v);
+        updateSliderRange(state.sliderMin, v + 10, v); // includes syncShareParam (debounced)
       } else {
         v = clamp(v, state.sliderMin, state.sliderMax);
         sliderEl.noUiSlider.set(v);
-        syncShareParam();
+        syncShareParam(); // debounced write for manual input within range
       }
     });
   }
 
-  // Reset
+  // Reset (to ORIG)
   if (resetBtn) {
     resetBtn.addEventListener("click", (e) => {
       e.preventDefault();
       state = { ...ORIG };
 
+      // pricingLocked visuals
       document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
         el.style.display = state.pricingLocked ? "none" : "";
       });
-      
       if (state.pricingLocked) {
         const singleW = document.getElementById("isSingleMailWrapper");
         const homeW   = document.getElementById("isHomeMailWrapper");
@@ -322,10 +321,12 @@ document.addEventListener("DOMContentLoaded", async () => {
           .forEach(id => { const el = document.getElementById(id); if (el) el.style.display = ""; });
       }
 
+      // checkboxes
       if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
       if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
       if (cbHomeMail)   cbHomeMail.checked   = state.isHomeMail;
 
+      // slider & input
       updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
       if (empInputEl) {
         empInputEl.min = state.sliderMin;
@@ -333,13 +334,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         empInputEl.value = state.statementCount;
       }
 
+      // repaint & sync URL after reset
       maxToastShown = false;
       recalc(state.statementCount);
       syncShareParam();
     });
   }
 
-  // Checkboxes
+  // Checkboxes + rules + share sync
   const onStateChanged = () => syncShareParam();
 
   if (cbHasInserts) {
