@@ -77,7 +77,6 @@
   "isHomeMail": true,
   "hasInserts": true,
   "pricingLock": true,
-  "pricingOff": true,
   "sliderMin": "0",
   "sliderMax": "2000",
   "payrollSystem":"",
