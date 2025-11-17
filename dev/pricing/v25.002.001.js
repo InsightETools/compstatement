@@ -168,13 +168,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             keys.forEach((key) => {
             const v = source[key];
             console.log(v);
-            /*
             if (v === null) {
                 document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
-                    el.textContent = "Unknown";
+                    el.textContent = "Test";
                 });
                 return;
             }
+            /*
             const isEmpty =
                 v === undefined ||
                 (typeof v === "string" && v.trim() === "") ||
