@@ -232,6 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const statementTotal = n * statementFee;
     const insertTotal    = n * insertFee;
     const deliveryTotal  = n * mailingPerStmt;
+    const mailingTotal = insertTotal + deliveryTotal;
 
     // grandTotal = baseFee + statementTotal + insertTotal + deliveryTotal
     const grandTotal     = baseFee + statementTotal + insertTotal + deliveryTotal;
@@ -264,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Calculated totals
     applyDataValue("statementTotal",       statementTotal,             fmtUSD);
     applyDataValue("insertTotal",          insertTotal,                fmtUSD);
-    applyDataValue("deliveryTotal",        deliveryTotal,              fmtUSD);
+    applyDataValue("mailingTotal",         mailingTotal,                fmtUSD);
     applyDataValue("pricePerStatement",    pricePerStatement,          fmtUSD);
     applyDataValue("grandTotal",           grandTotal,                 fmtUSD);
 
