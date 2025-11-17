@@ -168,8 +168,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  // Apply protected fields to DOM from JSON (strict rules)
   applyJsonFieldsStrict(defaults, [
+    "payrollSystem",
+    "payrollDataMethod",
+    "supplementalCostMethod",
+    "targetDate"
+  ]);
+
+  hideEmptyJsonWrappers(defaults, [
     "payrollSystem",
     "payrollDataMethod",
     "supplementalCostMethod",
