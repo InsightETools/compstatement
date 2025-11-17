@@ -232,10 +232,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const statementTotal = n * statementFee;
     const insertTotal    = n * insertFee;
     const deliveryTotal  = n * mailingPerStmt;
-    const mailTotal = insertTotal + deliveryTotal;
+    const mailTotal      = insertTotal + deliveryTotal;
 
     // grandTotal = baseFee + statementTotal + insertTotal + deliveryTotal
-    const grandTotal     = baseFee + statementTotal + insertTotal + deliveryTotal;
+    const grandTotal     = baseFee + statementTotal + insertTotal + mailTotal;
 
     // pricePerStatement = grandTotal / statementCount (if > 0)
     const pricePerStatement = n > 0 ? grandTotal / n : 0;
