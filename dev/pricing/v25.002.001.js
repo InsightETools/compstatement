@@ -162,6 +162,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (v === undefined || v === null || String(v).trim() === "") {
       document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
         const wrapper = el.parentElement; // "wrapper that it is in"
+        wrapper.style.display = "none";
         if (wrapper) wrapper.style.display = "none";
         });
       }
