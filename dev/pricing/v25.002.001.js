@@ -156,6 +156,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Immutable for reset
   const ORIG = { ...state };
 
+  function hideEmptyJsonWrappers(source, keys) {
+    keys.forEach((key) => {
+    const v = source[key];
+    if (v === undefined || v === null || String(v).trim() === "") {
+      document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+        const wrapper = el.parentElement; // "wrapper that it is in"
+        if (wrapper) wrapper.style.display = "none";
+        });
+      }
+    });
+  }
+
   // Apply protected fields to DOM from JSON (strict rules)
   applyJsonFieldsStrict(defaults, [
     "payrollSystem",
