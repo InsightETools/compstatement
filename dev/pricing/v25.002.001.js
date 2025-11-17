@@ -158,14 +158,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function hideEmptyJsonWrappers(source, keys) {
     keys.forEach((key) => {
-    const v = source[key];
-    if (v === undefined || v === null || String(v).trim() === "") {
-      document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
-        const wrapper = el.parentElement; // "wrapper that it is in"
-        wrapper.style.display = "none";
-        if (wrapper) wrapper.style.display = "none";
+      const v = source[key];
+      if (v === undefined || String(v).trim() === "") {
+        document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+          const wrapper = el.parentElement; // "wrapper that it is in"
+          wrapper.style.display = "none";
+          if (wrapper) wrapper.style.display = "none";
         });
-      }
+      } else if (v === null){
+        document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+          el.textContent = "Unknown";
+        });
+      };
     });
   }
 
