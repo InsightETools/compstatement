@@ -157,21 +157,34 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ORIG = { ...state };
 
   function hideEmptyJsonWrappers(source, keys) {
-    keys.forEach((key) => {
-      const v = source[key];
-      if (v === undefined || String(v).trim() === "") {
-        document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
-          const wrapper = el.parentElement; // "wrapper that it is in"
-          wrapper.style.display = "none";
-          if (wrapper) wrapper.style.display = "none";
-        });
-      } else if (v === null){
-        document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
-          el.textContent = "Unknown";
-        });
-      };
-    });
-  }
+  keys.forEach((key) => {
+    const v = source[key];
+
+    // --- If null → show "Unknown" ---
+    if (v === null) {
+      document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+        el.textContent = "Unknown";
+      });
+      return;
+    }
+
+    // --- If undefined or empty string → hide wrapper ---
+    const isEmpty =
+      v === undefined ||
+      (typeof v === "string" && v.trim() === "") ||
+      (typeof v !== "string" && String(v).trim() === "");
+
+    if (isEmpty) {
+      document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
+        const wrapper = el.parentElement;
+        if (wrapper) wrapper.style.display = "none";
+      });
+      return;
+    }
+
+    // (Otherwise do nothing—value exists)
+  });
+}
 
   applyJsonFieldsStrict(defaults, [
     "payrollSystem",
