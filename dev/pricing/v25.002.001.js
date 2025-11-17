@@ -73,8 +73,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const makePips = (min, max) => {
         const steps = 10;
         const span = max - min;
-        return span <= 0 ?
-            [min] :
+        return span <= 0 ? [min] :
             Array.from({
                 length: steps + 1
             }, (_, i) => Math.round(min + (span * i) / steps));
@@ -118,6 +117,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         supplementalCostMethod: json.supplementalCostMethod ?? "",
         targetDate: json.targetDate ?? ""
     };
+
+    applyJsonFieldsStrict(defaults, [
+        "payrollSystem",
+        "payrollDataMethod",
+        "supplementalCostMethod",
+        "targetDate"
+    ]);
+
+    hideEmptyJsonWrappers(defaults, [
+        "payrollSystem",
+        "payrollDataMethod",
+        "supplementalCostMethod",
+        "targetDate"
+    ]);
 
     /* ================== Share-mode detection & URL writer (debounced) ================== */
     const url = new URL(location.href);
@@ -165,44 +178,29 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     function hideEmptyJsonWrappers(source, keys) {
-            keys.forEach((key) => {
+        keys.forEach((key) => {
             const v = source[key];
-            console.log(v);
-            if (v === null) {
-                document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
-                    el.textContent = "Test";
-                });
-                return;
-            }
-            /*
-            const isEmpty =
-                v === undefined ||
-                (typeof v === "string" && v.trim() === "") ||
-                (typeof v !== "string" && String(v).trim() === "");
-            if (isEmpty) {
+
+            // value is "missing" or blank string
+            const isMissing = v === undefined;
+            const isBlank = typeof v === "string" && v.trim() === "";
+
+            if (isMissing || isBlank) {
+                // Prefer the explicit wrapper id like "payrollSystemWrapper"
+                const wrapperById = document.getElementById(`${key}Wrapper`);
+                if (wrapperById) {
+                    wrapperById.style.display = "none";
+                    return;
+                }
+
+                // Fallback: hide the immediate parent of the [data="key"] element
                 document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
                     const wrapper = el.parentElement;
                     if (wrapper) wrapper.style.display = "none";
                 });
-                return;
             }
-            */
         });
     }
-
-    applyJsonFieldsStrict(defaults, [
-        "payrollSystem",
-        "payrollDataMethod",
-        "supplementalCostMethod",
-        "targetDate"
-    ]);
-
-    hideEmptyJsonWrappers(defaults, [
-        "payrollSystem",
-        "payrollDataMethod",
-        "supplementalCostMethod",
-        "targetDate"
-    ]);
 
     // pricingLock visibility logic
     function applypricingLockVisibility() {
