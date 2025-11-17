@@ -168,6 +168,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             keys.forEach((key) => {
             const v = source[key];
             console.log(v);
+            /*
             if (v === null) {
                 document.querySelectorAll(`[data="${key}"]`).forEach((el) => {
                     el.textContent = "Unknown";
@@ -185,6 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
                 return;
             }
+            */
         });
     }
 
