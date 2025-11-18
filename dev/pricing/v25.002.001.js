@@ -92,6 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let json = {};
     try {
         json = await window.SharedDataFetcher.fetchData();
+        json = json.costDetails;
     } catch (e) {
         console.error("Pricing App: Error loading JSON:", e);
         json = {};
