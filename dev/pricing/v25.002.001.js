@@ -422,6 +422,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const onStateChanged = () => syncShareParam();
 
     if (cbHasInserts) {
+        cbHasInserts.classList.add('inactive');
         cbHasInserts.addEventListener("change", () => {
             // Attempting to turn inserts on
             if (cbHasInserts.checked) {
@@ -438,23 +439,20 @@ document.addEventListener("DOMContentLoaded", async () => {
                             duration: 3500
                         }
                     );
-                    cbHasInserts.classList.add('inactive');
                     return; // Prevent recalc
                 }
 
                 // Allowed: mailing option exists
                 state.hasInserts = true;
-                cbHasInserts.classList.remove('inactive');
             } else {
                 // Inserts turned off
                 state.hasInserts = false;
-                cbHasInserts.classList.remove('inactive');
             }
 
             recalc(sliderEl.noUiSlider.get());
             onStateChanged();
         });
-    }
+    } else { cbHasInserts.classList.remove('inactive'); }
 
     if (cbSingleMail) {
         cbSingleMail.addEventListener("change", () => {
