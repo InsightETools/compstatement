@@ -520,17 +520,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlMode = params.get("mode");
   const initialMode = urlMode === "pricing" ? "pricing" : "explore";
 
-  // Set initial toggle states
+  const allowRefetch = initialMode === "pricing";
+
   if (initialMode === "pricing") {
     if (pricingToggle) pricingToggle.checked = true;
   } else {
     if (exploreToggle) exploreToggle.checked = true;
   }
 
-  // Apply initial mode visibility
   updateModeDisplay(initialMode);
 
-  // Track current mode so we know what we're switching from
   let currentMode = initialMode;
 
   [exploreToggle, pricingToggle].forEach((toggle) => {
@@ -541,8 +540,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
 
-      // If toggled to design (explore) FROM pricing, re-fetch everything
       if (
+        allowRefetch &&
         currentMode === "pricing" &&
         newMode === "explore" &&
         typeof window.reloadFromParams === "function"
