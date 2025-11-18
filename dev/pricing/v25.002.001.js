@@ -243,13 +243,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!trueEl || !falseEl) return;
 
         if (!isLocked) {
-            // When NOT locked → hide all icons
+            // When NOT locked → hide BOTH icons
             trueEl.style.display = "none";
             falseEl.style.display = "none";
             return;
         }
 
-        // When locked → show only the correct one
+        // When locked → show correct icon
         if (value) {
             trueEl.style.display = "";
             falseEl.style.display = "none";
@@ -277,49 +277,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 }
 
 
+
     // pricingLock visibility logic
 function applypricingLockVisibility() {
     const isLocked = state.pricingLock === true;
-    ["isSingleMail", "isHomeMail", "hasInserts"].forEach((id) => {
-        const input = document.getElementById(id);
-        if (!input) return;
 
-        const pillRoot =
-            input.closest(".pill-toggle") ||
-            input.parentElement;
-
-        const wrapper =
-            pillRoot.closest('[lock="pricingLock"]') ||
-            pillRoot;
-
-        // If locked → hide pill; otherwise show pill
-        wrapper.style.display = isLocked ? "none" : "";
+    // 1. Hide/show ALL lock-target elements
+    document.querySelectorAll('[lock="pricingLock"]').forEach((el) => {
+        el.style.display = isLocked ? "none" : "";
     });
 
-    const toggleIconVisibility = (trueId, falseId) => {
-        const trueEl = document.getElementById(trueId);
-        const falseEl = document.getElementById(falseId);
-        if (!trueEl || !falseEl) return;
-
-        if (isLocked) {
-            // show icons (but will be set by updateBooleanIcons())
-            trueEl.style.display = "";
-            falseEl.style.display = "";
-        } else {
-            // when unlocked → hide ALL icons
-            trueEl.style.display = "none";
-            falseEl.style.display = "none";
-        }
-    };
-
-    toggleIconVisibility("isSingleMailTrue", "isSingleMailFalse");
-    toggleIconVisibility("isHomeMailTrue", "isHomeMailFalse");
-    toggleIconVisibility("hasInsertsTrue", "hasInsertsFalse");
-
-    if (isLocked) {
-        updateBooleanIcons(); // show correct true/false icons
-    }
+    // 2. Icons still controlled based on lock state
+    updateBooleanIcons();
 }
+
 
     // Apply initial pricingLock state
     applypricingLockVisibility();
