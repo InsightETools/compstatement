@@ -106,31 +106,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         json = {};
     }
 
-    const empInputEl = document.getElementById("empInput");
-
-if (empInputEl) {
-  empInputEl.addEventListener("input", (e) => {
-    let cursorPos = empInputEl.selectionStart;
-    const raw = empInputEl.value.replace(/,/g, "").replace(/[^\d]/g, "");
-
-    if (raw === "") {
-      empInputEl.value = "";
-      return;
-    }
-
-    // Format with commas
-    const formatted = Number(raw).toLocaleString("en-US");
-
-    // Set the value
-    empInputEl.value = formatted;
-
-    // Fix caret position after formatting
-    const diff = formatted.length - raw.length;
-    empInputEl.selectionStart = empInputEl.selectionEnd = cursorPos + diff;
-  });
-}
-
-
     // NEW: grab nested costDetails (with fallback to {})
     const cost = json.costDetails || {};
 
