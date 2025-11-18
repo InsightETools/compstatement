@@ -267,56 +267,54 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Full pricing + data-binding logic
     function recalc(rawCount) {
-        const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
+    const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
 
-        const baseFee = state.baseFee;
-        const statementFee = state.statementFee;
-        const insertFee = state.hasInserts ? state.insertCost : 0;
-        const mailingPerStmt = currentMailingFee();
+    const baseFee = state.baseFee;
+    const statementFee = state.statementFee;
+    const insertFee = state.hasInserts ? state.insertCost : 0;  // keep this for calculations
+    const mailingPerStmt = currentMailingFee();
 
-        const statementTotal = n * statementFee;
-        const insertTotal = n * insertFee;
-        const deliveryTotal = n * mailingPerStmt;
-        const mailTotal = insertTotal + deliveryTotal;
+    const statementTotal = n * statementFee;
+    const insertTotal = n * insertFee;
+    const deliveryTotal = n * mailingPerStmt;
+    const mailTotal = insertTotal + deliveryTotal;
 
-        // grandTotal = baseFee + statementTotal + insertTotal + deliveryTotal
-        const grandTotal = baseFee + statementTotal + insertTotal + mailTotal;
+    const grandTotal = baseFee + statementTotal + insertTotal + mailTotal;
+    const pricePerStatement = n > 0 ? grandTotal / n : 0;
 
-        // pricePerStatement = grandTotal / statementCount (if > 0)
-        const pricePerStatement = n > 0 ? grandTotal / n : 0;
+    if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
+    if (grandTotalEl) grandTotalEl.textContent = fmtUSD(grandTotal);
+    if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
-        // Primary UI totals (if you have separate hero numbers by ID)
-        if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
-        if (grandTotalEl) grandTotalEl.textContent = fmtUSD(grandTotal);
-        if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
+    state.statementCount = n;
 
-        state.statementCount = n;
+    // Direct/store values
+    applyDataValue("baseFee", baseFee, fmtUSD);
+    applyDataValue("statementFee", statementFee, fmtUSD);
 
-        // Push raw values into [data="..."] elements
+    // 🔴 CHANGE THIS LINE:
+    // applyDataValue("insertCost", insertFee, fmtUSD);
 
-        // Direct/store values
-        applyDataValue("baseFee", baseFee, fmtUSD);
-        applyDataValue("statementFee", statementFee, fmtUSD);
-        applyDataValue("insertCost", insertFee, fmtUSD);
-        applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
-        applyDataValue("homeAddressMailFee", state.homeAddressMailFee, fmtUSD);
+    // ✅ TO THIS (always use the original JSON value):
+    applyDataValue("insertCost", defaults.insertCost, fmtUSD);
 
-        // Per-statement delivery fee (for data="deliveryFee")
-        applyDataValue("deliveryFee", mailingPerStmt, fmtUSD);
+    applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
+    applyDataValue("homeAddressMailFee", state.homeAddressMailFee, fmtUSD);
 
-        // Count (non-dollar)
-        applyDataValue("statementCount", n, fmtInt);
+    // Per-statement delivery fee
+    applyDataValue("deliveryFee", mailingPerStmt, fmtUSD);
 
-        // Calculated totals
-        applyDataValue("statementTotal", statementTotal, fmtUSD);
-        applyDataValue("insertTotal", insertTotal, fmtUSD);
-        applyDataValue("deliveryTotal", deliveryTotal, fmtUSD);
-        applyDataValue("mailTotal", mailTotal, fmtUSD);
-        applyDataValue("pricePerStatement", pricePerStatement, fmtUSD);
-        applyDataValue("grandTotal", grandTotal, fmtUSD);
+    // Count
+    applyDataValue("statementCount", n, fmtInt);
 
-        // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
-    }
+    // Totals
+    applyDataValue("statementTotal", statementTotal, fmtUSD);
+    applyDataValue("insertTotal", insertTotal, fmtUSD);
+    applyDataValue("deliveryTotal", deliveryTotal, fmtUSD);
+    applyDataValue("mailTotal", mailTotal, fmtUSD);
+    applyDataValue("pricePerStatement", pricePerStatement, fmtUSD);
+    applyDataValue("grandTotal", grandTotal, fmtUSD);
+}
 
     function updateSliderRange(min, max, setVal = null) {
         state.sliderMin = min;
