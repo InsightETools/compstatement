@@ -439,9 +439,9 @@ function applypricingLockVisibility() {
 
     // Slider update (smooth UI) — no URL writes here
     let maxToastShown = false;
-    const mode = new URLSearchParams(location.search).get("mode");
     sliderEl.noUiSlider.on("update", (vals) => {
         const val = Number(vals[0]);
+        const mode = new URLSearchParams(location.search).get("mode");
         if (val >= state.sliderMax && mode = "pricing") {
             if (!maxToastShown) {
                 Toast.show(
