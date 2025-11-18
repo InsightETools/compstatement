@@ -643,6 +643,7 @@ function applyCostPageVisibility() {
 }
 
   function donutCharts() {
+    console.log("donutCharts");
     const isVisible = (el) => {
       if (!el) return false;
       const style = window.getComputedStyle(el);
