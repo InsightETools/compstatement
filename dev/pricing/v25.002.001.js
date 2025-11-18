@@ -1,6 +1,6 @@
-//------PRICING APP------//
+//------PRICING APP (FIXED)------//
 
-console.log("Pricing App v25.002.001");
+console.log("Pricing App v25.002.003");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
@@ -73,10 +73,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     const makePips = (min, max) => {
         const steps = 10;
         const span = max - min;
-        return span <= 0 ? [min] :
-            Array.from({
-                length: steps + 1
-            }, (_, i) => Math.round(min + (span * i) / steps));
+        return span <= 0
+            ? [min]
+            : Array.from({ length: steps + 1 }, (_, i) =>
+                  Math.round(min + (span * i) / steps)
+              );
     };
 
     const renderPips = () => {
@@ -92,7 +93,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     let json = {};
     try {
         json = await window.SharedDataFetcher.fetchData();
-        json = json.costDetails;
     } catch (e) {
         console.error("Pricing App: Error loading JSON:", e);
         json = {};
@@ -133,14 +133,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         "targetDate"
     ]);
 
+    /* ================== Share-mode detection & URL writer (debounced) ================== */
     const url = new URL(location.href);
     const sharePayload = ENABLE_SHARE ? url.searchParams.get("s") : null;
     const shareMode = ENABLE_SHARE && !!sharePayload;
 
     // State from share or defaults
-    let state = shareMode ? decodeShare(sharePayload, defaults) : {
-        ...defaults
-    };
+    let state = shareMode ? decodeShare(sharePayload, defaults) : { ...defaults };
 
     // Business rules
     // Inserts are allowed with either mailing option, but not with neither
@@ -173,9 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         syncShareParam();
     }
 
-    const ORIG = {
-        ...state
-    };
+    const ORIG = { ...state };
 
     function hideEmptyJsonWrappers(source, keys) {
         keys.forEach((key) => {
@@ -202,15 +199,54 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
+    // Helper: enable/disable inserts based on mailing choice
+    function updateHasInsertsAvailability() {
+        const hasMail = state.isSingleMail || state.isHomeMail;
+        if (!cbHasInserts) return;
+
+        cbHasInserts.classList.toggle("inactive", !hasMail);
+        cbHasInserts.disabled = !hasMail;
+
+        if (!hasMail) {
+            cbHasInserts.checked = false;
+            state.hasInserts = false;
+        }
+    }
+
     // pricingLock visibility logic
     function applypricingLockVisibility() {
         const isLocked = state.pricingLock === true;
 
-        document.querySelectorAll('[lock="pricingLock"]').forEach(el => {
+        // Generic lock-target elements
+        document.querySelectorAll('[lock="pricingLock"]').forEach((el) => {
+            el.style.display = isLocked ? "none" : "";
+        });
+
+        // Specific toggle → check display pairs
+        const pairs = [
+            { baseId: "isSingleMail", checkId: "isSingleMailCheck", stateKey: "isSingleMail" },
+            { baseId: "isHomeMail",   checkId: "isHomeMailCheck",   stateKey: "isHomeMail" },
+            { baseId: "hasInserts",   checkId: "hasInsertsCheck",   stateKey: "hasInserts" }
+        ];
+
+        pairs.forEach(({ baseId, checkId, stateKey }) => {
+            const baseEl = document.getElementById(baseId);
+            const checkEl = document.getElementById(checkId);
+            if (!baseEl || !checkEl) return;
+
             if (isLocked) {
-                el.style.display = "none";
+                // Hide the interactive control
+                baseEl.style.display = "none";
+                // Show the locked “check” display
+                checkEl.style.display = "";
+
+                // Reflect true/false state on the check element via classes
+                checkEl.classList.toggle("active", !!state[stateKey]);
+                checkEl.classList.toggle("inactive", !state[stateKey]);
             } else {
-                el.style.display = "";
+                // Normal (unlocked) mode
+                baseEl.style.display = "";
+                checkEl.style.display = "none";
             }
         });
     }
@@ -224,12 +260,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (labelSingleMailFee) labelSingleMailFee.textContent = fmtUSD(state.singleAddressMailFee);
     if (labelHomeMailFee) labelHomeMailFee.textContent = fmtUSD(state.homeAddressMailFee);
     if (labelInsertCost) labelInsertCost.textContent = fmtUSD(state.insertCost);
-    if (labelCanadaMailFee) labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
+    if (labelCanadaMailFee)
+        labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
 
     // Initialize checkboxes
     if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
     if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
     if (cbHomeMail) cbHomeMail.checked = state.isHomeMail;
+
+    // Ensure inserts availability matches initial mailing state
+    updateHasInsertsAvailability();
 
     // Create slider
     noUiSlider.create(sliderEl, {
@@ -244,7 +284,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             mode: "values",
             values: makePips(state.sliderMin, state.sliderMax),
             density: 10
-        },
+        }
     });
     const renderAllPips = () => requestAnimationFrame(renderPips);
     renderAllPips();
@@ -258,8 +298,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Pricing helpers
     const currentMailingFee = () =>
-        state.isHomeMail ? state.homeAddressMailFee :
-        state.isSingleMail ? state.singleAddressMailFee : 0;
+        state.isHomeMail
+            ? state.homeAddressMailFee
+            : state.isSingleMail
+            ? state.singleAddressMailFee
+            : 0;
 
     // Kept for compatibility, though recalc now does full math
     const perStatementCost = () =>
@@ -267,41 +310,57 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Full pricing + data-binding logic
     function recalc(rawCount) {
-    const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
+        const n = clamp(Math.round(Number(rawCount)), state.sliderMin, state.sliderMax);
 
-    const baseFee = state.baseFee;
-    const statementFee = state.statementFee;
-    const insertFee = state.hasInserts ? state.insertCost : 0;  // keep this for calculations
-    const mailingPerStmt = currentMailingFee();
+        const baseFee = state.baseFee;
+        const statementFee = state.statementFee;
+        const insertFee = state.hasInserts ? state.insertCost : 0;
+        const mailingPerStmt = currentMailingFee();
 
-    const statementTotal = n * statementFee;
-    const insertTotal = n * insertFee;
-    const deliveryTotal = n * mailingPerStmt;
-    const mailTotal = insertTotal + deliveryTotal;
+        const statementTotal = n * statementFee;
+        const insertTotal = n * insertFee;
+        const deliveryTotal = n * mailingPerStmt;
+        const mailTotal = insertTotal + deliveryTotal;
 
-    const grandTotal = baseFee + statementTotal + insertTotal + mailTotal;
-    const pricePerStatement = n > 0 ? grandTotal / n : 0;
+        // grandTotal = baseFee + statementTotal + insertTotal + deliveryTotal
+        const grandTotal = baseFee + statementTotal + insertTotal + mailTotal;
 
-    if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
-    if (grandTotalEl) grandTotalEl.textContent = fmtUSD(grandTotal);
-    if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
+        // pricePerStatement = grandTotal / statementCount (if > 0)
+        const pricePerStatement = n > 0 ? grandTotal / n : 0;
 
-    state.statementCount = n;
+        // Primary UI totals (if you have separate hero numbers by ID)
+        if (perEmployeeEl) perEmployeeEl.textContent = fmtUSD(pricePerStatement);
+        if (grandTotalEl) grandTotalEl.textContent = fmtUSD(grandTotal);
+        if (empInputEl && empInputEl.value !== String(n)) empInputEl.value = n;
 
-    applyDataValue("baseFee", baseFee, fmtUSD);
-    applyDataValue("statementFee", statementFee, fmtUSD);
-    applyDataValue("insertCost", defaults.insertCost, fmtUSD);
-    applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
-    applyDataValue("homeAddressMailFee", state.homeAddressMailFee, fmtUSD);
-    applyDataValue("deliveryFee", mailingPerStmt, fmtUSD);
-    applyDataValue("statementCount", n, fmtInt);
-    applyDataValue("statementTotal", statementTotal, fmtUSD);
-    applyDataValue("insertTotal", insertTotal, fmtUSD);
-    applyDataValue("deliveryTotal", deliveryTotal, fmtUSD);
-    applyDataValue("mailTotal", mailTotal, fmtUSD);
-    applyDataValue("pricePerStatement", pricePerStatement, fmtUSD);
-    applyDataValue("grandTotal", grandTotal, fmtUSD);
-}
+        state.statementCount = n;
+
+        // Push raw values into [data="..."] elements
+
+        // Direct/store values
+        applyDataValue("baseFee", baseFee, fmtUSD);
+        applyDataValue("statementFee", statementFee, fmtUSD);
+        // Always show original JSON insert cost, not 0 when toggled off
+        applyDataValue("insertCost", defaults.insertCost, fmtUSD);
+        applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
+        applyDataValue("homeAddressMailFee", state.homeAddressMailFee, fmtUSD);
+
+        // Per-statement delivery fee (for data="deliveryFee")
+        applyDataValue("deliveryFee", mailingPerStmt, fmtUSD);
+
+        // Count (non-dollar)
+        applyDataValue("statementCount", n, fmtInt);
+
+        // Calculated totals
+        applyDataValue("statementTotal", statementTotal, fmtUSD);
+        applyDataValue("insertTotal", insertTotal, fmtUSD);
+        applyDataValue("deliveryTotal", deliveryTotal, fmtUSD);
+        applyDataValue("mailTotal", mailTotal, fmtUSD);
+        applyDataValue("pricePerStatement", pricePerStatement, fmtUSD);
+        applyDataValue("grandTotal", grandTotal, fmtUSD);
+
+        // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
+    }
 
     function updateSliderRange(min, max, setVal = null) {
         state.sliderMin = min;
@@ -310,7 +369,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             empInputEl.min = String(min);
             empInputEl.max = String(max);
         }
-        sliderEl.noUiSlider.updateOptions({
+        sliderEl.noUiSlider.updateOptions(
+            {
                 range: {
                     min,
                     max
@@ -319,7 +379,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     mode: "values",
                     values: makePips(min, max),
                     density: 10
-                },
+                }
             },
             true
         );
@@ -336,10 +396,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     sliderEl.noUiSlider.on("update", (vals) => {
         const val = Number(vals[0]);
         if (val >= state.sliderMax) {
-            
             if (!maxToastShown) {
                 Toast.show(
-                    `If your employee count is more than ${fmtInt(state.sliderMax)} then type the size in the input.`, {
+                    `If your employee count is more than ${fmtInt(
+                        state.sliderMax
+                    )} then type the size in the input.`,
+                    {
                         type: "info",
                         duration: 3800,
                         onShow: () => {
@@ -391,9 +453,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (resetBtn) {
         resetBtn.addEventListener("click", (e) => {
             e.preventDefault();
-            state = {
-                ...ORIG
-            };
+            state = { ...ORIG };
 
             // Reapply pricingLock visibility
             applypricingLockVisibility();
@@ -402,6 +462,9 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
             if (cbSingleMail) cbSingleMail.checked = state.isSingleMail;
             if (cbHomeMail) cbHomeMail.checked = state.isHomeMail;
+
+            // Ensure inserts availability matches new mailing state
+            updateHasInsertsAvailability();
 
             // slider & input
             updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
@@ -421,33 +484,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Checkboxes + rules + share sync
     const onStateChanged = () => syncShareParam();
 
+    // Inserts toggle — now no toast, just state + recalc, availability controlled elsewhere
     if (cbHasInserts) {
         cbHasInserts.addEventListener("change", () => {
-            // Attempting to turn inserts on
-            if (cbHasInserts.checked) {
-                // BUT no mailing option selected
-                if (!state.isSingleMail && !state.isHomeMail) {
-                    // Revert toggle
-                    cbHasInserts.checked = false;
-                    state.hasInserts = false;
-
-                    // Show toast message
-                    Toast.show(
-                        "Please choose a mailing option (Single Address or Home Address) before enabling inserts.", {
-                            type: "warning",
-                            duration: 3500
-                        }
-                    );
-                    return; // Prevent recalc
-                }
-
-                // Allowed: mailing option exists
-                state.hasInserts = true;
-            } else {
-                // Inserts turned off
-                state.hasInserts = false;
-            }
-
+            state.hasInserts = cbHasInserts.checked;
             recalc(sliderEl.noUiSlider.get());
             onStateChanged();
         });
@@ -464,17 +504,15 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             } else {
                 state.isSingleMail = false;
-                // If no mailing method is selected, inserts can't stay enabled
-                if (!state.isHomeMail && state.hasInserts) {
-                    state.hasInserts = false;
-                    if (cbHasInserts) cbHasInserts.checked = false;
-                }
             }
+
+            // Update inserts availability after mail change
+            updateHasInsertsAvailability();
+
             recalc(sliderEl.noUiSlider.get());
             onStateChanged();
         });
     }
-
 
     if (cbHomeMail) {
         cbHomeMail.addEventListener("change", () => {
@@ -486,11 +524,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 state.isHomeMail = true;
             } else {
                 state.isHomeMail = false;
-                if (!state.isSingleMail && state.hasInserts) {
-                    state.hasInserts = false;
-                    if (cbHasInserts) cbHasInserts.checked = false;
-                }
             }
+
+            // Update inserts availability after mail change
+            updateHasInsertsAvailability();
+
             recalc(sliderEl.noUiSlider.get());
             onStateChanged();
         });
