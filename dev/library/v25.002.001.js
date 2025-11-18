@@ -535,18 +535,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
   [exploreToggle, pricingToggle].forEach((toggle) => {
     if (!toggle) return;
+
     toggle.addEventListener("change", (e) => {
       if (!e.target.checked) return;
 
       const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
 
-      // If toggled to design (explore) FROM pricing, run donutCharts()
+      // If toggled to design (explore) FROM pricing, re-fetch everything
       if (
         currentMode === "pricing" &&
         newMode === "explore" &&
-        typeof donutCharts === "function"
+        typeof window.reloadFromParams === "function"
       ) {
-        donutCharts();
+        window.reloadFromParams();
       }
 
       currentMode = newMode;
