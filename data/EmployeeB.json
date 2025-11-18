@@ -12,7 +12,8 @@
     "cover1": true,
     "cover2": true,
     "benefitsPage": true,
-    "companyPage": true
+    "companyPage": true,
+    "costPage": true
   },
   "primaryFont": "Roboto",
   "headerEmployeeSize": 35,
@@ -46,8 +47,8 @@
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "Sue Smith",
-  "employeeFirstName": "Sue",
+  "employeeName": "John Doe",
+  "employeeFirstName": "John",
   "employeeTitle": "Graphic Designer",
   "employeeSalary": "80000",
   "employeeWage": "35",
@@ -76,6 +77,25 @@
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png"
   ],
+  "costDetails": {
+    "baseFee": "590.00",
+    "statementFee": "2.09",
+    "singleAddressMailFee": "1.91",
+    "homeAddressMailFee": "300.85",
+    "singleAddressCanadaMailFee": "4.10",
+    "insertCost": "1.01",
+    "statementCount": "200",
+    "isSingleMail": false,
+    "isHomeMail": true,
+    "hasInserts": true,
+    "pricingLock": true,
+    "sliderMin": "0",
+    "sliderMax": "500",
+    "payrollSystem":"ADP",
+    "payrollDataMethod":"API",
+    "supplementalCostMethod": "Test Value",
+    "targetDate":"January 13, 2025"
+  },
   "listModules": [
     {
       "id": "listModule1",
