@@ -76,7 +76,7 @@
   "isSingleMail": false,
   "isHomeMail": true,
   "hasInserts": true,
-  "pricingLock": false,
+  "pricingLock": true,
   "sliderMin": "0",
   "sliderMax": "500",
   "payrollSystem":"ADP",
