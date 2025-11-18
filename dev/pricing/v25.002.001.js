@@ -483,9 +483,11 @@ function applypricingLockVisibility() {
             }
             let v = Math.floor(Number(empInputEl.value));
             if (!Number.isFinite(v)) return;
-
+            const HARD_MAX = 99999;
             if (v > state.sliderMax) {
-                updateSliderRange(state.sliderMin, v + 10, v); // includes syncShareParam (debounced)
+                const newMax = Math.min(v + 10, HARD_MAX);
+                const newVal = Math.min(v, HARD_MAX);
+                updateSliderRange(state.sliderMin, newMax, newVal);
             } else {
                 v = clamp(v, state.sliderMin, state.sliderMax);
                 sliderEl.noUiSlider.set(v);
