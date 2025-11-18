@@ -112,7 +112,7 @@
       ]
     }
   ],
-  "charts": [
+   "charts": [
     {
       "id": "chart1",
       "relatedGroupId": null,
@@ -357,7 +357,7 @@
         {
           "label": "Elective Benefits",
           "shortLabel": "Elective",
-          "color": "#b89237",
+          "color": "#063d69",
           "items": [
             {
               "label": "401(k) Match",
@@ -471,7 +471,7 @@
         {
           "label": "Elective Benefits",
           "shortLabel": "Elective",
-          "color": "#b89237",
+          "color": "#466c8a",
           "items": [
             {
               "label": "401(k) Match",
