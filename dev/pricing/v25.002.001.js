@@ -442,7 +442,7 @@ function applypricingLockVisibility() {
     sliderEl.noUiSlider.on("update", (vals) => {
         const val = Number(vals[0]);
         if (val >= state.sliderMax) {
-            if (!maxToastShown) {
+            if (!maxToastShown && urlParams.get('mode') = "pricing") {
                 Toast.show(
                     `If your employee count is more than ${fmtInt(
                         state.sliderMax
