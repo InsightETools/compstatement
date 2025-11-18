@@ -531,6 +531,7 @@ document.addEventListener("DOMContentLoaded", () => {
     toggle.addEventListener("change", (e) => {
       if (e.target.checked) {
         const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
+        donutCharts();
         updateModeDisplay(newMode);
       }
     });
