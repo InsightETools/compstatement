@@ -1,4 +1,4 @@
-//------PRICING APP (FIXED)------//
+//------PRICING APP------//
 
 console.log("Pricing App v25.002.002");
 
@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         "targetDate"
     ]);
 
-    /* ================== Share-mode detection & URL writer (debounced) ================== */
     const url = new URL(location.href);
     const sharePayload = ENABLE_SHARE ? url.searchParams.get("s") : null;
     const shareMode = ENABLE_SHARE && !!sharePayload;
@@ -288,26 +287,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     state.statementCount = n;
 
-    // Direct/store values
     applyDataValue("baseFee", baseFee, fmtUSD);
     applyDataValue("statementFee", statementFee, fmtUSD);
-
-    // 🔴 CHANGE THIS LINE:
-    // applyDataValue("insertCost", insertFee, fmtUSD);
-
-    // ✅ TO THIS (always use the original JSON value):
     applyDataValue("insertCost", defaults.insertCost, fmtUSD);
-
     applyDataValue("singleAddressMailFee", state.singleAddressMailFee, fmtUSD);
     applyDataValue("homeAddressMailFee", state.homeAddressMailFee, fmtUSD);
-
-    // Per-statement delivery fee
     applyDataValue("deliveryFee", mailingPerStmt, fmtUSD);
-
-    // Count
     applyDataValue("statementCount", n, fmtInt);
-
-    // Totals
     applyDataValue("statementTotal", statementTotal, fmtUSD);
     applyDataValue("insertTotal", insertTotal, fmtUSD);
     applyDataValue("deliveryTotal", deliveryTotal, fmtUSD);
