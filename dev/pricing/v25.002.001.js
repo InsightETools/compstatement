@@ -244,7 +244,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!isLocked) {
             trueEl.style.display = "none";
-            falseEl.style.display = "true";
+            falseEl.style.display = "block";
             return;
         }
         
