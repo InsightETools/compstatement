@@ -443,7 +443,8 @@ function applypricingLockVisibility() {
         const val = Number(vals[0]);
         if (val >= state.sliderMax) {
             let mode = urlParams.get('mode');
-            if (!maxToastShown && mode = "pricing") {
+            console.log(mode);
+            if (!maxToastShown) {
                 Toast.show(
                     `If your employee count is more than ${fmtInt(
                         state.sliderMax
