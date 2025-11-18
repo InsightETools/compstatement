@@ -422,7 +422,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     const onStateChanged = () => syncShareParam();
 
     if (cbHasInserts) {
-        cbHasInserts.classList.add('inactive');
         cbHasInserts.addEventListener("change", () => {
             // Attempting to turn inserts on
             if (cbHasInserts.checked) {
@@ -452,7 +451,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             recalc(sliderEl.noUiSlider.get());
             onStateChanged();
         });
-    } else { cbHasInserts.classList.remove('inactive'); }
+    }
 
     if (cbSingleMail) {
         cbSingleMail.addEventListener("change", () => {
