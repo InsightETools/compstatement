@@ -245,25 +245,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     // pricingLock visibility logic
 function applypricingLockVisibility() {
     const isLocked = state.pricingLock === true;
-
-    // For each toggle pill input, hide/show the pill UI when locked
     ["isSingleMail", "isHomeMail", "hasInserts"].forEach((id) => {
         const input = document.getElementById(id);
         if (!input) return;
 
-        // The pill structure (label + track + thumb)
-        const pillRoot = input.closest(".pill-toggle") || input.parentElement;
-        if (!pillRoot) return;
+        const pillRoot =
+            input.closest(".pill-toggle") ||
+            input.parentElement;
 
-        // In your HTML, the pill is wrapped in a div with lock="pricingLock"
-        const wrapper = pillRoot.closest('[lock="pricingLock"]') || pillRoot;
+        const wrapper =
+            pillRoot.closest('[lock="pricingLock"]') ||
+            pillRoot;
 
-        // When isLocked is true, hide the input pill UI; when false, show it
+        // If locked → hide pill; otherwise show pill
         wrapper.style.display = isLocked ? "none" : "";
     });
 
-    // Icons (True/False SVGs) are always driven by state
-    updateBooleanIcons();
+    const toggleIconVisibility = (trueId, falseId) => {
+        const trueEl = document.getElementById(trueId);
+        const falseEl = document.getElementById(falseId);
+        if (!trueEl || !falseEl) return;
+
+        if (isLocked) {
+            // show icons (but will be set by updateBooleanIcons())
+            trueEl.style.display = "";
+            falseEl.style.display = "";
+        } else {
+            // when unlocked → hide ALL icons
+            trueEl.style.display = "none";
+            falseEl.style.display = "none";
+        }
+    };
+
+    toggleIconVisibility("isSingleMailTrue", "isSingleMailFalse");
+    toggleIconVisibility("isHomeMailTrue", "isHomeMailFalse");
+    toggleIconVisibility("hasInsertsTrue", "hasInsertsFalse");
+
+    if (isLocked) {
+        updateBooleanIcons(); // show correct true/false icons
+    }
 }
 
     // Apply initial pricingLock state
