@@ -520,16 +520,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlMode = params.get("mode");
   const initialMode = urlMode === "pricing" ? "pricing" : "explore";
 
+  // Only pages that *started* in pricing mode are allowed to trigger a refetch
   const allowRefetch = initialMode === "pricing";
+  // Guard so we only ever refetch once
+  let hasRefetched = false;
 
+  // Set initial toggle states
   if (initialMode === "pricing") {
     if (pricingToggle) pricingToggle.checked = true;
   } else {
     if (exploreToggle) exploreToggle.checked = true;
   }
 
+  // Apply initial mode visibility
   updateModeDisplay(initialMode);
 
+  // Track current mode so we know what we're switching from
   let currentMode = initialMode;
 
   [exploreToggle, pricingToggle].forEach((toggle) => {
@@ -540,13 +546,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
 
+      // Only re-fetch if:
+      // 1. Initial page load was mode=pricing
+      // 2. We have NOT already refetched
+      // 3. User is switching FROM pricing → explore
       if (
         allowRefetch &&
+        !hasRefetched &&
         currentMode === "pricing" &&
         newMode === "explore" &&
         typeof window.reloadFromParams === "function"
       ) {
         window.reloadFromParams();
+        hasRefetched = true; // lock it so it won't run again
       }
 
       currentMode = newMode;
