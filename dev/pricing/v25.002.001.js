@@ -336,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     sliderEl.noUiSlider.on("update", (vals) => {
         const val = Number(vals[0]);
         if (val >= state.sliderMax) {
+            
             if (!maxToastShown) {
                 Toast.show(
                     `If your employee count is more than ${fmtInt(state.sliderMax)} then type the size in the input.`, {
@@ -437,15 +438,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                             duration: 3500
                         }
                     );
-
+                    cbHasInserts.classList.add('inactive');
                     return; // Prevent recalc
                 }
 
                 // Allowed: mailing option exists
                 state.hasInserts = true;
+                cbHasInserts.classList.remove('inactive');
             } else {
                 // Inserts turned off
                 state.hasInserts = false;
+                cbHasInserts.classList.remove('inactive');
             }
 
             recalc(sliderEl.noUiSlider.get());
