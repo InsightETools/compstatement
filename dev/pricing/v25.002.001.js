@@ -261,18 +261,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     setIcon(
         state.isSingleMail,
-        document.getElementById("isSingleMailTrue"),
-        document.getElementById("isSingleMailFalse")
+        isSingleMailTrueEl,
+        isSingleMailFalseEl
     );
     setIcon(
         state.isHomeMail,
-        document.getElementById("isHomeMailTrue"),
-        document.getElementById("isHomeMailFalse")
+        isHomeMailTrueEl,
+        isHomeMailFalseEl
     );
     setIcon(
         state.hasInserts,
-        document.getElementById("hasInsertsTrue"),
-        document.getElementById("hasInsertsFalse")
+        hasInsertsTrueEl,
+        hasInsertsFalseEl
     );
 }
 
