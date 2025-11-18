@@ -520,22 +520,37 @@ document.addEventListener("DOMContentLoaded", () => {
   const urlMode = params.get("mode");
   const initialMode = urlMode === "pricing" ? "pricing" : "explore";
 
+  // Set initial toggle states
   if (initialMode === "pricing") {
-    pricingToggle.checked = true;
-    donutCharts();
+    if (pricingToggle) pricingToggle.checked = true;
   } else {
-    exploreToggle.checked = true;
-    donutCharts();
+    if (exploreToggle) exploreToggle.checked = true;
   }
+
+  // Apply initial mode visibility
   updateModeDisplay(initialMode);
 
-  [exploreToggle, pricingToggle].forEach(toggle => {
+  // Track current mode so we know what we're switching from
+  let currentMode = initialMode;
+
+  [exploreToggle, pricingToggle].forEach((toggle) => {
+    if (!toggle) return;
     toggle.addEventListener("change", (e) => {
-      if (e.target.checked) {
-        const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
+      if (!e.target.checked) return;
+
+      const newMode = e.target.id === "toggleExplore" ? "explore" : "pricing";
+
+      // If toggled to design (explore) FROM pricing, run donutCharts()
+      if (
+        currentMode === "pricing" &&
+        newMode === "explore" &&
+        typeof donutCharts === "function"
+      ) {
         donutCharts();
-        updateModeDisplay(newMode);
       }
+
+      currentMode = newMode;
+      updateModeDisplay(newMode);
     });
   });
 });
