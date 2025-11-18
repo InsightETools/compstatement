@@ -237,10 +237,45 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     function updateBooleanIcons() {
-        setBooleanIcon(state.isSingleMail, isSingleMailTrueEl, isSingleMailFalseEl);
-        setBooleanIcon(state.isHomeMail,   isHomeMailTrueEl,   isHomeMailFalseEl);
-        setBooleanIcon(state.hasInserts,   hasInsertsTrueEl,   hasInsertsFalseEl);
-    }
+    const isLocked = state.pricingLock === true;
+
+    const setIcon = (value, trueEl, falseEl) => {
+        if (!trueEl || !falseEl) return;
+
+        if (!isLocked) {
+            // When NOT locked → hide all icons
+            trueEl.style.display = "none";
+            falseEl.style.display = "none";
+            return;
+        }
+
+        // When locked → show only the correct one
+        if (value) {
+            trueEl.style.display = "";
+            falseEl.style.display = "none";
+        } else {
+            trueEl.style.display = "none";
+            falseEl.style.display = "";
+        }
+    };
+
+    setIcon(
+        state.isSingleMail,
+        document.getElementById("isSingleMailTrue"),
+        document.getElementById("isSingleMailFalse")
+    );
+    setIcon(
+        state.isHomeMail,
+        document.getElementById("isHomeMailTrue"),
+        document.getElementById("isHomeMailFalse")
+    );
+    setIcon(
+        state.hasInserts,
+        document.getElementById("hasInsertsTrue"),
+        document.getElementById("hasInsertsFalse")
+    );
+}
+
 
     // pricingLock visibility logic
 function applypricingLockVisibility() {
