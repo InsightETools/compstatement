@@ -1,6 +1,6 @@
-//------PRICING APP (FIXED)------//
+//------PRICING APP (FIXED, costDetails)------//
 
-console.log("Pricing App v25.002.003");
+console.log("Pricing App v25.002.005");
 
 const ENABLE_SHARE = true;
 const MINIMAL_S = "eyJ2IjoxfQ";
@@ -38,6 +38,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const labelHomeMailFee = document.getElementById("homeAddressMailFee");
     const labelCanadaMailFee = document.getElementById("singleAddressCanadaMailFee");
     const labelInsertCost = document.getElementById("insertCost");
+
+    // SVG true/false icons
+    const isSingleMailTrueEl = document.getElementById("isSingleMailTrue");
+    const isSingleMailFalseEl = document.getElementById("isSingleMailFalse");
+    const isHomeMailTrueEl = document.getElementById("isHomeMailTrue");
+    const isHomeMailFalseEl = document.getElementById("isHomeMailFalse");
+    const hasInsertsTrueEl = document.getElementById("hasInsertsTrue");
+    const hasInsertsFalseEl = document.getElementById("hasInsertsFalse");
 
     const toNum = (v) => (Number.isFinite(Number(v)) ? Number(v) : 0);
     const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -98,25 +106,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         json = {};
     }
 
-    // Defaults from JSON
+    // NEW: grab nested costDetails (with fallback to {})
+    const cost = json.costDetails || {};
+
+    // Defaults from JSON (now from costDetails)
     const defaults = {
-        baseFee: toNum(json.baseFee),
-        statementFee: toNum(json.statementFee),
-        singleAddressMailFee: toNum(json.singleAddressMailFee),
-        homeAddressMailFee: toNum(json.homeAddressMailFee),
-        insertCost: toNum(json.insertCost),
-        sliderMin: toNum(json.sliderMin),
-        sliderMax: toNum(json.sliderMax),
-        statementCount: toNum(json.statementCount),
-        isSingleMail: !!json.isSingleMail,
-        isHomeMail: !!json.isHomeMail,
-        hasInserts: !!json.hasInserts,
-        pricingLock: !!json.pricingLock,
-        // PROTECTED JSON-ONLY fields (for DOM display)
-        payrollSystem: json.payrollSystem ?? "",
-        payrollDataMethod: json.payrollDataMethod ?? "",
-        supplementalCostMethod: json.supplementalCostMethod ?? "",
-        targetDate: json.targetDate ?? ""
+        baseFee: toNum(cost.baseFee),
+        statementFee: toNum(cost.statementFee),
+        singleAddressMailFee: toNum(cost.singleAddressMailFee),
+        homeAddressMailFee: toNum(cost.homeAddressMailFee),
+        insertCost: toNum(cost.insertCost),
+        sliderMin: toNum(cost.sliderMin),
+        sliderMax: toNum(cost.sliderMax),
+        statementCount: toNum(cost.statementCount),
+        isSingleMail: !!cost.isSingleMail,
+        isHomeMail: !!cost.isHomeMail,
+        hasInserts: !!cost.hasInserts,
+        pricingLock: !!cost.pricingLock,
+        // PROTECTED JSON-ONLY fields (for DOM display, also from costDetails now)
+        payrollSystem: cost.payrollSystem ?? "",
+        payrollDataMethod: cost.payrollDataMethod ?? "",
+        supplementalCostMethod: cost.supplementalCostMethod ?? "",
+        targetDate: cost.targetDate ?? ""
     };
 
     applyJsonFieldsStrict(defaults, [
@@ -213,42 +224,35 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // Helper: show/hide true/false icons
+    function setBooleanIcon(value, trueEl, falseEl) {
+        if (!trueEl || !falseEl) return;
+        if (value) {
+            trueEl.style.display = "";
+            falseEl.style.display = "none";
+        } else {
+            trueEl.style.display = "none";
+            falseEl.style.display = "";
+        }
+    }
+
+    function updateBooleanIcons() {
+        setBooleanIcon(state.isSingleMail, isSingleMailTrueEl, isSingleMailFalseEl);
+        setBooleanIcon(state.isHomeMail,   isHomeMailTrueEl,   isHomeMailFalseEl);
+        setBooleanIcon(state.hasInserts,   hasInsertsTrueEl,   hasInsertsFalseEl);
+    }
+
     // pricingLock visibility logic
     function applypricingLockVisibility() {
         const isLocked = state.pricingLock === true;
 
-        // Generic lock-target elements
+        // Generic lock-target elements (your pill toggles use lock="pricingLock")
         document.querySelectorAll('[lock="pricingLock"]').forEach((el) => {
             el.style.display = isLocked ? "none" : "";
         });
 
-        // Specific toggle → check display pairs
-        const pairs = [
-            { baseId: "isSingleMail", checkId: "isSingleMailCheck", stateKey: "isSingleMail" },
-            { baseId: "isHomeMail",   checkId: "isHomeMailCheck",   stateKey: "isHomeMail" },
-            { baseId: "hasInserts",   checkId: "hasInsertsCheck",   stateKey: "hasInserts" }
-        ];
-
-        pairs.forEach(({ baseId, checkId, stateKey }) => {
-            const baseEl = document.getElementById(baseId);
-            const checkEl = document.getElementById(checkId);
-            if (!baseEl || !checkEl) return;
-
-            if (isLocked) {
-                // Hide the interactive control
-                baseEl.style.display = "none";
-                // Show the locked “check” display
-                checkEl.style.display = "";
-
-                // Reflect true/false state on the check element via classes
-                checkEl.classList.toggle("active", !!state[stateKey]);
-                checkEl.classList.toggle("inactive", !state[stateKey]);
-            } else {
-                // Normal (unlocked) mode
-                baseEl.style.display = "";
-                checkEl.style.display = "none";
-            }
-        });
+        // Icons are always driven by state via updateBooleanIcons()
+        updateBooleanIcons();
     }
 
     // Apply initial pricingLock state
@@ -261,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (labelHomeMailFee) labelHomeMailFee.textContent = fmtUSD(state.homeAddressMailFee);
     if (labelInsertCost) labelInsertCost.textContent = fmtUSD(state.insertCost);
     if (labelCanadaMailFee)
-        labelCanadaMailFee.textContent = fmtUSD(toNum(json.singleAddressCanadaMailFee));
+        labelCanadaMailFee.textContent = fmtUSD(toNum(cost.singleAddressCanadaMailFee));
 
     // Initialize checkboxes
     if (cbHasInserts) cbHasInserts.checked = state.hasInserts;
@@ -270,6 +274,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Ensure inserts availability matches initial mailing state
     updateHasInsertsAvailability();
+    // Ensure icons match initial state
+    updateBooleanIcons();
 
     // Create slider
     noUiSlider.create(sliderEl, {
@@ -358,6 +364,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         applyDataValue("mailTotal", mailTotal, fmtUSD);
         applyDataValue("pricePerStatement", pricePerStatement, fmtUSD);
         applyDataValue("grandTotal", grandTotal, fmtUSD);
+
+        // Keep icons in sync with state
+        updateBooleanIcons();
 
         // NOTE: do NOT call syncShareParam() here — it's called on "set" & other user actions
     }
@@ -455,7 +464,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             e.preventDefault();
             state = { ...ORIG };
 
-            // Reapply pricingLock visibility
+            // Reapply pricingLock visibility (also updates icons)
             applypricingLockVisibility();
 
             // checkboxes
@@ -465,6 +474,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // Ensure inserts availability matches new mailing state
             updateHasInsertsAvailability();
+            // Ensure icons match new state
+            updateBooleanIcons();
 
             // slider & input
             updateSliderRange(state.sliderMin, state.sliderMax, state.statementCount);
@@ -484,7 +495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Checkboxes + rules + share sync
     const onStateChanged = () => syncShareParam();
 
-    // Inserts toggle — now no toast, just state + recalc, availability controlled elsewhere
+    // Inserts toggle — no toast now, availability handled elsewhere
     if (cbHasInserts) {
         cbHasInserts.addEventListener("change", () => {
             state.hasInserts = cbHasInserts.checked;
