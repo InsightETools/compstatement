@@ -262,8 +262,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         state.isSingleMail ? state.singleAddressMailFee : 0;
 
     // Kept for compatibility, though recalc now does full math
-    const perStatementCost = () =>
-        state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
+    //const perStatementCost = () =>
+        //state.statementFee + currentMailingFee() + (state.hasInserts ? state.insertCost : 0);
 
     // Full pricing + data-binding logic
     function recalc(rawCount) {
