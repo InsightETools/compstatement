@@ -243,13 +243,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!trueEl || !falseEl) return;
 
         if (!isLocked) {
-            // When NOT locked → hide BOTH icons
             trueEl.style.display = "none";
-            falseEl.style.display = "none";
+            falseEl.style.display = "true";
             return;
         }
-
-        // When locked → show correct icon
+        
         if (value) {
             trueEl.style.display = "";
             falseEl.style.display = "none";
