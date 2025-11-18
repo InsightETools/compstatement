@@ -244,16 +244,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (!isLocked) {
             trueEl.style.display = "none";
-            falseEl.style.display = "block";
+            falseEl.style.display = "none";
             return;
         }
         
         if (value) {
-            trueEl.style.display = "";
+            trueEl.style.display = "block";
             falseEl.style.display = "none";
         } else {
             trueEl.style.display = "none";
-            falseEl.style.display = "";
+            falseEl.style.display = "block";
         }
     };
 
