@@ -522,8 +522,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (initialMode === "pricing") {
     pricingToggle.checked = true;
+    donutCharts();
   } else {
     exploreToggle.checked = true;
+    donutCharts();
   }
   updateModeDisplay(initialMode);
 
