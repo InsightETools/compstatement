@@ -243,17 +243,28 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // pricingLock visibility logic
-    function applypricingLockVisibility() {
-        const isLocked = state.pricingLock === true;
+function applypricingLockVisibility() {
+    const isLocked = state.pricingLock === true;
 
-        // Generic lock-target elements (your pill toggles use lock="pricingLock")
-        document.querySelectorAll('[lock="pricingLock"]').forEach((el) => {
-            el.style.display = isLocked ? "none" : "";
-        });
+    // For each toggle pill input, hide/show the pill UI when locked
+    ["isSingleMail", "isHomeMail", "hasInserts"].forEach((id) => {
+        const input = document.getElementById(id);
+        if (!input) return;
 
-        // Icons are always driven by state via updateBooleanIcons()
-        updateBooleanIcons();
-    }
+        // The pill structure (label + track + thumb)
+        const pillRoot = input.closest(".pill-toggle") || input.parentElement;
+        if (!pillRoot) return;
+
+        // In your HTML, the pill is wrapped in a div with lock="pricingLock"
+        const wrapper = pillRoot.closest('[lock="pricingLock"]') || pillRoot;
+
+        // When isLocked is true, hide the input pill UI; when false, show it
+        wrapper.style.display = isLocked ? "none" : "";
+    });
+
+    // Icons (True/False SVGs) are always driven by state
+    updateBooleanIcons();
+}
 
     // Apply initial pricingLock state
     applypricingLockVisibility();
