@@ -77,13 +77,13 @@
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png"
   ],
-  "costDetails": {
-    "baseFee": "590.00",
-    "statementFee": "2.09",
-    "singleAddressMailFee": "1.91",
-    "homeAddressMailFee": "300.85",
+ "costDetails": {
+    "baseFee": "600.00",
+    "statementFee": "2.10",
+    "singleAddressMailFee": "1.20",
+    "homeAddressMailFee": "3.85",
     "singleAddressCanadaMailFee": "4.10",
-    "insertCost": "1.01",
+    "insertCost": "1.00",
     "statementCount": "850",
     "isSingleMail": false,
     "isHomeMail": true,
