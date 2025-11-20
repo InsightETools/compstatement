@@ -180,6 +180,7 @@ function applyCostPageVisibility() {
     document.querySelectorAll('[data="companyLogo"]').forEach((el) => {
       if (data.companyLogo) {
         el.setAttribute("src", data.companyLogo);
+        if (data.companyLogoHeight) el.style.height = data.companyLogoHeight + "px";
         el.style.display = "flex";
         el.style.justifyContent = "flex-end";
       } else {
