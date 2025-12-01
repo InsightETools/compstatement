@@ -22,6 +22,18 @@
   "welcomeFontSize": 12,
   "headerYearSize": 35,
   "headerNameSize": 25,
+  "headerLabels": [
+    "Name",
+    "Hire Date",
+    "Statement Periods",
+    "Position"
+  ],
+  "headerDetails": [
+    "employeeName",
+    "employeeHireDate",
+    "statementRange",
+    "employeeTitle"
+  ],
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
@@ -49,6 +61,7 @@
   "companyState": "WA",
   "companyZip": "99352",
   "employeeName": "John Doe",
+  "employeeHireDate": "01/04/2003",
   "employeeFirstName": "John",
   "employeeTitle": "Graphic Designer",
   "employeeSalary": "80000",
