@@ -272,7 +272,10 @@ function applyCostPageVisibility() {
 
       if (labelEl) labelEl.textContent = label;
       //if (detailEl) detailEl.textContent = data[detailKey] ?? "—";
-      if (detailEl) detailEl.textContent = data[detailKey];
+      if (detailEl) {
+        const v = data[detailKey];
+        detailEl.textContent = (v !== undefined && v !== null && v !== "") ? v : detailKey;
+      }
 
       parent.appendChild(clone);
     });
