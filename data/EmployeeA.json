@@ -29,7 +29,7 @@
     "Position"
   ],
   "headerDetails": [
-    "John Williams",
+    "employeeName",
     "employeeHireDate",
     "statementRange",
     "employeeTitle"
