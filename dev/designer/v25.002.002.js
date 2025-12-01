@@ -271,7 +271,8 @@ function applyCostPageVisibility() {
       const detailEl = clone.querySelector('[data="headerDetail"]');
 
       if (labelEl) labelEl.textContent = label;
-      if (detailEl) detailEl.textContent = data[detailKey] ?? "—";
+      //if (detailEl) detailEl.textContent = data[detailKey] ?? "—";
+      if (detailEl) detailEl.textContent = data[detailKey];
 
       parent.appendChild(clone);
     });
