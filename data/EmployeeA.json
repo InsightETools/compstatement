@@ -26,13 +26,15 @@
     "Name",
     "Hire Date",
     "Statement Periods",
-    "Position"
+    "Position",
+    "Termination Date"
   ],
   "headerDetails": [
     "employeeName",
     "employeeHireDate",
     "statementRange",
-    "employeeTitle"
+    "employeeTitle",
+    "3/30/2026"
   ],
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
