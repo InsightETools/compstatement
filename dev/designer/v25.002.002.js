@@ -204,6 +204,7 @@ function applyCostPageVisibility() {
     document.querySelectorAll('[data="footerImage"]').forEach((el) => {
       if (data.footerImage) {
         el.setAttribute("src", data.footerImage);
+        if (data.footerImageHeight) el.style.height = data.footerImageHeight + "px";
         el.style.display = "";
       } else {
         el.removeAttribute("src");
