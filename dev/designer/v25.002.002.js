@@ -243,6 +243,42 @@ function applyCostPageVisibility() {
     });
   }
 
+  function renderHeaderDetails(data) {
+    const labels = json.headerLabels || [];
+    const details = json.headerDetails || [];
+
+    if (labels.length !== details.length) {
+      console.error("headerLabels and headerDetails length mismatch");
+      return;
+    }
+
+    const template = document.querySelector('[data="headerDetails"]');
+    if (!template) {
+      console.error('Template element with data="headerDetails" not found.');
+      return;
+    }
+
+    const parent = template.parentElement;
+    parent.querySelectorAll('[data="headerDetails"]:not(:first-child)').forEach(el => el.remove());
+
+    labels.forEach((label, i) => {
+      const detailKey = details[i];
+
+      const clone = template.cloneNode(true);
+      clone.style.display = "";
+
+      const labelEl = clone.querySelector('[data="headerLabel"]');
+      const detailEl = clone.querySelector('[data="headerDetail"]');
+
+      if (labelEl) labelEl.textContent = label;
+      if (detailEl) detailEl.textContent = json[detailKey] ?? "—";
+
+      parent.appendChild(clone);
+    });
+
+    template.style.display = "none";
+  }
+
   function standardTables() {
     const categoryEntryTemplate = document.querySelector("#categoryEntry");
     const baseTableTemplate = document.querySelector("#tableTemplate");
@@ -1087,6 +1123,7 @@ function applyCostPageVisibility() {
   applyCustomFonts(data);
   computeDesignConstraintsAndApply();
   applyButtonStatus();
+  renderHeaderDetails(data);
 
   window.__currentData = data;
   renderPrice(window.__currentData);
