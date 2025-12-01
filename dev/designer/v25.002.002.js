@@ -130,7 +130,7 @@ function applyCostPageVisibility() {
 
   const statementElement = [
     "companyName","companyRepName","companyRepTitle","companyRepSignature","companySignatureText",
-    "companySignature","companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
+    "companySignature","letterDate", "companyAttn","companyAddress","companyUnit","companyCity","companyState","companyZip",
     "companyWelcome","companyMessage","employeeName","employeeFirstName","employeeAddress","employeeUnit",
     "employeeCity","employeeState","employeeZip","statementTitle","statementRange","statementYear",
     "statementDisclaimer","statementDisclaimerContactPage","lookbackYear","lookbackMessage","lookaheadYear","lookaheadMessage","employeeTitle",
