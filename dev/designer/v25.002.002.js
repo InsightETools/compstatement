@@ -201,6 +201,16 @@ function applyCostPageVisibility() {
       }
     });
 
+    document.querySelectorAll('[data="footerImage"]').forEach((el) => {
+      if (data.footerImage) {
+        el.setAttribute("src", data.footerImage);
+        el.style.display = "";
+      } else {
+        el.removeAttribute("src");
+        el.style.display = "none";
+      }
+    });
+
     document.querySelectorAll('[data="companyLogoSideBar"]').forEach((el) => {
       if (data.companyLogoSideBar) {
         el.setAttribute("src", data.companyLogoSideBar);
