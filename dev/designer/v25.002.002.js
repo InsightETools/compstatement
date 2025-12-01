@@ -244,8 +244,8 @@ function applyCostPageVisibility() {
   }
 
   function renderHeaderDetails(data) {
-    const labels = json.headerLabels || [];
-    const details = json.headerDetails || [];
+    const labels = data.headerLabels || [];
+    const details = data.headerDetails || [];
 
     if (labels.length !== details.length) {
       console.error("headerLabels and headerDetails length mismatch");
@@ -271,7 +271,7 @@ function applyCostPageVisibility() {
       const detailEl = clone.querySelector('[data="headerDetail"]');
 
       if (labelEl) labelEl.textContent = label;
-      if (detailEl) detailEl.textContent = json[detailKey] ?? "—";
+      if (detailEl) detailEl.textContent = data[detailKey] ?? "—";
 
       parent.appendChild(clone);
     });
