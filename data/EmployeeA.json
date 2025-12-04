@@ -199,6 +199,21 @@
           "type": "currency",
           "value": "50000",
           "description": "Description goes here"
+        }
+      ]
+    },{
+      "id": "module11",
+      "year": "2024",
+      "label": "Time Off Snapshot",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": [
+        {
+          "label": "",
+          "type": "currency",
+          "value": "50000",
+          "description": "Description goes here"
         },
         {
           "label": "",
@@ -213,8 +228,7 @@
           "description": "Description goes here"
         }
       ]
-    },
-    {
+    },{
       "id": "module13",
       "year": "2024",
       "label": "Time Off Snapshot",
