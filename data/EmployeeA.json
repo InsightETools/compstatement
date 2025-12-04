@@ -79,12 +79,13 @@
   "lookbackYear": "2024",
   "lookbackMessage": "",
   "lookaheadYear": "2025",
-  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off—offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
+  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off�offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
   "statementEffectiveDate": "January 2025",
   "statementDisclaimer": "DISCLAIMER 1: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details. Policy forms for your reference will be made available upon request. In the case of any discrepancy between this statement of benefits and the paper enrollment form completed by the employee, the paper enrollment form will prevail.",
   "statementDisclaimerContactPage": "DISCLAIMER CONTACT: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details.",
   "primaryColor": "#f5c527",
   "secondaryColor": "#00406c",
+  "tertiaryColor": "#15e269",
   "tableColor": "#00406c",
   "chartSize": "small",
   "coverContent": [
@@ -107,10 +108,10 @@
     "pricingLock": false,
     "sliderMin": "0",
     "sliderMax": "500",
-    "payrollSystem":"ADP",
-    "payrollDataMethod":"API",
+    "payrollSystem": "ADP",
+    "payrollDataMethod": "API",
     "supplementalCostMethod": "Test Value",
-    "targetDate":"January 13, 2025"
+    "targetDate": "January 13, 2025"
   },
   "listModules": [
     {
@@ -119,7 +120,7 @@
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "height": 50,
       "align": "center",
-          "values": [
+      "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
         "Fit & Fun Dollas",
@@ -128,7 +129,7 @@
       ]
     }
   ],
-   "charts": [
+  "charts": [
     {
       "id": "chart1",
       "relatedGroupId": null,
@@ -185,7 +186,7 @@
     }
   ],
   "modules": [
-   {
+    {
       "id": "module11",
       "year": "2024",
       "label": "Time Off Snapshot",
@@ -212,7 +213,8 @@
           "description": "Description goes here"
         }
       ]
-    },{
+    },
+    {
       "id": "module13",
       "year": "2024",
       "label": "Time Off Snapshot",
@@ -726,7 +728,7 @@
     },
     {
       "name": "Discretionary Retirement Award",
-      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee’s salary into a defined contribution plan. This contribution is considered annually."
+      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee�s salary into a defined contribution plan. This contribution is considered annually."
     },
     {
       "name": "Employee Assistance Program",
@@ -734,7 +736,7 @@
     },
     {
       "name": "Flexible Spending Accounts",
-      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. • You are not currently enrolled in the medical flexible spending account. • You are not currently enrolled in the dependent care flexible spending account."
+      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. � You are not currently enrolled in the medical flexible spending account. � You are not currently enrolled in the dependent care flexible spending account."
     },
     {
       "name": "Holiday Bonus",
@@ -866,7 +868,7 @@
       "contact2": "",
       "url": "http://www.visionprowa.com",
       "url2": ""
-    
+
     }
   ]
 }
