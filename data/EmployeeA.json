@@ -163,7 +163,7 @@
     {
       "id": "chart2",
       "relatedGroupId": null,
-      "type": "bar",
+      "type": "donut",
       "isDecimal": false,
       "label": "Total Benefits Costs",
       "description": "",
