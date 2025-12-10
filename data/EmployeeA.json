@@ -45,7 +45,7 @@
       "flex": 0.5,
       "direction": "horizontal",
       "horizontal": "0",
-      "vertical": "-30"
+      "vertical": "100"
     },
     "coverImageWrapper":{
       "flex": 1,
