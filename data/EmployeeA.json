@@ -36,7 +36,7 @@
   ],
   "cover": {
     "coverMailWrapper": {
-      "flex": 1,
+      "flex": 1.5,
       "direction": "vertical",
       "horizontal": "0",
       "vertical": "0"
