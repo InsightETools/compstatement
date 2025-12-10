@@ -34,6 +34,24 @@
     "statementRange",
     "employeeTitle"
   ],
+  "cover": {
+    "coverMailWrapper": {
+      "flex": "center",
+      "position": null
+    },
+    "coverLogoWrapper": {
+      "flex": "center",
+      "position": ""
+    },
+    "coverImageWrapper":{
+      "flex": "center",
+      "position": "0%"
+    },
+    "coverLetterWrapper": {
+      "flex": "center",
+      "position": "50%"
+    }
+  },
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
