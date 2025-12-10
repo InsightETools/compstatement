@@ -36,25 +36,21 @@
   ],
   "cover": {
     "coverMailWrapper": {
-      "position": "left",
       "direction": "vertical",
       "horizontal": "0",
       "vertical": "0"
     },
     "coverLogoWrapper": {
-      "position": "center",
       "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0"
     },
     "coverImageWrapper":{
-      "position": "center",
       "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0"
     },
     "coverLetterWrapper": {
-      "position": "center",
       "direction": "vertical",
       "horizontal": "0",
       "vertical": "0"
