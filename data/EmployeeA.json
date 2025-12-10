@@ -36,7 +36,7 @@
   ],
   "cover": {
     "coverMailWrapper": {
-      "flex": "center",
+      "flex": "top",
       "position": null
     },
     "coverLogoWrapper": {
@@ -44,7 +44,7 @@
       "position": ""
     },
     "coverImageWrapper":{
-      "flex": "center",
+      "flex": "bottom",
       "position": "0%"
     },
     "coverLetterWrapper": {
