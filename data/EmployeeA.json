@@ -41,17 +41,17 @@
       "vertical": "0"
     },
     "coverLogoWrapper": {
-      "flex": 0,
+      "flex": 1,
       "horizontal": "0",
       "vertical": "0"
     },
     "coverImageWrapper":{
-      "flex": 0,
+      "flex": 1,
       "horizontal": "0",
       "vertical": "0"
     },
     "coverLetterWrapper": {
-      "flex": 0,
+      "flex": 1,
       "horizontal": "0",
       "vertical": "0"
     }
