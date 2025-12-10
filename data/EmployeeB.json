@@ -37,25 +37,21 @@
   "cover": {
     "coverMailWrapper": {
       "flex": 1,
-      "direction": "vertical",
       "horizontal": "0",
       "vertical": "0"
     },
     "coverLogoWrapper": {
-      "flex": 0.5,
-      "direction": "horizontal",
+      "flex": 1,
       "horizontal": "0",
       "vertical": "0"
     },
     "coverImageWrapper":{
       "flex": 1,
-      "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0"
     },
     "coverLetterWrapper": {
       "flex": 1,
-      "direction": "vertical",
       "horizontal": "0",
       "vertical": "0"
     }
