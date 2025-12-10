@@ -42,7 +42,7 @@
       "vertical": "0"
     },
     "coverLogoWrapper": {
-      "flex": 0.5,
+      "flex": 1,
       "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0"
