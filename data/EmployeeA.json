@@ -43,7 +43,7 @@
     },
     "coverLogoWrapper": {
       "position": "center",
-      "direction": "vertical",
+      "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0"
     },
