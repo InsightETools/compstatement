@@ -44,7 +44,7 @@
     "coverLogoWrapper": {
       "flex": 0.5,
       "direction": "horizontal",
-      "horizontal": "0",
+      "horizontal": "-50",
       "vertical": "0"
     },
     "coverImageWrapper":{
