@@ -39,25 +39,25 @@
       "position": "top",
       "direction": "horizontal",
       "horizontal": "0",
-      "vertical": "0",
+      "vertical": "0"
     },
     "coverLogoWrapper": {
       "position": "center",
       "direction": "vertical",
       "horizontal": "0",
-      "vertical": "0",
+      "vertical": "0"
     },
     "coverImageWrapper":{
       "position": "bottom",
       "direction": "horizontal",
       "horizontal": "0",
-      "vertical": "0",
+      "vertical": "0"
     },
     "coverLetterWrapper": {
       "position": "top",
       "direction": "horizontal",
       "horizontal": "0",
-      "vertical": "0",
+      "vertical": "0"
     }
   },
   "companyName": "Demo Company",
