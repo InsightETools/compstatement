@@ -22,11 +22,49 @@
   "welcomeFontSize": 12,
   "headerYearSize": 35,
   "headerNameSize": 25,
+  "headerLabels": [
+    "Name",
+    "Hire Date",
+    "Statement Periods",
+    "Position"
+  ],
+  "headerDetails": [
+    "employeeName",
+    "employeeHireDate",
+    "statementRange",
+    "employeeTitle"
+  ],
+  "cover": {
+    "coverMailWrapper": {
+      "flex": 1,
+      "direction": "vertical",
+      "horizontal": "0",
+      "vertical": "0"
+    },
+    "coverLogoWrapper": {
+      "flex": 0.5,
+      "direction": "horizontal",
+      "horizontal": "0",
+      "vertical": "0"
+    },
+    "coverImageWrapper":{
+      "flex": 1,
+      "direction": "horizontal",
+      "horizontal": "0",
+      "vertical": "0"
+    },
+    "coverLetterWrapper": {
+      "flex": 1,
+      "direction": "vertical",
+      "horizontal": "0",
+      "vertical": "0"
+    }
+  },
   "companyName": "Demo Company",
   "companyURL": "https://www.google.com",
   "coverSheet": true,
   "companyLogoCover": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792c6316e7ced39f8b5f1e_DemoCompany_Logo.png",
-  "companyLogoCoverJustification": "left",
+  "companyLogoCoverJustification": "center",
   "companyLogoCoverHeight": 50,
   "companyLogoMail": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/682678566f8a2bb00b01f5a8_Award2.png",
   "companyLogoMailHeight": 150,
@@ -41,15 +79,17 @@
   "companyRepTitle": "Chief Comp Officer",
   "companySignature": "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/68792cff6b7dfcbdb518c6b5_DemoSignature.png",
   "companySignatureText": "",
+  "letterDate": "January 2, 2026",
   "companyAttn": "",
   "companyAddress": "723 The Parkway",
   "companyUnit": "",
   "companyCity": "Richland",
   "companyState": "WA",
   "companyZip": "99352",
-  "employeeName": "Rick Smith",
-  "employeeFirstName": "Rick",
-  "employeeTitle": "Graphic Designer",
+  "employeeName": "John Doe",
+  "employeeHireDate": "01/04/2004",
+  "employeeFirstName": "John",
+  "employeeTitle": "UI Designer",
   "employeeSalary": "80000",
   "employeeWage": "35",
   "employeeAddress": "1110 N Center Parkway",
@@ -57,18 +97,21 @@
   "employeeCity": "Kennewick",
   "employeeState": "WA",
   "employeeZip": "99336",
+  "footerImage": "",
+  "footerImageHeight": "55",
   "statementTitle": "Total Compensation & Benefits Statement",
-  "statementRange": "January 2024 - December 2024",
+  "statementRange": "",
   "statementYear": "2025",
   "lookbackYear": "2024",
   "lookbackMessage": "",
   "lookaheadYear": "2025",
-  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off—offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
+  "lookaheadMessage": "Your projected 2025 total compensation includes salary, core and optional benefits, and the value of paid time off�offering a clear, full-picture view of your rewards. This snapshot helps you understand the broader investment Demo Company makes in supporting you in the year ahead.",
   "statementEffectiveDate": "January 2025",
   "statementDisclaimer": "DISCLAIMER 1: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details. Policy forms for your reference will be made available upon request. In the case of any discrepancy between this statement of benefits and the paper enrollment form completed by the employee, the paper enrollment form will prevail.",
   "statementDisclaimerContactPage": "DISCLAIMER CONTACT: This statement of benefits is provided for the convenience of the employee, and is an outline of the coverages proposed by the carrier(s), based upon election information provided by the employee to Demo Company. It does not include all of the terms, coverages, exclusions, limitations, and conditions of the actual contract language. The policies and contracts themselves must be read for those details.",
   "primaryColor": "#f5c527",
   "secondaryColor": "#00406c",
+  "tertiaryColor": "#00406c",
   "tableColor": "#00406c",
   "chartSize": "small",
   "coverContent": [
@@ -77,24 +120,24 @@
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png",
     "https://cdn.prod.website-files.com/6809171f634ed03b8d7997ab/683894e452eec6f3a7581513_logoPlaceholder.png"
   ],
- "costDetails": {
+  "costDetails": {
     "baseFee": "600.00",
     "statementFee": "2.10",
     "singleAddressMailFee": "1.20",
     "homeAddressMailFee": "3.85",
     "singleAddressCanadaMailFee": "4.10",
     "insertCost": "1.00",
-    "statementCount": "850",
+    "statementCount": "200",
     "isSingleMail": false,
     "isHomeMail": true,
-    "hasInserts": true,
-    "pricingLock": true,
+    "hasInserts": false,
+    "pricingLock": false,
     "sliderMin": "0",
-    "sliderMax": "1000",
-    "payrollSystem":"ADP",
-    "payrollDataMethod":"API",
+    "sliderMax": "500",
+    "payrollSystem": "ADP",
+    "payrollDataMethod": "API",
     "supplementalCostMethod": "Test Value",
-    "targetDate":"January 13, 2025"
+    "targetDate": "January 13, 2025"
   },
   "listModules": [
     {
@@ -103,7 +146,7 @@
       "details": "The following perks are provided in addition to the compensation and benefits above",
       "height": 50,
       "align": "center",
-          "values": [
+      "values": [
         "100% tuition reimbursement up to <span>$5,000</span>",
         "Short-term Disability coverage at no cost",
         "Fit & Fun Dollas",
@@ -112,11 +155,11 @@
       ]
     }
   ],
-   "charts": [
+  "charts": [
     {
       "id": "chart1",
       "relatedGroupId": null,
-      "type": "donut",
+      "type": "bar",
       "isDecimal": false,
       "label": "Total Compensation",
       "description": "",
@@ -169,7 +212,22 @@
     }
   ],
   "modules": [
-   {
+    {
+      "id": "module10",
+      "year": "2024",
+      "label": "Time Off Snapshot",
+      "description": "",
+      "isDecimal": false,
+      "disclaimer": "",
+      "components": [
+        {
+          "label": "",
+          "type": "currency",
+          "value": "50000",
+          "description": "Description goes here"
+        }
+      ]
+    },{
       "id": "module11",
       "year": "2024",
       "label": "Time Off Snapshot",
@@ -710,7 +768,7 @@
     },
     {
       "name": "Discretionary Retirement Award",
-      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee’s salary into a defined contribution plan. This contribution is considered annually."
+      "description": "The company values the commitment made by its employees. Historically, the Board of Directors has voted to contribute approximately 5.5% of each employee�s salary into a defined contribution plan. This contribution is considered annually."
     },
     {
       "name": "Employee Assistance Program",
@@ -718,7 +776,7 @@
     },
     {
       "name": "Flexible Spending Accounts",
-      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. • You are not currently enrolled in the medical flexible spending account. • You are not currently enrolled in the dependent care flexible spending account."
+      "description": "Health Care and Dependent Care Flexible Spending Accounts (FSAs) offer tax savings on predictable health and dependent care expenses. You can pay eligible expenses using pre-tax dollars. For 2024, the maximum health care allowance is $3,200; for dependent care, the maximum allowance is $5,000. You may rollover up to $640 of your unused 2024 Health Care FSA funds to your 2025 FSA account. You can review your benefits, monitor your claims, check on eligibility information or contact a customer service representative at www.voya.com/connect-benefits-savings then choose Login under Health Account Solutions. � You are not currently enrolled in the medical flexible spending account. � You are not currently enrolled in the dependent care flexible spending account."
     },
     {
       "name": "Holiday Bonus",
@@ -850,7 +908,7 @@
       "contact2": "",
       "url": "http://www.visionprowa.com",
       "url2": ""
-    
+
     }
   ]
 }
