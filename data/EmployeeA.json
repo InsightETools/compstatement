@@ -42,13 +42,13 @@
       "vertical": "0",
     },
     "coverLogoWrapper": {
-      "position": "top",
+      "position": "center",
       "direction": "vertical",
       "horizontal": "0",
       "vertical": "0",
     },
     "coverImageWrapper":{
-      "position": "top",
+      "position": "bottom",
       "direction": "horizontal",
       "horizontal": "0",
       "vertical": "0",
