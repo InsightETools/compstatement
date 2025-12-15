@@ -350,7 +350,7 @@
       "column1Total": 0,
       "column2Total": 0,
       "column3Total": 56000,
-      "totalLineName": "Total",
+      "totalLineName": "Grand Total",
       "categories": [
         {
           "label": "Cash Compensation",
@@ -467,7 +467,7 @@
       "column1Total": 0,
       "column2Total": 0,
       "column3Total": 56000,
-      "totalLineName": "Total",
+      "totalLineName": "Grand Total",
       "categories": [
         {
           "label": "Cash Compensation",
