@@ -350,7 +350,7 @@
       "column1Total": 0,
       "column2Total": 0,
       "column3Total": 56000,
-      "totalLineName": "Grand Total",
+      "totalLineName": "Total",
       "categories": [
         {
           "label": "Cash Compensation",
@@ -373,7 +373,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Test Name"
+          "subTotalLineName": "Subtotal"
         },
         {
           "label": "Core Benefits",
@@ -408,7 +408,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Test Name"
+          "subTotalLineName": "Subtotal"
         },
         {
           "label": "Elective Benefits",
@@ -453,7 +453,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Test Name"
+          "subTotalLineName": "Subtotal"
         }
       ]
     },
@@ -467,7 +467,7 @@
       "column1Total": 0,
       "column2Total": 0,
       "column3Total": 56000,
-      "totalLineName": "Grand Total",
+      "totalLineName": "Total",
       "categories": [
         {
           "label": "Cash Compensation",
@@ -490,7 +490,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Name Test"
+          "subTotalLineName": "Subtotal"
         },
         {
           "label": "Core Benefits",
@@ -525,7 +525,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Name Test"
+          "subTotalLineName": "Subtotal"
         },
         {
           "label": "Elective Benefits",
@@ -542,7 +542,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Name Test"
+          "subTotalLineName": "Subtotal"
         },
         {
           "label": "Additional Benefits",
@@ -571,7 +571,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": "Name Test"
+          "subTotalLineName": "Subtotal"
         }
       ]
     }
