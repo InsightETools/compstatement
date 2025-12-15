@@ -373,7 +373,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": null
+          "subTotalLineName": "Test Name"
         },
         {
           "label": "Core Benefits",
@@ -408,7 +408,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": null
+          "subTotalLineName": "Test Name"
         },
         {
           "label": "Elective Benefits",
@@ -453,7 +453,7 @@
           "col1_subtotal": null,
           "col2_subtotal": 0,
           "col3_subtotal": null,
-          "subTotalLineName": null
+          "subTotalLineName": "Test Name"
         }
       ]
     },
