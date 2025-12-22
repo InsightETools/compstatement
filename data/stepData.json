@@ -24,7 +24,7 @@
             ]
         },
         {
-            "step": "1",
+            "step": "2",
             "step_name": "Step Title",
             "step_description": "Step Description",
             "step_status": "Not Started",
