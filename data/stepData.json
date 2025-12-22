@@ -1,0 +1,14 @@
+{
+        "step": "1",
+        "step_name": "Step Title",
+        "step_description": "Step Description",
+        "step_status": "Not Started",
+        "step_control": "",
+        "step_tasks": [
+            {
+                "task_name": "Task Name",
+                "task_control": "periodDetailsCard",
+                "task_status": "Not Started"
+            }
+        ]
+    }
